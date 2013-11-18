@@ -28,7 +28,7 @@
     </appender>
 
     <logger name="com.vaushell">
-        <level value="debug" />
+        <level value="trace" />
     </logger>
 
     <root>

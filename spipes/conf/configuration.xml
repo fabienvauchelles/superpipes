@@ -1,3 +1,20 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <configuration>
+    <nodes>
+        <node>
+            <id>generator</id>
+            <type>com.vaushell.spipes.nodes.stub.N_PostGenerator</type>
+            <param name="frequency" value="3000" />
+        </node>
+        <node>
+            <id>receptor</id>
+            <type>com.vaushell.spipes.nodes.stub.N_MessageLogger</type>
+        </node>
+    </nodes>
+    <routes>
+        <route>
+            <source>generator</source>
+            <destination>receptor</destination>
+        </route>
+    </routes>
 </configuration>
