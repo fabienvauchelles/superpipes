@@ -4,7 +4,7 @@
  */
 package com.vaushell.spipes.nodes.filters.done;
 
-import com.vaushell.spipes.model.A_Message;
+import com.vaushell.spipes.nodes.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

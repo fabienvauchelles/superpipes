@@ -4,8 +4,8 @@
  */
 package com.vaushell.spipes.nodes.stub;
 
-import com.vaushell.spipes.model.posts.PostsFactory;
-import com.vaushell.spipes.model.posts.Post;
+import com.vaushell.spipes.nodes.posts.PostsFactory;
+import com.vaushell.spipes.nodes.posts.Post;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.ValuesGenerator;
 import org.slf4j.Logger;

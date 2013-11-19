@@ -5,7 +5,6 @@
 package com.vaushell.spipes.nodes;
 
 import com.vaushell.spipes.Dispatcher;
-import com.vaushell.spipes.model.A_Message;
 import java.util.LinkedList;
 import java.util.Properties;
 import org.slf4j.Logger;

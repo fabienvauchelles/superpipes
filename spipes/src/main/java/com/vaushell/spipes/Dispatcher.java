@@ -4,7 +4,7 @@
  */
 package com.vaushell.spipes;
 
-import com.vaushell.spipes.model.A_Message;
+import com.vaushell.spipes.nodes.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.util.HashMap;
 import java.util.HashSet;

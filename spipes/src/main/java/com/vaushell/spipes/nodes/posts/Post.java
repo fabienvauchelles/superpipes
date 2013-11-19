@@ -2,9 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.vaushell.spipes.model.posts;
+package com.vaushell.spipes.nodes.posts;
 
-import com.vaushell.spipes.model.A_Message;
+import com.vaushell.spipes.nodes.A_Message;
 import java.util.Objects;
 import java.util.Set;
 
