@@ -25,7 +25,8 @@ public enum PostsFactory
                         String urlDescription ,
                         Set<String> tags )
     {
-        if ( message == null && url == null )
+        if ( ( message == null || message.length() <= 0 )
+             && ( url == null || url.length() <= 0 ) )
         {
             throw new NullPointerException( "Message and URL can not be null" );
         }
@@ -38,7 +39,7 @@ public enum PostsFactory
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] create : message=" + message + " / url=" + url + " / urlName=" + urlName + " / urlDescription=" + urlDescription + " tags.size()=" + tags.
+                    "[" + getClass().getSimpleName() + "] create : message=" + message + " / url=" + url + " / urlName=" + urlName + " / urlDescription=" + urlDescription + " / tags.size()=" + tags.
                     size() );
         }
 

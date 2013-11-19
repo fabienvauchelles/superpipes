@@ -5,13 +5,12 @@
 package com.vaushell.spipes.nodes.rss;
 
 import com.sun.syndication.feed.synd.SyndCategory;
+import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
-import com.vaushell.spipes.nodes.posts.Post;
-import com.vaushell.spipes.nodes.posts.PostsFactory;
 import com.vaushell.spipes.nodes.A_Node;
 import java.io.IOException;
 import java.net.URL;
@@ -56,9 +55,9 @@ public class N_RSS
         List<SyndEntry> entries = feed.getEntries();
         for ( SyndEntry entry : entries )
         {
-            Post post = convert( entry );
+            News news = convert( entry );
 
-            sendMessage( post );
+            sendMessage( news );
         }
     }
 
@@ -70,23 +69,12 @@ public class N_RSS
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_RSS.class );
 
-    private static Post convert( SyndEntry entry )
+    private static News convert( SyndEntry entry )
     {
         String uri = entry.getUri();
         if ( uri == null )
         {
             return null;
-        }
-
-        HashSet<String> tags = new HashSet<>();
-
-        List<SyndCategory> categories = entry.getCategories();
-        if ( categories != null )
-        {
-            for ( SyndCategory category : categories )
-            {
-                tags.add( category.getName() );
-            }
         }
 
         String description;
@@ -99,10 +87,43 @@ public class N_RSS
             description = null;
         }
 
-        return PostsFactory.INSTANCE.create( null ,
-                                             uri ,
-                                             entry.getTitle() ,
-                                             description ,
-                                             tags );
+        StringBuilder sb = new StringBuilder();
+        List<SyndContent> scontents = entry.getContents();
+        if ( scontents != null )
+        {
+            for ( SyndContent scontent : scontents )
+            {
+                sb.append( scontent.getValue() );
+            }
+        }
+
+        String content;
+        if ( sb.length() > 0 )
+        {
+            content = sb.toString();
+        }
+        else
+        {
+            content = null;
+        }
+
+        HashSet<String> tags = new HashSet<>();
+
+        List<SyndCategory> categories = entry.getCategories();
+        if ( categories != null )
+        {
+            for ( SyndCategory category : categories )
+            {
+                tags.add( category.getName().toLowerCase() );
+            }
+        }
+
+        return NewsFactory.INSTANCE.create( entry.getTitle() ,
+                                            description ,
+                                            uri ,
+                                            entry.getAuthor() ,
+                                            content ,
+                                            tags ,
+                                            entry.getPublishedDate() );
     }
 }
