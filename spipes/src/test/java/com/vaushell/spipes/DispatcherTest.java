@@ -3,7 +3,6 @@ package com.vaushell.spipes;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.stub.N_MessageLogger;
 import com.vaushell.spipes.nodes.stub.N_PostGenerator;
-import com.vaushell.spipes.tools.ValuesGenerator;
 import java.util.Properties;
 import javax.naming.ConfigurationException;
 import static org.testng.AssertJUnit.*;
@@ -48,13 +47,13 @@ public class DispatcherTest
         assertEquals( node.getClass() ,
                       N_PostGenerator.class );
 
-        dispatcher.addRoutes( "generator" ,
-                              "receptor" );
+        dispatcher.addRoute( "generator" ,
+                             "receptor" );
 
         assertTrue( dispatcher.routes.get( "generator" ).contains( "receptor" ) );
 
-        dispatcher.addRoutes( "generator" ,
-                              "receptor" );
+        dispatcher.addRoute( "generator" ,
+                             "receptor" );
 
         assertEquals( dispatcher.routes.get( "generator" ).size() ,
                       1 );
@@ -84,7 +83,7 @@ public class DispatcherTest
     {
         Dispatcher dispatcher = new Dispatcher();
 
-        dispatcher.addRoutes( "generator" ,
-                              "receptor" );
+        dispatcher.addRoute( "generator" ,
+                             "receptor" );
     }
 }

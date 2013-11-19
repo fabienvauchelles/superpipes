@@ -4,6 +4,7 @@
  */
 package com.vaushell.spipes.model.posts;
 
+import com.vaushell.spipes.model.A_Message;
 import java.util.Objects;
 import java.util.Set;
 
@@ -12,6 +13,7 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class Post
+        extends A_Message
 {
     // PUBLIC
     public Post( String ID ,
@@ -21,22 +23,13 @@ public class Post
                  String urlDescription ,
                  Set<String> tags )
     {
-        this.ID = ID;
+        super( ID );
+
         this.message = message;
         this.url = url;
         this.urlName = urlName;
         this.urlDescription = urlDescription;
         this.tags = tags;
-    }
-
-    public String getID()
-    {
-        return ID;
-    }
-
-    public void setID( String ID )
-    {
-        this.ID = ID;
     }
 
     public String getMessage()
@@ -93,68 +86,65 @@ public class Post
     @Override
     public int hashCode()
     {
-        int hash = 7;
-        hash = 53 * hash + Objects.hashCode( this.ID );
-        hash = 53 * hash + Objects.hashCode( this.message );
-        hash = 53 * hash + Objects.hashCode( this.url );
-        hash = 53 * hash + Objects.hashCode( this.urlName );
-        hash = 53 * hash + Objects.hashCode( this.urlDescription );
-        hash = 53 * hash + Objects.hashCode( this.tags );
+        int hash = super.hashCode();
+
+        hash = 41 * hash + Objects.hashCode( this.message );
+        hash = 41 * hash + Objects.hashCode( this.url );
+        hash = 41 * hash + Objects.hashCode( this.urlName );
+        hash = 41 * hash + Objects.hashCode( this.urlDescription );
+        hash = 41 * hash + Objects.hashCode( this.tags );
+
         return hash;
     }
 
     @Override
     public boolean equals( Object obj )
     {
-        if ( obj == null )
+        if ( !super.equals( obj ) )
         {
             return false;
         }
-        if ( getClass() != obj.getClass() )
-        {
-            return false;
-        }
+
         final Post other = (Post) obj;
-        if ( !Objects.equals( this.ID ,
-                              other.ID ) )
-        {
-            return false;
-        }
         if ( !Objects.equals( this.message ,
                               other.message ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.url ,
                               other.url ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.urlName ,
                               other.urlName ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.urlDescription ,
                               other.urlDescription ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.tags ,
                               other.tags ) )
         {
             return false;
         }
+
         return true;
     }
 
     @Override
     public String toString()
     {
-        return "Post{" + "ID=" + ID + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlDescription=" + urlDescription + ", tags=" + tags + '}';
+        return "Post{" + super.toString() + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlDescription=" + urlDescription + ", tags=" + tags + '}';
     }
     // PRIVATE
-    private String ID;
     private String message;
     private String url;
     private String urlName;

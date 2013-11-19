@@ -5,10 +5,8 @@
 package com.vaushell.spipes.nodes;
 
 import com.vaushell.spipes.Dispatcher;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.vaushell.spipes.model.A_Message;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +22,7 @@ public abstract class A_Node
     public A_Node()
     {
         this.nodeID = null;
-        this.properties = properties;
+        this.properties = null;
         this.dispatcher = null;
         this.activated = true;
         this.internalStack = new LinkedList<>();
@@ -40,31 +38,86 @@ public abstract class A_Node
     }
 
     @Override
-    public abstract void run();
-
-    public void receiveMessages( Collection messages )
+    public void run()
     {
-        if ( messages == null )
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "[" + getNodeID() + "] start thread" );
+        }
+
+        try
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "[" + getNodeID() + "] prepare" );
+            }
+            prepare();
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "[" + getNodeID() + "] loopin'" );
+            }
+            while ( isActive() )
+            {
+                try
+                {
+                    loop();
+                }
+                catch( InterruptedException ignore )
+                {
+                }
+                catch( Throwable th )
+                {
+                    logger.error( "Error" ,
+                                  th );
+                }
+
+                String delayStr = getConfig( "delay" );
+                if ( delayStr != null )
+                {
+                    try
+                    {
+                        Thread.sleep( Long.parseLong( delayStr ) );
+                    }
+                    catch( InterruptedException ignore )
+                    {
+                    }
+                }
+            }
+
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "[" + getNodeID() + "] terminate" );
+            }
+            terminate();
+        }
+        catch( Throwable th )
+        {
+            logger.error( "Error" ,
+                          th );
+        }
+
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "[" + getNodeID() + "] stop thread" );
+        }
+    }
+
+    public void receiveMessage( A_Message message )
+    {
+        if ( message == null )
         {
             throw new NullPointerException();
         }
 
         if ( logger.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receiveMessages : messages.size=" + messages.size() );
-        }
-
-        if ( messages.isEmpty() )
-        {
-            return;
+            logger.trace( "[" + getNodeID() + "] receiveMessage : message=" + message );
         }
 
         synchronized( internalStack )
         {
-            for ( Object message : messages )
-            {
-                internalStack.addFirst( message );
-            }
+            internalStack.addFirst( message );
 
             internalStack.notify();
         }
@@ -78,48 +131,44 @@ public abstract class A_Node
     }
 
     // PROTECTED
+    protected abstract void prepare()
+            throws Exception;
+
+    protected abstract void loop()
+            throws Exception;
+
+    protected abstract void terminate()
+            throws Exception;
+
     protected String getNodeID()
     {
         return nodeID;
     }
 
-    protected String getValue( String key )
+    protected String getConfig( String key )
     {
         return properties.getProperty( key );
     }
 
-    protected void sendMessages( Collection messages )
+    protected String getMainConfig( String key )
     {
-        if ( messages == null )
-        {
-            throw new NullPointerException();
-        }
-
-        if ( logger.isTraceEnabled() )
-        {
-            logger.trace( "[" + getNodeID() + "] sendMessages : messages.size=" + messages.size() );
-        }
-
-        if ( messages.isEmpty() )
-        {
-            return;
-        }
-
-        dispatcher.sendMessages( nodeID ,
-                                 messages );
+        return dispatcher.getConfig( key );
     }
 
-    protected void sendMessage( Object message )
+    protected void sendMessage( A_Message message )
     {
         if ( message == null )
         {
             throw new NullPointerException();
         }
 
-        List messages = new ArrayList();
-        messages.add( message );
+        if ( logger.isTraceEnabled() )
+        {
+            logger.trace( "[" + getNodeID() + "] sendMessage : message=" + message );
+        }
 
-        sendMessages( messages );
+        dispatcher.sendMessage( nodeID ,
+                                message );
     }
 
     protected synchronized boolean isActive()
@@ -127,7 +176,7 @@ public abstract class A_Node
         return activated;
     }
 
-    protected Object getLastMessageOrWait()
+    protected A_Message getLastMessageOrWait()
             throws InterruptedException
     {
         if ( logger.isTraceEnabled() )
@@ -150,6 +199,6 @@ public abstract class A_Node
     private String nodeID;
     private Properties properties;
     private Dispatcher dispatcher;
-    private final LinkedList internalStack;
+    private final LinkedList<A_Message> internalStack;
     private volatile boolean activated;
 }

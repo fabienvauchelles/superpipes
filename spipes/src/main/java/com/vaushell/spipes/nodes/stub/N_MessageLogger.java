@@ -4,6 +4,7 @@
  */
 package com.vaushell.spipes.nodes.stub;
 
+import com.vaushell.spipes.model.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,37 +21,29 @@ public class N_MessageLogger
     {
     }
 
+    // PROTECTED
     @Override
-    public void run()
+    protected void prepare()
+            throws Exception
     {
-        if ( logger.isTraceEnabled() )
-        {
-            logger.trace( "[" + getNodeID() + "] start thread " );
-        }
+    }
 
-        Object message = null;
-        while ( isActive() )
-        {
-            try
-            {
-                message = getLastMessageOrWait();
+    @Override
+    protected void loop()
+            throws InterruptedException
+    {
+        A_Message message = getLastMessageOrWait();
 
-                logger.info( "[" + getNodeID() + "] receive message : " + message );
-            }
-            catch( InterruptedException ignore )
-            {
-            }
-            catch( Throwable th )
-            {
-                logger.error( "Receive error when processing message : " + message ,
-                              th );
-            }
-        }
-
-        if ( logger.isTraceEnabled() )
+        if ( logger.isInfoEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] stop thread" );
+            logger.info( "[" + getNodeID() + "] receive message : " + message );
         }
+    }
+
+    @Override
+    protected void terminate()
+            throws Exception
+    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_MessageLogger.class );

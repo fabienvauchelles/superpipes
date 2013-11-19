@@ -5,6 +5,7 @@
 package com.vaushell.spipes.model.posts;
 
 import java.util.Set;
+import java.util.TreeSet;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +65,13 @@ public enum PostsFactory
             sb.append( urlDescription );
         }
 
+        TreeSet<String> correctedTags = new TreeSet<>();
         for ( String tag : tags )
         {
-            sb.append( tag );
+            String correctedTag = tag.toLowerCase();
+
+            correctedTags.add( correctedTag );
+            sb.append( correctedTag );
         }
 
         String ID = DigestUtils.md5Hex( sb.toString() );
@@ -76,7 +81,7 @@ public enum PostsFactory
                          url ,
                          urlName ,
                          urlDescription ,
-                         tags );
+                         correctedTags );
     }
     private final static Logger logger = LoggerFactory.getLogger( PostsFactory.class );
 }

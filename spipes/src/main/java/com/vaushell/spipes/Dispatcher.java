@@ -4,8 +4,8 @@
  */
 package com.vaushell.spipes;
 
+import com.vaushell.spipes.model.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +13,6 @@ import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +25,14 @@ public class Dispatcher
     // PUBLIC
     public Dispatcher()
     {
+        this.properties = null;
         this.nodes = new HashMap<>();
         this.routes = new HashMap<>();
+    }
+
+    public String getConfig( String key )
+    {
+        return properties.getProperty( key );
     }
 
     public void addNode( String nodeID ,
@@ -78,10 +83,10 @@ public class Dispatcher
                  properties );
     }
 
-    public void addRoutes( String sourceID ,
-                           String... destinationsID )
+    public void addRoute( String sourceID ,
+                          String destinationID )
     {
-        if ( sourceID == null || destinationsID == null )
+        if ( sourceID == null || destinationID == null )
         {
             throw new NullPointerException();
         }
@@ -89,14 +94,7 @@ public class Dispatcher
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] addRoutes : sourceID=" + sourceID + " / destinationsID=" + StringUtils.
-                    join( destinationsID ,
-                          "," ) );
-        }
-
-        if ( destinationsID.length <= 0 )
-        {
-            return;
+                    "[" + getClass().getSimpleName() + "] addRoute : sourceID=" + sourceID + " / destinationID=" + destinationID );
         }
 
         if ( !nodes.containsKey( sourceID ) )
@@ -104,12 +102,9 @@ public class Dispatcher
             throw new IllegalArgumentException( "Cannot find route source '" + sourceID + "'" );
         }
 
-        for ( String destinationID : destinationsID )
+        if ( !nodes.containsKey( destinationID ) )
         {
-            if ( !nodes.containsKey( destinationID ) )
-            {
-                throw new IllegalArgumentException( "Cannot find route destination '" + destinationID + "'" );
-            }
+            throw new IllegalArgumentException( "Cannot find route destination '" + destinationID + "'" );
         }
 
         Set<String> subRoutes = routes.get( sourceID );
@@ -120,17 +115,14 @@ public class Dispatcher
                         subRoutes );
         }
 
-        for ( String destinationID : destinationsID )
-        {
-            subRoutes.add( destinationID );
-        }
+        subRoutes.add( destinationID );
     }
 
     public void start()
     {
-        if ( logger.isTraceEnabled() )
+        if ( logger.isDebugEnabled() )
         {
-            logger.trace(
+            logger.debug(
                     "[" + getClass().getSimpleName() + "] start" );
         }
 
@@ -142,9 +134,9 @@ public class Dispatcher
 
     public void stopAndWait()
     {
-        if ( logger.isTraceEnabled() )
+        if ( logger.isDebugEnabled() )
         {
-            logger.trace(
+            logger.debug(
                     "[" + getClass().getSimpleName() + "] stopAndWait" );
         }
 
@@ -165,23 +157,18 @@ public class Dispatcher
         }
     }
 
-    public void sendMessages( String sourceID ,
-                              Collection messages )
+    public void sendMessage( String sourceID ,
+                             A_Message message )
     {
 
-        if ( sourceID == null || messages == null )
+        if ( sourceID == null || message == null )
         {
             throw new NullPointerException();
         }
 
         if ( logger.isTraceEnabled() )
         {
-            logger.trace( "[" + getClass().getSimpleName() + "] sendMessages : sourceID=" + sourceID + " / messages=" + messages );
-        }
-
-        if ( messages.isEmpty() )
-        {
-            return;
+            logger.trace( "[" + getClass().getSimpleName() + "] sendMessage : sourceID=" + sourceID + " / message=" + message );
         }
 
         Set<String> subRoutes = routes.get( sourceID );
@@ -194,7 +181,7 @@ public class Dispatcher
         {
             A_Node destination = nodes.get( destinationID );
 
-            destination.receiveMessages( messages );
+            destination.receiveMessage( message );
         }
 
     }
@@ -206,10 +193,13 @@ public class Dispatcher
             throw new NullPointerException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( logger.isDebugEnabled() )
         {
-            logger.trace( "[" + getClass().getSimpleName() + "] load" );
+            logger.debug( "[" + getClass().getSimpleName() + "] load" );
         }
+
+        // Load general configuration
+        properties = readProperties( config.configurationAt( "general" ) );
 
         // Load nodes
         List<HierarchicalConfiguration> cNodes = config.configurationsAt( "nodes.node" );
@@ -220,28 +210,11 @@ public class Dispatcher
             {
                 String nodeID = cNode.getString( "id" );
                 String type = cNode.getString( "type" );
-
-                Properties properties = new Properties();
-
-                List<HierarchicalConfiguration> hConfs = cNode.configurationsAt( "param" );
-                if ( hConfs != null )
-                {
-                    for ( HierarchicalConfiguration hConf : hConfs )
-                    {
-                        String name = hConf.getString( "[@name]" );
-                        String value = hConf.getString( "[@value]" );
-
-                        if ( name != null && name.length() > 0 && value != null && value.length() > 0 )
-                        {
-                            properties.put( name ,
-                                            value );
-                        }
-                    }
-                }
+                Properties nodeProperties = readProperties( cNode );
 
                 addNode( nodeID ,
                          type ,
-                         properties );
+                         nodeProperties );
             }
         }
 
@@ -257,8 +230,11 @@ public class Dispatcher
 
                 for ( String sourceID : sourcesID )
                 {
-                    addRoutes( sourceID ,
-                               destinationsID );
+                    for ( String destinationID : destinationsID )
+                    {
+                        addRoute( sourceID ,
+                                  destinationID );
+                    }
                 }
             }
         }
@@ -268,4 +244,28 @@ public class Dispatcher
     HashMap<String , Set<String>> routes;
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( Dispatcher.class );
+    private Properties properties;
+
+    private Properties readProperties( HierarchicalConfiguration node )
+    {
+        Properties nodeProperties = new Properties();
+
+        List<HierarchicalConfiguration> hConfs = node.configurationsAt( "param" );
+        if ( hConfs != null )
+        {
+            for ( HierarchicalConfiguration hConf : hConfs )
+            {
+                String name = hConf.getString( "[@name]" );
+                String value = hConf.getString( "[@value]" );
+
+                if ( name != null && name.length() > 0 && value != null && value.length() > 0 )
+                {
+                    nodeProperties.put( name ,
+                                        value );
+                }
+            }
+        }
+
+        return nodeProperties;
+    }
 }

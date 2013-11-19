@@ -1,10 +1,18 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <configuration>
+    <general>
+        <param name="datas-directory" value="data" />
+    </general>
     <nodes>
         <node>
-            <id>generator</id>
-            <type>com.vaushell.spipes.nodes.stub.N_PostGenerator</type>
-            <param name="frequency" value="3000" />
+            <id>rss-vauchelles</id>
+            <type>com.vaushell.spipes.nodes.rss.N_RSS</type>
+            <param name="url" value="http://feeds.feedburner.com/fabienvauchelles" />
+            <param name="delay" value="2000" />
+        </node>
+        <node>
+            <id>filter-done</id>
+            <type>com.vaushell.spipes.nodes.filters.done.NF_Done</type>
         </node>
         <node>
             <id>receptor</id>
@@ -13,7 +21,11 @@
     </nodes>
     <routes>
         <route>
-            <source>generator</source>
+            <source>rss-vauchelles</source>
+            <destination>filter-done</destination>
+        </route>
+        <route>
+            <source>filter-done</source>
             <destination>receptor</destination>
         </route>
     </routes>

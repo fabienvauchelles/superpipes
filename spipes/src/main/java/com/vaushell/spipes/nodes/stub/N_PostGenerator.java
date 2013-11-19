@@ -23,50 +23,39 @@ public class N_PostGenerator
     {
     }
 
+    // PROTECTED
     @Override
-    public void run()
+    protected void prepare()
+            throws Exception
+    {
+    }
+
+    @Override
+    protected void loop()
     {
         if ( logger.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] start thread " );
+            logger.trace( "[" + getNodeID() + "] generate post" );
         }
 
-        while ( isActive() )
-        {
-            try
-            {
-                Post post = PostsFactory.INSTANCE.create( ValuesGenerator.getRandomText( 20 ,
-                                                                                         30 ) ,
-                                                          ValuesGenerator.getRandomWord( 10 ,
-                                                                                         20 ) ,
-                                                          ValuesGenerator.getRandomText( 5 ,
-                                                                                         8 ) ,
-                                                          ValuesGenerator.getRandomText( 15 ,
-                                                                                         20 ) ,
-                                                          ValuesGenerator.getRandomWordSet( 3 ,
-                                                                                            8 ) );
+        Post post = PostsFactory.INSTANCE.create( ValuesGenerator.getRandomText( 20 ,
+                                                                                 30 ) ,
+                                                  ValuesGenerator.getRandomWord( 10 ,
+                                                                                 20 ) ,
+                                                  ValuesGenerator.getRandomText( 5 ,
+                                                                                 8 ) ,
+                                                  ValuesGenerator.getRandomText( 15 ,
+                                                                                 20 ) ,
+                                                  ValuesGenerator.getRandomWordSet( 3 ,
+                                                                                    8 ) );
 
-                sendMessage( post );
+        sendMessage( post );
+    }
 
-                try
-                {
-                    Thread.sleep( Long.parseLong( getValue( "frequency" ) ) );
-                }
-                catch( InterruptedException ignore )
-                {
-                }
-            }
-            catch( Throwable th )
-            {
-                logger.error( "Error" ,
-                              th );
-            }
-        }
-
-        if ( logger.isTraceEnabled() )
-        {
-            logger.trace( "[" + getNodeID() + "] stop thread" );
-        }
+    @Override
+    protected void terminate()
+            throws Exception
+    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_PostGenerator.class );
