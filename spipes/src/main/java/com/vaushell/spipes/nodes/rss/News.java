@@ -4,7 +4,8 @@
  */
 package com.vaushell.spipes.nodes.rss;
 
-import com.vaushell.spipes.nodes.A_Message;
+import com.vaushell.spipes.nodes.filters.date.I_Date;
+import com.vaushell.spipes.nodes.filters.done.I_Identifier;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class News
-        extends A_Message
+        implements I_Identifier , I_Date
 {
     // PUBLIC
     public News( String ID ,
@@ -26,8 +27,7 @@ public class News
                  Set<String> tags ,
                  Date date )
     {
-        super( ID );
-
+        this.ID = ID;
         this.title = title;
         this.description = description;
         this.uri = uri;
@@ -35,6 +35,18 @@ public class News
         this.content = content;
         this.tags = tags;
         this.date = date;
+    }
+
+    @Override
+    public String getID()
+    {
+        return ID;
+    }
+
+    @Override
+    public void setID( String ID )
+    {
+        this.ID = ID;
     }
 
     public String getTitle()
@@ -98,11 +110,13 @@ public class News
         this.tags = tags;
     }
 
+    @Override
     public Date getDate()
     {
         return date;
     }
 
+    @Override
     public void setDate( Date date )
     {
         this.date = date;
@@ -111,80 +125,80 @@ public class News
     @Override
     public int hashCode()
     {
-        int hash = super.hashCode();
-
-        hash = 41 * hash + Objects.hashCode( this.title );
-        hash = 41 * hash + Objects.hashCode( this.description );
-        hash = 41 * hash + Objects.hashCode( this.uri );
-        hash = 41 * hash + Objects.hashCode( this.author );
-        hash = 41 * hash + Objects.hashCode( this.content );
-        hash = 41 * hash + Objects.hashCode( this.tags );
-        hash = 41 * hash + Objects.hashCode( this.date );
-
+        int hash = 7;
+        hash = 29 * hash + Objects.hashCode( this.ID );
+        hash = 29 * hash + Objects.hashCode( this.title );
+        hash = 29 * hash + Objects.hashCode( this.description );
+        hash = 29 * hash + Objects.hashCode( this.uri );
+        hash = 29 * hash + Objects.hashCode( this.author );
+        hash = 29 * hash + Objects.hashCode( this.content );
+        hash = 29 * hash + Objects.hashCode( this.tags );
+        hash = 29 * hash + Objects.hashCode( this.date );
         return hash;
     }
 
     @Override
     public boolean equals( Object obj )
     {
-        if ( !super.equals( obj ) )
+        if ( obj == null )
         {
             return false;
         }
-
+        if ( getClass() != obj.getClass() )
+        {
+            return false;
+        }
         final News other = (News) obj;
-
+        if ( !Objects.equals( this.ID ,
+                              other.ID ) )
+        {
+            return false;
+        }
         if ( !Objects.equals( this.title ,
                               other.title ) )
         {
             return false;
         }
-
         if ( !Objects.equals( this.description ,
                               other.description ) )
         {
             return false;
         }
-
         if ( !Objects.equals( this.uri ,
                               other.uri ) )
         {
             return false;
         }
-
         if ( !Objects.equals( this.author ,
                               other.author ) )
         {
             return false;
         }
-
         if ( !Objects.equals( this.content ,
                               other.content ) )
         {
             return false;
         }
-
         if ( !Objects.equals( this.tags ,
                               other.tags ) )
         {
             return false;
         }
-
         if ( !Objects.equals( this.date ,
                               other.date ) )
         {
             return false;
         }
-
         return true;
     }
 
     @Override
     public String toString()
     {
-        return "News{" + super.toString() + ", title=" + title + ", description=" + description + ", uri=" + uri + ", author=" + author + ", content=" + content + ", tags=" + tags + ", date=" + date + '}';
+        return "News{" + "ID=" + ID + ", title=" + title + ", description=" + description + ", uri=" + uri + ", author=" + author + ", tags=" + tags + ", date=" + date + '}';
     }
     // PRIVATE
+    private String ID;
     private String title;
     private String description;
     private String uri;

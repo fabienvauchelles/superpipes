@@ -41,7 +41,7 @@ public enum NewsFactory
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] create : title=" + title + " / description=" + description + " / url=" + url + " / url=" + url + " / author=" + author + " / content=" + content + " / tags.size()=" + tags.
+                    "[" + getClass().getSimpleName() + "] create : title=" + title + " / description=" + description + " / url=" + url + " / url=" + url + " / author=" + author + " / tags.size()=" + tags.
                     size() );
         }
 

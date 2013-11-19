@@ -102,7 +102,7 @@ public abstract class A_Node
         }
     }
 
-    public void receiveMessage( A_Message message )
+    public void receiveMessage( Object message )
     {
         if ( message == null )
         {
@@ -154,7 +154,7 @@ public abstract class A_Node
         return dispatcher.getConfig( key );
     }
 
-    protected void sendMessage( A_Message message )
+    protected void sendMessage( Object message )
     {
         if ( message == null )
         {
@@ -175,7 +175,7 @@ public abstract class A_Node
         return activated;
     }
 
-    protected A_Message getLastMessageOrWait()
+    protected Object getLastMessageOrWait()
             throws InterruptedException
     {
         if ( logger.isTraceEnabled() )
@@ -198,6 +198,6 @@ public abstract class A_Node
     private String nodeID;
     private Properties properties;
     private Dispatcher dispatcher;
-    private final LinkedList<A_Message> internalStack;
+    private final LinkedList internalStack;
     private volatile boolean activated;
 }

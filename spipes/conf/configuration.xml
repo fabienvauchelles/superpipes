@@ -15,6 +15,11 @@
             <type>com.vaushell.spipes.nodes.filters.done.NF_Done</type>
         </node>
         <node>
+            <id>filter-date-min</id>
+            <type>com.vaushell.spipes.nodes.filters.date.NF_Date</type>
+            <param name="date-min" value="11/11/2013 10:00" />
+        </node>
+        <node>
             <id>receptor</id>
             <type>com.vaushell.spipes.nodes.stub.N_MessageLogger</type>
         </node>
@@ -22,6 +27,10 @@
     <routes>
         <route>
             <source>rss-vauchelles</source>
+            <destination>filter-date-min</destination>
+        </route>
+        <route>
+            <source>filter-date-min</source>
             <destination>filter-done</destination>
         </route>
         <route>

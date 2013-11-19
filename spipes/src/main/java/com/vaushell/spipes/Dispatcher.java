@@ -4,7 +4,6 @@
  */
 package com.vaushell.spipes;
 
-import com.vaushell.spipes.nodes.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -158,7 +157,7 @@ public class Dispatcher
     }
 
     public void sendMessage( String sourceID ,
-                             A_Message message )
+                             Object message )
     {
 
         if ( sourceID == null || message == null )

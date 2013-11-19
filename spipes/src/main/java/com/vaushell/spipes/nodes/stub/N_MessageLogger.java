@@ -4,7 +4,6 @@
  */
 package com.vaushell.spipes.nodes.stub;
 
-import com.vaushell.spipes.nodes.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class N_MessageLogger
     protected void loop()
             throws InterruptedException
     {
-        A_Message message = getLastMessageOrWait();
+        Object message = getLastMessageOrWait();
 
         if ( logger.isInfoEnabled() )
         {

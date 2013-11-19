@@ -4,7 +4,6 @@
  */
 package com.vaushell.spipes.nodes.filters.done;
 
-import com.vaushell.spipes.nodes.A_Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -68,7 +67,7 @@ public class NF_Done
     protected void loop()
             throws IOException , InterruptedException
     {
-        A_Message message = getLastMessageOrWait();
+        I_Identifier message = (I_Identifier) getLastMessageOrWait();
 
         if ( logger.isTraceEnabled() )
         {
