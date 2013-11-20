@@ -171,16 +171,14 @@ public class Dispatcher
         }
 
         Set<String> subRoutes = routes.get( sourceID );
-        if ( subRoutes == null )
+        if ( subRoutes != null )
         {
-            throw new IllegalArgumentException( "Cannot find route source '" + sourceID + "'" );
-        }
+            for ( String destinationID : subRoutes )
+            {
+                A_Node destination = nodes.get( destinationID );
 
-        for ( String destinationID : subRoutes )
-        {
-            A_Node destination = nodes.get( destinationID );
-
-            destination.receiveMessage( message );
+                destination.receiveMessage( message );
+            }
         }
 
     }
