@@ -12,7 +12,6 @@ import facebook4j.FacebookFactory;
 import facebook4j.PostUpdate;
 import facebook4j.conf.ConfigurationBuilder;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.TreeSet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -90,19 +89,19 @@ public class N_FB_Post
         }
 
         PostUpdate pu;
-        if ( post.getUrl() != null && post.getUrl().length() > 0 )
+        if ( post.getURI() != null )
         {
             // We have an url
-            pu = new PostUpdate( new URL( post.getUrl() ) );
+            pu = new PostUpdate( post.getURI().toURL() );
 
-            if ( post.getUrlName() != null && post.getUrlName().length() > 0 )
+            if ( post.getURIname() != null && post.getURIname().length() > 0 )
             {
-                pu.name( post.getUrlName() );
+                pu.name( post.getURIname() );
             }
 
-            if ( post.getUrlDescription() != null && post.getUrlDescription().length() > 0 )
+            if ( post.getURIdescription() != null && post.getURIdescription().length() > 0 )
             {
-                pu.description( post.getUrlDescription() );
+                pu.description( post.getURIdescription() );
             }
 
             if ( post.getMessage() != null && post.getMessage().length() > 0 )
@@ -139,7 +138,7 @@ public class N_FB_Post
     private static FB_Post convertFromNews( News news )
     {
         if ( ( news.getTitle() == null || news.getTitle().length() <= 0 )
-             && ( news.getUri() == null || news.getUri().length() <= 0 ) )
+             && ( news.getURI() == null ) )
         {
             throw new NullPointerException( "Title and URL can not be null" );
         }
@@ -162,7 +161,7 @@ public class N_FB_Post
         }
 
         return new FB_Post( null ,
-                            news.getUri() ,
+                            news.getURI() ,
                             title ,
                             description ,
                             correctedTags );

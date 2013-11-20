@@ -107,7 +107,7 @@ public class N_TW_Post
     static Tweet convertFromNews( News news )
     {
         if ( news.getTitle() == null || news.getTitle().length() <= 0
-             || news.getUri() == null || news.getUri().length() <= 0 )
+             || news.getURI() == null )
         {
             throw new NullPointerException( "Title or URL can not be null" );
         }
@@ -117,21 +117,22 @@ public class N_TW_Post
             throw new NullPointerException();
         }
 
-        if ( news.getUri().length() > TWEET_SIZE )
+        String uri = news.getURI().toString();
+        if ( uri.length() > TWEET_SIZE )
         {
             throw new IllegalArgumentException( "URL is too long" );
         }
 
         StringBuilder sb = new StringBuilder();
-        if ( news.getUri().length() > TWEET_SIZE - 15 )
+        if ( uri.length() > TWEET_SIZE - 15 )
         {
-            sb.append( news.getUri() );
+            sb.append( uri );
         }
         else
         {
             String title = cleanHTML( news.getTitle() );
 
-            sb.append( " (" ).append( news.getUri() ).append( ")" );
+            sb.append( " (" ).append( uri ).append( ")" );
             if ( title.length() + sb.length() > TWEET_SIZE )
             {
                 sb.insert( 0 ,

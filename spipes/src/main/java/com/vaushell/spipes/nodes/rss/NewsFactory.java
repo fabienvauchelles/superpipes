@@ -4,6 +4,7 @@
  */
 package com.vaushell.spipes.nodes.rss;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.Set;
 import java.util.TreeSet;
@@ -22,13 +23,13 @@ public enum NewsFactory
 
     public News create( String title ,
                         String description ,
-                        String url ,
+                        URI uri ,
                         String author ,
                         String content ,
                         Set<String> tags ,
                         Date date )
     {
-        if ( title == null || title.length() <= 0 || url == null || url.length() <= 0 )
+        if ( title == null || title.length() <= 0 || uri == null || uri.toString().length() <= 0 )
         {
             throw new NullPointerException( "Title and URL can not be null" );
         }
@@ -41,7 +42,7 @@ public enum NewsFactory
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] create : title=" + title + " / description=" + description + " / url=" + url + " / url=" + url + " / author=" + author + " / tags.size()=" + tags.
+                    "[" + getClass().getSimpleName() + "] create : title=" + title + " / description=" + description + " / uri=" + uri + " / url=" + uri + " / author=" + author + " / tags.size()=" + tags.
                     size() );
         }
 
@@ -54,7 +55,7 @@ public enum NewsFactory
             sb.append( description );
         }
 
-        sb.append( url );
+        sb.append( uri );
 
         if ( author != null && author.length() > 0 )
         {
@@ -85,7 +86,7 @@ public enum NewsFactory
         return new News( ID ,
                          title ,
                          description ,
-                         url ,
+                         uri ,
                          author ,
                          content ,
                          correctedTags ,

@@ -8,6 +8,8 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.nodes.rss.NewsFactory;
 import com.vaushell.spipes.tools.ValuesGenerator;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ public class N_NewsGenerator
 
     @Override
     protected void loop()
+            throws URISyntaxException
     {
         if ( logger.isTraceEnabled() )
         {
@@ -43,8 +46,8 @@ public class N_NewsGenerator
                                                                                 20 ) ,
                                                  ValuesGenerator.getRandomText( 20 ,
                                                                                 30 ) ,
-                                                 ValuesGenerator.getRandomWord( 10 ,
-                                                                                20 ) ,
+                                                 new URI( "http://" + ValuesGenerator.getRandomWord( 10 ,
+                                                                                                     20 ) ) ,
                                                  ValuesGenerator.getRandomText( 1 ,
                                                                                 2 ) ,
                                                  ValuesGenerator.getRandomText( 100 ,

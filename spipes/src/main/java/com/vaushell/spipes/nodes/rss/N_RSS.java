@@ -13,6 +13,8 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import com.vaushell.spipes.nodes.A_Node;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +42,7 @@ public class N_RSS
 
     @Override
     protected void loop()
-            throws IllegalArgumentException , FeedException , IOException
+            throws URISyntaxException , IllegalArgumentException , FeedException , IOException
     {
         URL url = new URL( getConfig( "url" ) );
 
@@ -70,9 +72,10 @@ public class N_RSS
     private final static Logger logger = LoggerFactory.getLogger( N_RSS.class );
 
     private static News convert( SyndEntry entry )
+            throws URISyntaxException
     {
-        String uri = entry.getUri();
-        if ( uri == null )
+        String uriStr = entry.getUri();
+        if ( uriStr == null )
         {
             return null;
         }
@@ -120,7 +123,7 @@ public class N_RSS
 
         return NewsFactory.INSTANCE.create( entry.getTitle() ,
                                             description ,
-                                            uri ,
+                                            new URI( uriStr ) ,
                                             entry.getAuthor() ,
                                             content ,
                                             tags ,

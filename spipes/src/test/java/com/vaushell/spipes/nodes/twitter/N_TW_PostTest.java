@@ -7,8 +7,9 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.nodes.rss.NewsFactory;
 import com.vaushell.spipes.tools.ValuesGenerator;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.naming.ConfigurationException;
@@ -40,6 +41,7 @@ public class N_TW_PostTest
 
     @Test
     public void testConvertNews()
+            throws URISyntaxException
     {
         Set<String> tags = new TreeSet<>();
         tags.add( "ceci" );
@@ -59,7 +61,8 @@ public class N_TW_PostTest
 
         News news = NewsFactory.INSTANCE.create( "Le titre de cette news n'est pas trop long" ,
                                                  "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
-                                                 "http://url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ,
+                                                 new URI(
+                "http://url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
                                                  "John Kiki" ,
                                                  "Le contenu, je m'en fous" ,
                                                  tags ,
@@ -77,11 +80,13 @@ public class N_TW_PostTest
         IllegalArgumentException.class
     } )
     public void testURLlong()
+            throws URISyntaxException
     {
 
         News news = NewsFactory.INSTANCE.create( "Le titre de cette news n'est pas trop long" ,
                                                  "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
-                                                 "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ,
+                                                 new URI(
+                "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
                                                  "John Kiki" ,
                                                  "Le contenu, je m'en fous" ,
                                                  new TreeSet<String>() ,

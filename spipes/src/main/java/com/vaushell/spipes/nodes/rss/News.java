@@ -4,8 +4,10 @@
  */
 package com.vaushell.spipes.nodes.rss;
 
+import com.vaushell.spipes.nodes.bitly.I_URI;
 import com.vaushell.spipes.nodes.filters.date.I_Date;
 import com.vaushell.spipes.nodes.filters.done.I_Identifier;
+import java.net.URI;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
@@ -15,13 +17,13 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class News
-        implements I_Identifier , I_Date
+        implements I_Identifier , I_Date , I_URI
 {
     // PUBLIC
     public News( String ID ,
                  String title ,
                  String description ,
-                 String uri ,
+                 URI uri ,
                  String author ,
                  String content ,
                  Set<String> tags ,
@@ -69,12 +71,14 @@ public class News
         this.description = description;
     }
 
-    public String getUri()
+    @Override
+    public URI getURI()
     {
         return uri;
     }
 
-    public void setUri( String uri )
+    @Override
+    public void setURI( URI uri )
     {
         this.uri = uri;
     }
@@ -201,7 +205,7 @@ public class News
     private String ID;
     private String title;
     private String description;
-    private String uri;
+    private URI uri;
     private String author;
     private String content;
     private Set<String> tags;

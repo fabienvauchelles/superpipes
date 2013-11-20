@@ -4,7 +4,9 @@
  */
 package com.vaushell.spipes.nodes.fb;
 
+import com.vaushell.spipes.nodes.bitly.I_URI;
 import com.vaushell.spipes.nodes.filters.done.I_Identifier;
+import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
 
@@ -13,20 +15,20 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class FB_Post
-        implements I_Identifier
+        implements I_Identifier , I_URI
 {
     // PUBLIC
     public FB_Post( String message ,
-                    String url ,
+                    URI uri ,
                     String urlName ,
                     String urlDescription ,
                     Set<String> tags )
     {
         this.ID = null;
         this.message = message;
-        this.url = url;
-        this.urlName = urlName;
-        this.urlDescription = urlDescription;
+        this.uri = uri;
+        this.uriName = urlName;
+        this.uriDescription = urlDescription;
         this.tags = tags;
     }
 
@@ -52,34 +54,36 @@ public class FB_Post
         this.message = message;
     }
 
-    public String getUrl()
+    @Override
+    public URI getURI()
     {
-        return url;
+        return uri;
     }
 
-    public void setUrl( String url )
+    @Override
+    public void setURI( URI uri )
     {
-        this.url = url;
+        this.uri = uri;
     }
 
-    public String getUrlName()
+    public String getURIname()
     {
-        return urlName;
+        return uriName;
     }
 
-    public void setUrlName( String urlName )
+    public void setURIname( String uriName )
     {
-        this.urlName = urlName;
+        this.uriName = uriName;
     }
 
-    public String getUrlDescription()
+    public String getURIdescription()
     {
-        return urlDescription;
+        return uriDescription;
     }
 
-    public void setUrlDescription( String urlDescription )
+    public void setURIdescription( String uriDescription )
     {
-        this.urlDescription = urlDescription;
+        this.uriDescription = uriDescription;
     }
 
     public Set<String> getTags()
@@ -99,9 +103,9 @@ public class FB_Post
         int hash = 3;
         hash = 61 * hash + Objects.hashCode( this.ID );
         hash = 61 * hash + Objects.hashCode( this.message );
-        hash = 61 * hash + Objects.hashCode( this.url );
-        hash = 61 * hash + Objects.hashCode( this.urlName );
-        hash = 61 * hash + Objects.hashCode( this.urlDescription );
+        hash = 61 * hash + Objects.hashCode( this.uri );
+        hash = 61 * hash + Objects.hashCode( this.uriName );
+        hash = 61 * hash + Objects.hashCode( this.uriDescription );
         hash = 61 * hash + Objects.hashCode( this.tags );
         return hash;
     }
@@ -128,18 +132,18 @@ public class FB_Post
         {
             return false;
         }
-        if ( !Objects.equals( this.url ,
-                              other.url ) )
+        if ( !Objects.equals( this.uri ,
+                              other.uri ) )
         {
             return false;
         }
-        if ( !Objects.equals( this.urlName ,
-                              other.urlName ) )
+        if ( !Objects.equals( this.uriName ,
+                              other.uriName ) )
         {
             return false;
         }
-        if ( !Objects.equals( this.urlDescription ,
-                              other.urlDescription ) )
+        if ( !Objects.equals( this.uriDescription ,
+                              other.uriDescription ) )
         {
             return false;
         }
@@ -154,13 +158,13 @@ public class FB_Post
     @Override
     public String toString()
     {
-        return "FB_Post{" + "ID=" + ID + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlDescription=" + urlDescription + ", tags=" + tags + '}';
+        return "FB_Post{" + "ID=" + ID + ", message=" + message + ", uri=" + uri + ", uriName=" + uriName + ", uriDescription=" + uriDescription + ", tags=" + tags + '}';
     }
     // PRIVATE
     private String ID;
     private String message;
-    private String url;
-    private String urlName;
-    private String urlDescription;
+    private URI uri;
+    private String uriName;
+    private String uriDescription;
     private Set<String> tags;
 }
