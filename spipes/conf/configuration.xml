@@ -34,6 +34,14 @@
             <param name="token" value="CAADJVWfTix4BAIsO7oqlZBzfZAuM0w4e6spbtUgoAvkyepZCuMW4VzeqXk0ZCOdIpQZCfQgtJL1Q2VNmoOWEjZCXUbhns5fXc3k5BSC38t8wYBzp9ssilwUaQun5pk5rK4Y9BMmbWvX4GCJhXvZBqfxbXMlZAHHiiJIy51neLfmPjoI6xZAERrJu7ZB2nMwG1HcKsZD" />
         </node>
         <node>
+            <id>twpost</id>
+            <type>com.vaushell.spipes.nodes.twitter.N_TW_Post</type>
+            <param name="key" value="YJq2YTRMe78n02VIrkHA" />
+            <param name="secret" value="Dx6TKZjEBJTABZ7y4QFoD6vsdS7oDkCEnTr6OCjc" />
+            <param name="token" value="110520884-KTEmkLo8ebpG7LnJ1ekAIVCFqGOxVTLXaprge3gW" />
+            <param name="token-secret" value="Hz7acXtmtNBl0j3MYrNJqcktc5g4ESxZRuxQ8Ne70R77x" />
+        </node>
+        <node>
             <id>logger</id>
             <type>com.vaushell.spipes.nodes.stub.N_MessageLogger</type>
         </node>
@@ -49,11 +57,7 @@
         </route>
         <route>
             <source>filter-done</source>
-            <destination>fbpost</destination>
-        </route>
-        <route>
-            <source>fbpost</source>
-            <destination>fbpostlike</destination>
+            <destination>twpost</destination>
         </route>
     </routes>
 </configuration>
