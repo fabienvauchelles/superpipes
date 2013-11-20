@@ -28,6 +28,7 @@ public class N_FB_Post
     // PUBLIC
     public N_FB_Post()
     {
+        this.facebook = null;
     }
 
     // PROTECTED
@@ -38,23 +39,9 @@ public class N_FB_Post
         ConfigurationBuilder cb = new ConfigurationBuilder();
 //        cb.setDebugEnabled( true );
 
-        String appID = getConfig( "id" );
-        if ( appID != null && appID.length() > 0 )
-        {
-            cb.setOAuthAppId( appID );
-        }
-
-        String appSecret = getConfig( "secret" );
-        if ( appSecret != null && appSecret.length() > 0 )
-        {
-            cb.setOAuthAppSecret( appSecret );
-        }
-
-        String appToken = getConfig( "token" );
-        if ( appToken != null && appToken.length() > 0 )
-        {
-            cb.setOAuthAccessToken( appToken );
-        }
+        cb.setOAuthAppId( getConfig( "id" ) );
+        cb.setOAuthAppSecret( getConfig( "secret" ) );
+        cb.setOAuthAccessToken( getConfig( "token" ) );
 
         FacebookFactory ff = new FacebookFactory( cb.build() );
 
