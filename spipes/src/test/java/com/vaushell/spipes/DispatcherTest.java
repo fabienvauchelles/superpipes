@@ -2,7 +2,7 @@ package com.vaushell.spipes;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.stub.N_MessageLogger;
-import com.vaushell.spipes.nodes.stub.N_PostGenerator;
+import com.vaushell.spipes.nodes.stub.N_NewsGenerator;
 import java.util.Properties;
 import javax.naming.ConfigurationException;
 import static org.testng.AssertJUnit.*;
@@ -36,7 +36,7 @@ public class DispatcherTest
         Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
-                            N_PostGenerator.class ,
+                            N_NewsGenerator.class ,
                             new Properties() );
 
         dispatcher.addNode( "receptor" ,
@@ -45,7 +45,7 @@ public class DispatcherTest
 
         A_Node node = dispatcher.nodes.get( "generator" );
         assertEquals( node.getClass() ,
-                      N_PostGenerator.class );
+                      N_NewsGenerator.class );
 
         dispatcher.addRoute( "generator" ,
                              "receptor" );
@@ -68,10 +68,10 @@ public class DispatcherTest
         Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
-                            N_PostGenerator.class ,
+                            N_NewsGenerator.class ,
                             new Properties() );
         dispatcher.addNode( "generator" ,
-                            N_PostGenerator.class ,
+                            N_NewsGenerator.class ,
                             new Properties() );
     }
 

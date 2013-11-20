@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.vaushell.spipes.nodes.posts;
+package com.vaushell.spipes.nodes.fb;
 
 import com.vaushell.spipes.nodes.filters.done.I_Identifier;
 import java.util.Objects;
@@ -12,18 +12,17 @@ import java.util.Set;
  *
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
-public class Post
+public class FB_Post
         implements I_Identifier
 {
     // PUBLIC
-    public Post( String ID ,
-                 String message ,
-                 String url ,
-                 String urlName ,
-                 String urlDescription ,
-                 Set<String> tags )
+    public FB_Post( String message ,
+                    String url ,
+                    String urlName ,
+                    String urlDescription ,
+                    Set<String> tags )
     {
-        this.ID = ID;
+        this.ID = null;
         this.message = message;
         this.url = url;
         this.urlName = urlName;
@@ -118,7 +117,7 @@ public class Post
         {
             return false;
         }
-        final Post other = (Post) obj;
+        final FB_Post other = (FB_Post) obj;
         if ( !Objects.equals( this.ID ,
                               other.ID ) )
         {
@@ -155,7 +154,7 @@ public class Post
     @Override
     public String toString()
     {
-        return "Post{" + "ID=" + ID + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlDescription=" + urlDescription + ", tags=" + tags + '}';
+        return "FB_Post{" + "ID=" + ID + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlDescription=" + urlDescription + ", tags=" + tags + '}';
     }
     // PRIVATE
     private String ID;
