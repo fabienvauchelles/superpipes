@@ -42,6 +42,12 @@
             <param name="token-secret" value="Hz7acXtmtNBl0j3MYrNJqcktc5g4ESxZRuxQ8Ne70R77x" />
         </node>
         <node>
+            <id>reduce</id>
+            <type>com.vaushell.spipes.nodes.bitly.N_Bitly_Reduce</type>
+            <param name="username" value="o_12n319r5dp" />
+            <param name="apikey" value="R_86460adc9f99f3270c25190f82799c0c" />
+        </node>
+        <node>
             <id>logger</id>
             <type>com.vaushell.spipes.nodes.stub.N_MessageLogger</type>
         </node>
@@ -57,6 +63,10 @@
         </route>
         <route>
             <source>filter-done</source>
+            <destination>reduce</destination>
+        </route>
+        <route>
+            <source>reduce</source>
             <destination>twpost</destination>
         </route>
     </routes>
