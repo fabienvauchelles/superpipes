@@ -38,6 +38,12 @@
             <param name="secret" value="Dx6TKZjEBJTABZ7y4QFoD6vsdS7oDkCEnTr6OCjc" />
         </node>
         <node>
+            <id>lnkpost</id>
+            <type>com.vaushell.spipes.nodes.linkedin.N_LNK_Post</type>
+            <param name="key" value="75dpgrrkch45wr" />
+            <param name="secret" value="4naYAbcTOLapm9Ct" />
+        </node>
+        <node>
             <id>reduce</id>
             <type>com.vaushell.spipes.nodes.bitly.N_Bitly_Shorten</type>
             <param name="username" value="o_12n319r5dp" />
@@ -72,6 +78,10 @@
         <route>
             <source>fbpost</source>
             <destination>fbpostlike</destination>
+        </route>
+        <route>
+            <source>reduce</source>
+            <destination>lnkpost</destination>
         </route>
     </routes>
 </configuration>
