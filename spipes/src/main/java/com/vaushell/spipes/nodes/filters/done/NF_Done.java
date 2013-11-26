@@ -31,9 +31,8 @@ public class NF_Done
         this.path = null;
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws IOException
     {
         if ( logger.isTraceEnabled() )
@@ -64,6 +63,12 @@ public class NF_Done
     }
 
     @Override
+    public void terminate()
+    {
+    }
+
+    // PROTECTED
+    @Override
     protected void loop()
             throws IOException , InterruptedException
     {
@@ -91,11 +96,6 @@ public class NF_Done
                 bfw.newLine();
             }
         }
-    }
-
-    @Override
-    protected void terminate()
-    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( NF_Done.class );

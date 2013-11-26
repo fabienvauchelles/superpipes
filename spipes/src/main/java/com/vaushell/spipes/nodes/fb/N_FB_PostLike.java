@@ -5,11 +5,11 @@
 package com.vaushell.spipes.nodes.fb;
 
 import com.vaushell.spipes.nodes.A_Node;
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.conf.ConfigurationBuilder;
-import java.net.MalformedURLException;
+import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
+import com.vaushell.spipes.tools.scribe.fb.FacebookException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,42 +23,34 @@ public class N_FB_PostLike
     // PUBLIC
     public N_FB_PostLike()
     {
+        this.client = new FacebookClient();
+    }
+
+    @Override
+    public void prepare()
+            throws Exception
+    {
+        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                    getNodeID() ,
+                                    "token" );
+
+        client.login( getConfig( "key" ) ,
+                      getConfig( "secret" ) ,
+                      "publish_stream" ,
+                      tokenPath ,
+                      "[" + getClass().getName() + " / " + getNodeID() + "]" );
+    }
+
+    @Override
+    public void terminate()
+            throws Exception
+    {
     }
 
     // PROTECTED
     @Override
-    protected void prepare()
-            throws Exception
-    {
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-//        cb.setDebugEnabled( true );
-
-        String appID = getConfig( "id" );
-        if ( appID != null && appID.length() > 0 )
-        {
-            cb.setOAuthAppId( appID );
-        }
-
-        String appSecret = getConfig( "secret" );
-        if ( appSecret != null && appSecret.length() > 0 )
-        {
-            cb.setOAuthAppSecret( appSecret );
-        }
-
-        String appToken = getConfig( "token" );
-        if ( appToken != null && appToken.length() > 0 )
-        {
-            cb.setOAuthAccessToken( appToken );
-        }
-
-        FacebookFactory ff = new FacebookFactory( cb.build() );
-
-        this.facebook = ff.getInstance();
-    }
-
-    @Override
     protected void loop()
-            throws InterruptedException , MalformedURLException , FacebookException
+            throws InterruptedException , IOException , FacebookException
     {
         // Receive
         FB_Post post = (FB_Post) getLastMessageOrWait();
@@ -69,15 +61,9 @@ public class N_FB_PostLike
         }
 
         // Like
-        facebook.likePost( post.getID() );
-    }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
+        client.likePost( post.getID() );
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_FB_PostLike.class );
-    private Facebook facebook;
+    private FacebookClient client;
 }

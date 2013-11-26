@@ -2,6 +2,8 @@ package com.vaushell.spipes;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Main
@@ -13,33 +15,35 @@ public class App
     // PUBLIC
     public static void main( String[] args )
     {
-        // Config
-        Dispatcher dispatcher = new Dispatcher();
-
         try
         {
+            // Config
+            Dispatcher dispatcher = new Dispatcher();
+
             XMLConfiguration config = new XMLConfiguration( "conf/configuration.xml" );
             dispatcher.load( config );
-        }
-        catch( ConfigurationException ex )
-        {
-            throw new RuntimeException( ex );
-        }
 
-        // Run
-        dispatcher.start();
+            // Run
+            dispatcher.start();
 
-        // Wait
-        try
-        {
-            Thread.sleep( 1000 * 10 );
-        }
-        catch( InterruptedException ignore )
-        {
-        }
+            // Wait
+            try
+            {
+                Thread.sleep( 1000 * 10 );
+            }
+            catch( InterruptedException ignore )
+            {
+            }
 
-        // Stop
-        dispatcher.stopAndWait();
+            // Stop
+            dispatcher.stopAndWait();
+        }
+        catch( Exception ex )
+        {
+            logger.error( "[Main] Error" ,
+                          ex );
+        }
     }
     // PRIVATE
+    private final static Logger logger = LoggerFactory.getLogger( App.class );
 }

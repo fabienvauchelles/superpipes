@@ -33,13 +33,19 @@ public class N_RSS
     {
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws Exception
     {
     }
 
+    @Override
+    public void terminate()
+            throws Exception
+    {
+    }
+
+    // PROTECTED
     @Override
     protected void loop()
             throws URISyntaxException , IllegalArgumentException , FeedException , IOException
@@ -61,12 +67,6 @@ public class N_RSS
 
             sendMessage( news );
         }
-    }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_RSS.class );

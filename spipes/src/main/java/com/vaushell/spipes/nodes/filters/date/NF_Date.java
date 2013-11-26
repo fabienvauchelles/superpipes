@@ -28,9 +28,8 @@ public class NF_Date
         this.df = new SimpleDateFormat( "dd/MM/yyyy HH:ss" );
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws IOException
     {
         String minDateStr = getConfig( "date-min" );
@@ -59,6 +58,12 @@ public class NF_Date
     }
 
     @Override
+    public void terminate()
+    {
+    }
+
+    // PROTECTED
+    @Override
     protected void loop()
             throws InterruptedException
     {
@@ -85,11 +90,6 @@ public class NF_Date
         }
 
         sendMessage( message );
-    }
-
-    @Override
-    protected void terminate()
-    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( NF_Date.class );

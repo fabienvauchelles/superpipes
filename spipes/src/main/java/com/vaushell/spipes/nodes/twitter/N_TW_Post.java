@@ -6,15 +6,15 @@ package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
+import com.vaushell.spipes.tools.scribe.OAuthException;
+import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.TreeSet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
 
 /**
  *
@@ -26,26 +26,33 @@ public class N_TW_Post
     // PUBLIC
     public N_TW_Post()
     {
-        this.twitter = null;
+        this.client = new TwitterClient();
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws Exception
     {
-        this.twitter = TwitterFactory.getSingleton();
+        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                    getNodeID() ,
+                                    "token" );
 
-        twitter.setOAuthConsumer( getConfig( "key" ) ,
-                                  getConfig( "secret" ) ); // Consumer secret
-
-        twitter.setOAuthAccessToken( new AccessToken( getConfig( "token" ) ,
-                                                      getConfig( "token-secret" ) ) );
+        client.login( getConfig( "key" ) ,
+                      getConfig( "secret" ) ,
+                      tokenPath ,
+                      "[" + getClass().getName() + " / " + getNodeID() + "]" );
     }
+
+    @Override
+    public void terminate()
+            throws Exception
+    {
+    }
+    // PROTECTED
 
     @Override
     protected void loop()
-            throws TwitterException , InterruptedException
+            throws InterruptedException , IOException , OAuthException
     {
         // Receive
         Object message = getLastMessageOrWait();
@@ -84,22 +91,16 @@ public class N_TW_Post
             logger.trace( "[" + getNodeID() + "] send tweet to twitter : " + tweet );
         }
 
-        Status status = twitter.updateStatus( tweet.getMessage() );
+        long ID = client.tweet( tweet.getMessage() );
 
-        tweet.setTweetID( status.getId() );
+        tweet.setTweetID( ID );
 
         if ( logger.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive ID : " + status.getId() );
+            logger.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
         sendMessage( tweet );
-    }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
     }
     // DEFAULT
     final static int TWEET_SIZE = 140;
@@ -168,7 +169,7 @@ public class N_TW_Post
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_TW_Post.class );
-    private Twitter twitter;
+    private TwitterClient client;
 
     private static String cleanHTML( String s )
     {

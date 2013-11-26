@@ -27,6 +27,17 @@ public abstract class A_Node
         this.internalStack = new LinkedList<>();
     }
 
+    public abstract void prepare()
+            throws Exception;
+
+    public abstract void terminate()
+            throws Exception;
+
+    public String getNodeID()
+    {
+        return nodeID;
+    }
+
     public void config( String nodeID ,
                         Properties properties ,
                         Dispatcher dispatcher )
@@ -46,15 +57,9 @@ public abstract class A_Node
 
         try
         {
-            if ( logger.isDebugEnabled() )
+            if ( logger.isTraceEnabled() )
             {
-                logger.debug( "[" + getNodeID() + "] prepare" );
-            }
-            prepare();
-
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "[" + getNodeID() + "] loopin'" );
+                logger.trace( "[" + getNodeID() + "] loopin'" );
             }
             while ( isActive() )
             {
@@ -83,12 +88,6 @@ public abstract class A_Node
                     }
                 }
             }
-
-            if ( logger.isDebugEnabled() )
-            {
-                logger.debug( "[" + getNodeID() + "] terminate" );
-            }
-            terminate();
         }
         catch( Throwable th )
         {
@@ -124,25 +123,19 @@ public abstract class A_Node
 
     public synchronized void stopMe()
     {
+        if ( logger.isTraceEnabled() )
+        {
+            logger.trace( "[" + getNodeID() + "] stopMe" );
+        }
+
         activated = false;
 
         interrupt();
     }
 
     // PROTECTED
-    protected abstract void prepare()
-            throws Exception;
-
     protected abstract void loop()
             throws Exception;
-
-    protected abstract void terminate()
-            throws Exception;
-
-    protected String getNodeID()
-    {
-        return nodeID;
-    }
 
     protected String getConfig( String key )
     {

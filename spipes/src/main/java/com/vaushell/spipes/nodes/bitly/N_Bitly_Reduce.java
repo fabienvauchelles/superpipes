@@ -26,9 +26,8 @@ public class N_Bitly_Reduce
         this.bitly = null;
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws Exception
     {
         // https://bitly.com/a/your_api_key
@@ -36,6 +35,13 @@ public class N_Bitly_Reduce
                                getConfig( "apikey" ) );
 
     }
+
+    @Override
+    public void terminate()
+            throws Exception
+    {
+    }
+    // PROTECTED
 
     @Override
     protected void loop()
@@ -61,12 +67,6 @@ public class N_Bitly_Reduce
         }
 
         sendMessage( message );
-    }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_Bitly_Reduce.class );

@@ -26,13 +26,19 @@ public class N_NewsGenerator
     {
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws Exception
     {
     }
 
+    @Override
+    public void terminate()
+            throws Exception
+    {
+    }
+
+    // PROTECTED
     @Override
     protected void loop()
             throws URISyntaxException
@@ -57,12 +63,6 @@ public class N_NewsGenerator
                                                  new Date() );
 
         sendMessage( news );
-    }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_NewsGenerator.class );

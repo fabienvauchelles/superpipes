@@ -6,12 +6,11 @@ package com.vaushell.spipes.nodes.fb;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
-import facebook4j.Facebook;
-import facebook4j.FacebookException;
-import facebook4j.FacebookFactory;
-import facebook4j.PostUpdate;
-import facebook4j.conf.ConfigurationBuilder;
-import java.net.MalformedURLException;
+import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
+import com.vaushell.spipes.tools.scribe.fb.FacebookException;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.TreeSet;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -27,29 +26,34 @@ public class N_FB_Post
     // PUBLIC
     public N_FB_Post()
     {
-        this.facebook = null;
+        this.client = new FacebookClient();
+    }
+
+    @Override
+    public void prepare()
+            throws Exception
+    {
+        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                    getNodeID() ,
+                                    "token" );
+
+        client.login( getConfig( "key" ) ,
+                      getConfig( "secret" ) ,
+                      "publish_stream" ,
+                      tokenPath ,
+                      "[" + getClass().getName() + " / " + getNodeID() + "]" );
+    }
+
+    @Override
+    public void terminate()
+            throws Exception
+    {
     }
 
     // PROTECTED
     @Override
-    protected void prepare()
-            throws Exception
-    {
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-//        cb.setDebugEnabled( true );
-
-        cb.setOAuthAppId( getConfig( "id" ) );
-        cb.setOAuthAppSecret( getConfig( "secret" ) );
-        cb.setOAuthAccessToken( getConfig( "token" ) );
-
-        FacebookFactory ff = new FacebookFactory( cb.build() );
-
-        this.facebook = ff.getInstance();
-    }
-
-    @Override
     protected void loop()
-            throws InterruptedException , MalformedURLException , FacebookException
+            throws InterruptedException , FacebookException , IOException
     {
         // Receive
         Object message = getLastMessageOrWait();
@@ -88,33 +92,21 @@ public class N_FB_Post
             logger.trace( "[" + getNodeID() + "] send post to facebook : " + post );
         }
 
-        PostUpdate pu;
+        String uri;
         if ( post.getURI() != null )
         {
-            // We have an url
-            pu = new PostUpdate( post.getURI().toURL() );
-
-            if ( post.getURIname() != null && post.getURIname().length() > 0 )
-            {
-                pu.name( post.getURIname() );
-            }
-
-            if ( post.getURIdescription() != null && post.getURIdescription().length() > 0 )
-            {
-                pu.description( post.getURIdescription() );
-            }
-
-            if ( post.getMessage() != null && post.getMessage().length() > 0 )
-            {
-                pu.message( post.getMessage() );
-            }
+            uri = post.getURI().toURL().toString();
         }
         else
         {
-            pu = new PostUpdate( post.getMessage() );
+            uri = null;
         }
 
-        String ID = facebook.postFeed( pu );
+        String ID = client.post( post.getMessage() ,
+                                 uri ,
+                                 post.getURIname() ,
+                                 null ,
+                                 post.getURIdescription() );
 
         post.setID( ID );
 
@@ -125,15 +117,9 @@ public class N_FB_Post
 
         sendMessage( post );
     }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
-    }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_FB_Post.class );
-    private Facebook facebook;
+    private FacebookClient client;
 
     private static FB_Post convertFromNews( News news )
     {

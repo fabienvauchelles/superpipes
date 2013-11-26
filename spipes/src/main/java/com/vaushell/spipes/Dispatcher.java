@@ -118,6 +118,7 @@ public class Dispatcher
     }
 
     public void start()
+            throws Exception
     {
         if ( logger.isDebugEnabled() )
         {
@@ -125,6 +126,17 @@ public class Dispatcher
                     "[" + getClass().getSimpleName() + "] start" );
         }
 
+        // Prepare nodes
+        for ( A_Node node : nodes.values() )
+        {
+            if ( logger.isTraceEnabled() )
+            {
+                logger.trace( "[" + node.getNodeID() + "] prepare" );
+            }
+            node.prepare();
+        }
+
+        // Start nodes
         for ( A_Node node : nodes.values() )
         {
             node.start();
@@ -132,6 +144,7 @@ public class Dispatcher
     }
 
     public void stopAndWait()
+            throws Exception
     {
         if ( logger.isDebugEnabled() )
         {
@@ -153,6 +166,15 @@ public class Dispatcher
             catch( InterruptedException ignore )
             {
             }
+        }
+
+        for ( A_Node node : nodes.values() )
+        {
+            if ( logger.isTraceEnabled() )
+            {
+                logger.trace( "[" + node.getNodeID() + "] terminate" );
+            }
+            node.terminate();
         }
     }
 

@@ -20,13 +20,19 @@ public class N_MessageLogger
     {
     }
 
-    // PROTECTED
     @Override
-    protected void prepare()
+    public void prepare()
             throws Exception
     {
     }
 
+    @Override
+    public void terminate()
+            throws Exception
+    {
+    }
+
+    // PROTECTED
     @Override
     protected void loop()
             throws InterruptedException
@@ -37,12 +43,6 @@ public class N_MessageLogger
         {
             logger.info( "[" + getNodeID() + "] receive message : " + message );
         }
-    }
-
-    @Override
-    protected void terminate()
-            throws Exception
-    {
     }
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_MessageLogger.class );
