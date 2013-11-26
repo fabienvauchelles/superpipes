@@ -13,8 +13,8 @@ public class OAuthException
 {
     // PRIVATE
     public OAuthException( int httpCode ,
-                             int apiCode ,
-                             String message )
+                           int apiCode ,
+                           String message )
     {
         super( message );
 
