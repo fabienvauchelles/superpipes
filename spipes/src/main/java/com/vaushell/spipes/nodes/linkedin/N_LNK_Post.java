@@ -133,6 +133,6 @@ public class N_LNK_Post
         return new LNK_Post( null ,
                              news.getURI() ,
                              HTMLhelper.cleanHTML( news.getTitle() ) ,
-                             " " );
+                             null );
     }
 }

@@ -111,13 +111,7 @@ public class N_TW_Post
 
     static Tweet convertFromNews( News news )
     {
-        if ( news.getTitle() == null || news.getTitle().length() <= 0
-             || news.getURI() == null )
-        {
-            throw new NullPointerException( "Title or URL can not be null" );
-        }
-
-        if ( news.getTags() == null )
+        if ( news.getURI() == null )
         {
             throw new NullPointerException();
         }
@@ -136,19 +130,24 @@ public class N_TW_Post
         else
         {
             String title = HTMLhelper.cleanHTML( news.getTitle() );
-
-            sb.append( " (" ).append( uri ).append( ")" );
-            if ( title.length() + sb.length() > TWEET_SIZE )
+            if ( title != null )
             {
-                sb.insert( 0 ,
-                           title.substring( 0 ,
-                                            TWEET_SIZE - sb.length() ) );
+                sb.append( " (" ).append( uri ).append( ")" );
+                if ( title.length() + sb.length() > TWEET_SIZE )
+                {
+                    sb.insert( 0 ,
+                               title.substring( 0 ,
+                                                TWEET_SIZE - sb.length() ) );
+                }
+                else
+                {
+                    sb.insert( 0 ,
+                               title );
+                }
             }
-            else
-            {
-                sb.insert( 0 ,
-                           title );
 
+            if ( news.getTags() != null )
+            {
                 TreeSet<String> correctedTags = new TreeSet<>();
                 for ( String tag : news.getTags() )
                 {

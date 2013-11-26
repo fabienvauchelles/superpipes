@@ -67,7 +67,7 @@ public class TumblrClient
                           Set<String> tags )
             throws IOException , TumblrException
     {
-        if ( uri == null || uri.length() <= 0 || tags == null )
+        if ( uri == null || uri.length() <= 0 )
         {
             throw new NullPointerException();
         }
@@ -84,6 +84,9 @@ public class TumblrClient
         request.addBodyParameter( "type" ,
                                   "link" );
 
+        request.addBodyParameter( "url" ,
+                                  uri );
+
         if ( uriName != null && uriName.length() > 0 )
         {
             request.addBodyParameter( "title" ,
@@ -96,10 +99,7 @@ public class TumblrClient
                                       uriDescription );
         }
 
-        request.addBodyParameter( "url" ,
-                                  uri );
-
-        if ( tags.size() > 0 )
+        if ( tags != null && tags.size() > 0 )
         {
             TreeSet<String> correctedTags = new TreeSet<>();
             for ( String tag : tags )

@@ -78,24 +78,22 @@ public class LinkedInClient
         }
 
         // Content
-        Element content = new Element( "content" );
-        if ( uriName != null && uriName.length() > 0 )
-        {
-            content.addContent( new Element( "title" ).setText( uriName ) );
-        }
-
-        if ( uriDescription != null && uriDescription.length() > 0 )
-        {
-            content.addContent( new Element( "description" ).setText( uriDescription ) );
-        }
-
         if ( uri != null && uri.length() > 0 )
         {
-            content.addContent( new Element( "submitted-url" ).setText( uri ) );
-        }
+            Element content = new Element( "content" );
 
-        if ( content.getContentSize() > 0 )
-        {
+            if ( uriName != null && uriName.length() > 0 )
+            {
+                content.addContent( new Element( "title" ).setText( uriName ) );
+            }
+
+            if ( uriDescription != null && uriDescription.length() > 0 )
+            {
+                content.addContent( new Element( "description" ).setText( uriDescription ) );
+            }
+
+            content.addContent( new Element( "submitted-url" ).setText( uri ) );
+
             share.addContent( content );
         }
 

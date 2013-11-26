@@ -64,8 +64,10 @@ public class N_RSS
         for ( SyndEntry entry : entries )
         {
             News news = convert( entry );
-
-            sendMessage( news );
+            if ( news != null )
+            {
+                sendMessage( news );
+            }
         }
     }
     // PRIVATE
@@ -110,24 +112,29 @@ public class N_RSS
             content = null;
         }
 
-        HashSet<String> tags = new HashSet<>();
-
+        HashSet<String> tags;
         List<SyndCategory> categories = entry.getCategories();
         if ( categories != null )
         {
+            tags = new HashSet<>();
+
             for ( SyndCategory category : categories )
             {
                 tags.add( category.getName().toLowerCase() );
             }
         }
+        else
+        {
+            tags = null;
+        }
 
-        return NewsFactory.INSTANCE.create( entry.getTitle() ,
-                                            description ,
-                                            new URI( uriStr ) ,
-                                            new URI( uriStr ) ,
-                                            entry.getAuthor() ,
-                                            content ,
-                                            tags ,
-                                            entry.getPublishedDate() );
+        return News.create( entry.getTitle() ,
+                            description ,
+                            new URI( uriStr ) ,
+                            new URI( uriStr ) ,
+                            entry.getAuthor() ,
+                            content ,
+                            tags ,
+                            entry.getPublishedDate() );
     }
 }

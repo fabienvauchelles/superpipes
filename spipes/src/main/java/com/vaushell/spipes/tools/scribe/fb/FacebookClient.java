@@ -77,24 +77,24 @@ public class FacebookClient
         {
             request.addBodyParameter( "link" ,
                                       uri );
-        }
 
-        if ( uriName != null && uriName.length() > 0 )
-        {
-            request.addBodyParameter( "name" ,
-                                      uriName );
-        }
+            if ( uriName != null && uriName.length() > 0 )
+            {
+                request.addBodyParameter( "name" ,
+                                          uriName );
+            }
 
-        if ( uriCaption != null && uriCaption.length() > 0 )
-        {
-            request.addBodyParameter( "caption" ,
-                                      uriCaption );
-        }
+            if ( uriCaption != null && uriCaption.length() > 0 )
+            {
+                request.addBodyParameter( "caption" ,
+                                          uriCaption );
+            }
 
-        if ( uriDescription != null && uriDescription.length() > 0 )
-        {
-            request.addBodyParameter( "description" ,
-                                      uriDescription );
+            if ( uriDescription != null && uriDescription.length() > 0 )
+            {
+                request.addBodyParameter( "description" ,
+                                          uriDescription );
+            }
         }
 
         Response response = sendSignedRequest( request );

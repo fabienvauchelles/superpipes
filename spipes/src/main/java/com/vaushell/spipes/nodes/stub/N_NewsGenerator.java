@@ -6,7 +6,6 @@ package com.vaushell.spipes.nodes.stub;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
-import com.vaushell.spipes.nodes.rss.NewsFactory;
 import com.vaushell.spipes.tools.ValuesGenerator;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -50,19 +49,19 @@ public class N_NewsGenerator
 
         String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
                                                                    20 );
-        News news = NewsFactory.INSTANCE.create( ValuesGenerator.getRandomText( 10 ,
-                                                                                20 ) ,
-                                                 ValuesGenerator.getRandomText( 20 ,
-                                                                                30 ) ,
-                                                 new URI( uriStr ) ,
-                                                 new URI( uriStr ) ,
-                                                 ValuesGenerator.getRandomText( 1 ,
-                                                                                2 ) ,
-                                                 ValuesGenerator.getRandomText( 100 ,
-                                                                                200 ) ,
-                                                 ValuesGenerator.getRandomWordSet( 3 ,
-                                                                                   8 ) ,
-                                                 new Date() );
+        News news = News.create( ValuesGenerator.getRandomText( 10 ,
+                                                                20 ) ,
+                                 ValuesGenerator.getRandomText( 20 ,
+                                                                30 ) ,
+                                 new URI( uriStr ) ,
+                                 new URI( uriStr ) ,
+                                 ValuesGenerator.getRandomText( 1 ,
+                                                                2 ) ,
+                                 ValuesGenerator.getRandomText( 100 ,
+                                                                200 ) ,
+                                 ValuesGenerator.getRandomWordSet( 3 ,
+                                                                   8 ) ,
+                                 new Date() );
 
         sendMessage( news );
     }
