@@ -39,7 +39,7 @@
         </node>
         <node>
             <id>reduce</id>
-            <type>com.vaushell.spipes.nodes.bitly.N_Bitly_Reduce</type>
+            <type>com.vaushell.spipes.nodes.bitly.N_Bitly_Shorten</type>
             <param name="username" value="o_12n319r5dp" />
             <param name="apikey" value="R_86460adc9f99f3270c25190f82799c0c" />
         </node>

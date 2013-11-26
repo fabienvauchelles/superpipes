@@ -6,13 +6,13 @@ package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
+import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.TreeSet;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,11 @@ public class N_TW_Post
         }
         else
         {
-            if ( message instanceof News )
+            if ( message instanceof Tweet )
+            {
+                tweet = (Tweet) message;
+            }
+            else if ( message instanceof News )
             {
                 tweet = convertFromNews( (News) message );
             }
@@ -131,7 +135,7 @@ public class N_TW_Post
         }
         else
         {
-            String title = cleanHTML( news.getTitle() );
+            String title = HTMLhelper.cleanHTML( news.getTitle() );
 
             sb.append( " (" ).append( uri ).append( ")" );
             if ( title.length() + sb.length() > TWEET_SIZE )
@@ -170,15 +174,4 @@ public class N_TW_Post
     // PRIVATE
     private final static Logger logger = LoggerFactory.getLogger( N_TW_Post.class );
     private TwitterClient client;
-
-    private static String cleanHTML( String s )
-    {
-        if ( s == null )
-        {
-            return null;
-        }
-
-        return StringEscapeUtils.unescapeHtml( s.replaceAll( "<[^>]+>" ,
-                                                             "" ) );
-    }
 }

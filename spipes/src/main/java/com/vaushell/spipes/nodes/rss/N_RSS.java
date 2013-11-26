@@ -124,6 +124,7 @@ public class N_RSS
         return NewsFactory.INSTANCE.create( entry.getTitle() ,
                                             description ,
                                             new URI( uriStr ) ,
+                                            new URI( uriStr ) ,
                                             entry.getAuthor() ,
                                             content ,
                                             tags ,

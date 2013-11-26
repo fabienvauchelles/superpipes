@@ -48,12 +48,14 @@ public class N_NewsGenerator
             logger.trace( "[" + getNodeID() + "] generate post" );
         }
 
+        String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
+                                                                   20 );
         News news = NewsFactory.INSTANCE.create( ValuesGenerator.getRandomText( 10 ,
                                                                                 20 ) ,
                                                  ValuesGenerator.getRandomText( 20 ,
                                                                                 30 ) ,
-                                                 new URI( "http://" + ValuesGenerator.getRandomWord( 10 ,
-                                                                                                     20 ) ) ,
+                                                 new URI( uriStr ) ,
+                                                 new URI( uriStr ) ,
                                                  ValuesGenerator.getRandomText( 1 ,
                                                                                 2 ) ,
                                                  ValuesGenerator.getRandomText( 100 ,

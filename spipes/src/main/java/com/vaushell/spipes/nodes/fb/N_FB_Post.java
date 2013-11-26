@@ -6,13 +6,12 @@ package com.vaushell.spipes.nodes.fb;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
+import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import com.vaushell.spipes.tools.scribe.fb.FacebookException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.TreeSet;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +70,11 @@ public class N_FB_Post
         }
         else
         {
-            if ( message instanceof News )
+            if ( message instanceof FB_Post )
+            {
+                post = (FB_Post) message;
+            }
+            else if ( message instanceof News )
             {
                 post = convertFromNews( (News) message );
             }
@@ -105,7 +108,7 @@ public class N_FB_Post
         String ID = client.post( post.getMessage() ,
                                  uri ,
                                  post.getURIname() ,
-                                 null ,
+                                 post.getURIcaption() ,
                                  post.getURIdescription() );
 
         post.setID( ID );
@@ -123,44 +126,26 @@ public class N_FB_Post
 
     private static FB_Post convertFromNews( News news )
     {
-        if ( ( news.getTitle() == null || news.getTitle().length() <= 0 )
-             && ( news.getURI() == null ) )
+        if ( news.getURI() == null )
         {
-            throw new NullPointerException( "Title and URL can not be null" );
+            throw new NullPointerException( "URI can not be null" );
         }
 
-        if ( news.getTags() == null )
+        String caption;
+        if ( news.getURIsource() != null )
         {
-            throw new NullPointerException();
+            caption = news.getURIsource().getHost();
         }
-
-        String title = cleanHTML( news.getTitle() );
-
-        String description = cleanHTML( news.getDescription() );
-
-        TreeSet<String> correctedTags = new TreeSet<>();
-        for ( String tag : news.getTags() )
+        else
         {
-            String correctedTag = tag.toLowerCase();
-
-            correctedTags.add( correctedTag );
+            caption = null;
         }
 
         return new FB_Post( null ,
                             news.getURI() ,
-                            title ,
-                            description ,
-                            correctedTags );
-    }
-
-    private static String cleanHTML( String s )
-    {
-        if ( s == null )
-        {
-            return null;
-        }
-
-        return StringEscapeUtils.unescapeHtml( s.replaceAll( "<[^>]+>" ,
-                                                             "" ) );
+                            news.getURIsource() ,
+                            HTMLhelper.cleanHTML( news.getTitle() ) ,
+                            caption ,
+                            HTMLhelper.cleanHTML( news.getDescription() ) );
     }
 }

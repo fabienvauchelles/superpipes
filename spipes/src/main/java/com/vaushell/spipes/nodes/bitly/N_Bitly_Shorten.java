@@ -17,11 +17,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
-public class N_Bitly_Reduce
+public class N_Bitly_Shorten
         extends A_Node
 {
     // PUBLIC
-    public N_Bitly_Reduce()
+    public N_Bitly_Shorten()
     {
         this.bitly = null;
     }
@@ -48,7 +48,7 @@ public class N_Bitly_Reduce
             throws InterruptedException , URISyntaxException
     {
         // Receive
-        I_URI message = (I_URI) getLastMessageOrWait();
+        I_URIshorten message = (I_URIshorten) getLastMessageOrWait();
 
         if ( logger.isTraceEnabled() )
         {
@@ -63,12 +63,13 @@ public class N_Bitly_Reduce
             if ( url != null && url.getShortUrl() != null )
             {
                 message.setURI( new URI( url.getShortUrl() ) );
+                message.setURIsource( longURI );
             }
         }
 
         sendMessage( message );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_Bitly_Reduce.class );
+    private final static Logger logger = LoggerFactory.getLogger( N_Bitly_Shorten.class );
     private Provider bitly;
 }

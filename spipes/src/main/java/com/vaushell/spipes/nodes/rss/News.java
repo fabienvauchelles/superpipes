@@ -5,6 +5,7 @@
 package com.vaushell.spipes.nodes.rss;
 
 import com.vaushell.spipes.nodes.bitly.I_URI;
+import com.vaushell.spipes.nodes.bitly.I_URIshorten;
 import com.vaushell.spipes.nodes.filters.date.I_Date;
 import com.vaushell.spipes.nodes.filters.done.I_Identifier;
 import java.net.URI;
@@ -17,13 +18,14 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class News
-        implements I_Identifier , I_Date , I_URI
+        implements I_Identifier , I_Date , I_URIshorten
 {
     // PUBLIC
     public News( String ID ,
                  String title ,
                  String description ,
                  URI uri ,
+                 URI uriSource ,
                  String author ,
                  String content ,
                  Set<String> tags ,
@@ -33,6 +35,7 @@ public class News
         this.title = title;
         this.description = description;
         this.uri = uri;
+        this.uriSource = uriSource;
         this.author = author;
         this.content = content;
         this.tags = tags;
@@ -127,17 +130,30 @@ public class News
     }
 
     @Override
+    public URI getURIsource()
+    {
+        return uriSource;
+    }
+
+    @Override
+    public void setURIsource( URI uriSource )
+    {
+        this.uriSource = uriSource;
+    }
+
+    @Override
     public int hashCode()
     {
-        int hash = 7;
-        hash = 29 * hash + Objects.hashCode( this.ID );
-        hash = 29 * hash + Objects.hashCode( this.title );
-        hash = 29 * hash + Objects.hashCode( this.description );
-        hash = 29 * hash + Objects.hashCode( this.uri );
-        hash = 29 * hash + Objects.hashCode( this.author );
-        hash = 29 * hash + Objects.hashCode( this.content );
-        hash = 29 * hash + Objects.hashCode( this.tags );
-        hash = 29 * hash + Objects.hashCode( this.date );
+        int hash = 5;
+        hash = 37 * hash + Objects.hashCode( this.ID );
+        hash = 37 * hash + Objects.hashCode( this.title );
+        hash = 37 * hash + Objects.hashCode( this.description );
+        hash = 37 * hash + Objects.hashCode( this.uri );
+        hash = 37 * hash + Objects.hashCode( this.uriSource );
+        hash = 37 * hash + Objects.hashCode( this.author );
+        hash = 37 * hash + Objects.hashCode( this.content );
+        hash = 37 * hash + Objects.hashCode( this.tags );
+        hash = 37 * hash + Objects.hashCode( this.date );
         return hash;
     }
 
@@ -173,6 +189,11 @@ public class News
         {
             return false;
         }
+        if ( !Objects.equals( this.uriSource ,
+                              other.uriSource ) )
+        {
+            return false;
+        }
         if ( !Objects.equals( this.author ,
                               other.author ) )
         {
@@ -199,13 +220,14 @@ public class News
     @Override
     public String toString()
     {
-        return "News{" + "ID=" + ID + ", title=" + title + ", description=" + description + ", uri=" + uri + ", author=" + author + ", tags=" + tags + ", date=" + date + '}';
+        return "News{" + "ID=" + ID + ", title=" + title + ", description=" + description + ", uri=" + uri + ", uriSource=" + uriSource + ", author=" + author + ", content=" + content + ", tags=" + tags + ", date=" + date + '}';
     }
     // PRIVATE
     private String ID;
     private String title;
     private String description;
     private URI uri;
+    private URI uriSource;
     private String author;
     private String content;
     private Set<String> tags;
