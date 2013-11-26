@@ -53,7 +53,7 @@ public class FacebookClient
                         String uriDescription )
             throws FacebookException , IOException
     {
-        if ( ( uri == null || uri.length() <= 0 ) && ( message != null || message.length() <= 0 ) )
+        if ( ( uri == null || uri.length() <= 0 ) && ( message == null || message.length() <= 0 ) )
         {
             throw new NullPointerException();
         }
