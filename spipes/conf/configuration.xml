@@ -44,6 +44,13 @@
             <param name="secret" value="4naYAbcTOLapm9Ct" />
         </node>
         <node>
+            <id>tbpost</id>
+            <type>com.vaushell.spipes.nodes.tumblr.N_TB_Post</type>
+            <param name="blogname" value="lebidelon.tumblr.com" />
+            <param name="key" value="eD3df0jWI9GEGIOAbFbFwwKGdE1pEtfoVbefKLq49m95279QZ4" />
+            <param name="secret" value="5KVQiLxyBSb2GY2wSFgSPMqmLgeS8eyRMaxVuV35nkOdMKeEPm" />
+        </node>
+        <node>
             <id>reduce</id>
             <type>com.vaushell.spipes.nodes.bitly.N_Bitly_Shorten</type>
             <param name="username" value="o_12n319r5dp" />
@@ -82,6 +89,10 @@
         <route>
             <source>reduce</source>
             <destination>lnkpost</destination>
+        </route>
+        <route>
+            <source>reduce</source>
+            <destination>tbpost</destination>
         </route>
     </routes>
 </configuration>
