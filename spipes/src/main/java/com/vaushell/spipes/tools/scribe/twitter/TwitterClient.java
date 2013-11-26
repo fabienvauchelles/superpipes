@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author
+ * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class TwitterClient
         extends A_OAuthClient

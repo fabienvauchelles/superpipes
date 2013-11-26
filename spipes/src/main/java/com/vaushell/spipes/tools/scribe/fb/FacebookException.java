@@ -8,7 +8,7 @@ import com.vaushell.spipes.tools.scribe.OAuthException;
 
 /**
  *
- * @author
+ * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class FacebookException
         extends OAuthException

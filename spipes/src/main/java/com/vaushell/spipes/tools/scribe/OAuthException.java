@@ -6,7 +6,7 @@ package com.vaushell.spipes.tools.scribe;
 
 /**
  *
- * @author
+ * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class OAuthException
         extends Exception

@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author
+ * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public abstract class A_OAuthClient
 {
