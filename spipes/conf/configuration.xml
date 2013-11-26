@@ -22,24 +22,20 @@
         <node>
             <id>fbpost</id>
             <type>com.vaushell.spipes.nodes.fb.N_FB_Post</type>
-            <param name="id" value="221368651320094" />
+            <param name="key" value="221368651320094" />
             <param name="secret" value="ff205c6dd4614aca400aaf16d2ad3e46" />
-            <param name="token" value="CAADJVWfTix4BABipFQXCHxnZCwQmbvO4YEBbkZAVK8DBZCCr3Af4ZCpHgPUoZAS32cqldRlXBS52nylod3QX7vIUmbazKqS694BkD9ZACZColEwSCZCWZAP1QaM1ZB3ZCxGz1Y1oRyoTywY4PcaXGHh9Ad0ZBJ01evVAg1nFQLQah59dCM9O2tu1XZAQv6x2GIS3YkZCsZD" />
         </node>
         <node>
             <id>fbpostlike</id>
             <type>com.vaushell.spipes.nodes.fb.N_FB_PostLike</type>
-            <param name="id" value="221368651320094" />
+            <param name="key" value="221368651320094" />
             <param name="secret" value="ff205c6dd4614aca400aaf16d2ad3e46" />
-            <param name="token" value="CAADJVWfTix4BAIsO7oqlZBzfZAuM0w4e6spbtUgoAvkyepZCuMW4VzeqXk0ZCOdIpQZCfQgtJL1Q2VNmoOWEjZCXUbhns5fXc3k5BSC38t8wYBzp9ssilwUaQun5pk5rK4Y9BMmbWvX4GCJhXvZBqfxbXMlZAHHiiJIy51neLfmPjoI6xZAERrJu7ZB2nMwG1HcKsZD" />
         </node>
         <node>
             <id>twpost</id>
             <type>com.vaushell.spipes.nodes.twitter.N_TW_Post</type>
             <param name="key" value="YJq2YTRMe78n02VIrkHA" />
             <param name="secret" value="Dx6TKZjEBJTABZ7y4QFoD6vsdS7oDkCEnTr6OCjc" />
-            <param name="token" value="110520884-KTEmkLo8ebpG7LnJ1ekAIVCFqGOxVTLXaprge3gW" />
-            <param name="token-secret" value="Hz7acXtmtNBl0j3MYrNJqcktc5g4ESxZRuxQ8Ne70R77x" />
         </node>
         <node>
             <id>reduce</id>
@@ -68,6 +64,14 @@
         <route>
             <source>reduce</source>
             <destination>twpost</destination>
+        </route>
+        <route>
+            <source>reduce</source>
+            <destination>fbpost</destination>
+        </route>
+        <route>
+            <source>fbpost</source>
+            <destination>fbpostlike</destination>
         </route>
     </routes>
 </configuration>
