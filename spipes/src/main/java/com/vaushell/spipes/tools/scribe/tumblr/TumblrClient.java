@@ -21,12 +21,13 @@ package com.vaushell.spipes.tools.scribe.tumblr;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaushell.spipes.tools.scribe.A_OAuthClient;
+import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 import org.scribe.builder.api.TumblrApi;
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class TumblrClient
-    extends A_OAuthClient
+    extends OAuthClient
 {
     // PUBLIC
     public TumblrClient()
@@ -51,16 +52,16 @@ public class TumblrClient
         this.blogname = null;
     }
 
-    public void login( String blogname ,
-                       String key ,
-                       String secret ,
-                       Path tokenPath ,
-                       String loginText )
+    public void login( final String blogname ,
+                       final String key ,
+                       final String secret ,
+                       final Path tokenPath ,
+                       final String loginText )
         throws IOException
     {
         if ( blogname == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
         this.blogname = blogname;
@@ -75,26 +76,26 @@ public class TumblrClient
                    loginText );
     }
 
-    public long postLink( String message ,
-                          String uri ,
-                          String uriName ,
-                          String uriDescription ,
-                          Set<String> tags )
+    public long postLink( final String message ,
+                          final String uri ,
+                          final String uriName ,
+                          final String uriDescription ,
+                          final Set<String> tags )
         throws IOException , TumblrException
     {
         if ( uri == null || uri.length() <= 0 )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] post() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags );
         }
 
-        OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                 "http://api.tumblr.com/v2/blog/" + blogname + "/post" );
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "http://api.tumblr.com/v2/blog/" + blogname + "/post" );
 
         request.addBodyParameter( "type" ,
                                   "link" );
@@ -114,21 +115,21 @@ public class TumblrClient
                                       uriDescription );
         }
 
-        if ( tags != null && tags.size() > 0 )
+        if ( tags != null && !tags.isEmpty() )
         {
-            TreeSet<String> correctedTags = new TreeSet<>();
-            for ( String tag : tags )
+            final TreeSet<String> correctedTags = new TreeSet<>();
+            for ( final String tag : tags )
             {
-                String correctedTag = tag.toLowerCase();
+                final String correctedTag = tag.toLowerCase( Locale.ENGLISH );
                 correctedTags.add( correctedTag );
             }
 
-            StringBuilder sbTags = new StringBuilder();
-            for ( String tag : correctedTags )
+            final StringBuilder sbTags = new StringBuilder();
+            for ( final String tag : correctedTags )
             {
                 if ( sbTags.length() > 0 )
                 {
-                    sbTags.append( "," );
+                    sbTags.append( ',' );
                 }
 
                 sbTags.append( tag );
@@ -138,36 +139,36 @@ public class TumblrClient
                                       sbTags.toString() );
         }
 
-        Response response = sendSignedRequest( request );
+        final Response response = sendSignedRequest( request );
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
         checkErrors( response ,
                      node );
 
-        JsonNode nodeResponse = node.get( "response" );
+        final JsonNode nodeResponse = node.get( "response" );
 
         return nodeResponse.get( "id" ).asLong();
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( FacebookClient.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
     private String blogname;
 
-    private void checkErrors( Response response ,
-                              JsonNode root )
+    private void checkErrors( final Response response ,
+                              final JsonNode root )
         throws TumblrException
     {
-        JsonNode res = root.get( "response" );
+        final JsonNode res = root.get( "response" );
         if ( response.getCode() != 201 )
         {
-            JsonNode meta = root.get( "meta" );
+            final JsonNode meta = root.get( "meta" );
 
-            List<String> listErrors = new ArrayList<>();
-            JsonNode errors = res.get( "errors" );
+            final List<String> listErrors = new ArrayList<>();
+            final JsonNode errors = res.get( "errors" );
             if ( errors != null )
             {
-                for ( JsonNode error : errors )
+                for ( final JsonNode error : errors )
                 {
                     listErrors.add( error.asText() );
                 }

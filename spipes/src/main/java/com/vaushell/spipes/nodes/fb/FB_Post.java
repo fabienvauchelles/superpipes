@@ -32,12 +32,12 @@ public class FB_Post
     implements I_Identifier , I_URIshorten
 {
     // PUBLIC
-    public FB_Post( String message ,
-                    URI uri ,
-                    URI uriSource ,
-                    String uriName ,
-                    String uriCaption ,
-                    String uriDescription )
+    public FB_Post( final String message ,
+                    final URI uri ,
+                    final URI uriSource ,
+                    final String uriName ,
+                    final String uriCaption ,
+                    final String uriDescription )
     {
         this.ID = null;
         this.message = message;
@@ -55,7 +55,7 @@ public class FB_Post
     }
 
     @Override
-    public void setID( String ID )
+    public void setID( final String ID )
     {
         this.ID = ID;
     }
@@ -65,7 +65,7 @@ public class FB_Post
         return message;
     }
 
-    public void setMessage( String message )
+    public void setMessage( final String message )
     {
         this.message = message;
     }
@@ -77,7 +77,7 @@ public class FB_Post
     }
 
     @Override
-    public void setURI( URI uri )
+    public void setURI( final URI uri )
     {
         this.uri = uri;
     }
@@ -89,7 +89,7 @@ public class FB_Post
     }
 
     @Override
-    public void setURIsource( URI uriSource )
+    public void setURIsource( final URI uriSource )
     {
         this.uriSource = uriSource;
     }
@@ -99,7 +99,7 @@ public class FB_Post
         return uriName;
     }
 
-    public void setURIname( String uriName )
+    public void setURIname( final String uriName )
     {
         this.uriName = uriName;
     }
@@ -109,7 +109,7 @@ public class FB_Post
         return uriDescription;
     }
 
-    public void setURIdescription( String uriDescription )
+    public void setURIdescription( final String uriDescription )
     {
         this.uriDescription = uriDescription;
     }
@@ -119,7 +119,7 @@ public class FB_Post
         return uriCaption;
     }
 
-    public void setURIcaption( String uriCaption )
+    public void setURIcaption( final String uriCaption )
     {
         this.uriCaption = uriCaption;
     }
@@ -128,6 +128,7 @@ public class FB_Post
     public int hashCode()
     {
         int hash = 3;
+
         hash = 97 * hash + Objects.hashCode( this.ID );
         hash = 97 * hash + Objects.hashCode( this.message );
         hash = 97 * hash + Objects.hashCode( this.uri );
@@ -135,56 +136,66 @@ public class FB_Post
         hash = 97 * hash + Objects.hashCode( this.uriName );
         hash = 97 * hash + Objects.hashCode( this.uriCaption );
         hash = 97 * hash + Objects.hashCode( this.uriDescription );
+
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( obj == null )
         {
             return false;
         }
+
         if ( getClass() != obj.getClass() )
         {
             return false;
         }
+
         final FB_Post other = (FB_Post) obj;
         if ( !Objects.equals( this.ID ,
                               other.ID ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.message ,
                               other.message ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uri ,
                               other.uri ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriSource ,
                               other.uriSource ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriName ,
                               other.uriName ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriCaption ,
                               other.uriCaption ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriDescription ,
                               other.uriDescription ) )
         {
             return false;
         }
+
         return true;
     }
 

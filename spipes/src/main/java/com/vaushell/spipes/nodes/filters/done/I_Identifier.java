@@ -26,7 +26,7 @@ package com.vaushell.spipes.nodes.filters.done;
 public interface I_Identifier
 {
     // PUBLIC
-    public String getID();
+    String getID();
 
-    public void setID( String ID );
+    void setID( String ID );
 }

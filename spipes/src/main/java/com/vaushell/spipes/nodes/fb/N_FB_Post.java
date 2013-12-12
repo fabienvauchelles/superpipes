@@ -40,6 +40,8 @@ public class N_FB_Post
     // PUBLIC
     public N_FB_Post()
     {
+        super();
+
         this.client = new FacebookClient();
     }
 
@@ -47,9 +49,9 @@ public class N_FB_Post
     public void prepare()
         throws Exception
     {
-        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                    getNodeID() ,
-                                    "token" );
+        final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                          getNodeID() ,
+                                          "token" );
 
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
@@ -62,6 +64,7 @@ public class N_FB_Post
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
 
     // PROTECTED
@@ -70,15 +73,15 @@ public class N_FB_Post
         throws InterruptedException , FacebookException , IOException
     {
         // Receive
-        Object message = getLastMessageOrWait();
+        final Object message = getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
         // Convert if possible
-        FB_Post post;
+        final FB_Post post;
         if ( message == null )
         {
             post = null;
@@ -105,55 +108,55 @@ public class N_FB_Post
         }
 
         // Send to FB
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] send post to facebook : " + post );
+            LOGGER.trace( "[" + getNodeID() + "] send post to facebook : " + post );
         }
 
-        String uri;
-        if ( post.getURI() != null )
-        {
-            uri = post.getURI().toURL().toString();
-        }
-        else
+        final String uri;
+        if ( post.getURI() == null )
         {
             uri = null;
         }
+        else
+        {
+            uri = post.getURI().toURL().toString();
+        }
 
-        String ID = client.post( post.getMessage() ,
-                                 uri ,
-                                 post.getURIname() ,
-                                 post.getURIcaption() ,
-                                 post.getURIdescription() );
+        final String ID = client.post( post.getMessage() ,
+                                       uri ,
+                                       post.getURIname() ,
+                                       post.getURIcaption() ,
+                                       post.getURIdescription() );
 
         post.setID( ID );
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive ID : " + ID );
+            LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
         sendMessage( post );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_FB_Post.class );
-    private FacebookClient client;
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_FB_Post.class );
+    private final FacebookClient client;
 
-    private static FB_Post convertFromNews( News news )
+    private static FB_Post convertFromNews( final News news )
     {
         if ( news.getURI() == null )
         {
-            throw new NullPointerException( "URI can not be null" );
+            throw new IllegalArgumentException( "URI can not be null" );
         }
 
-        String caption;
-        if ( news.getURIsource() != null )
+        final String caption;
+        if ( news.getURIsource() == null )
         {
-            caption = news.getURIsource().getHost();
+            caption = null;
         }
         else
         {
-            caption = null;
+            caption = news.getURIsource().getHost();
         }
 
         return new FB_Post( null ,

@@ -25,14 +25,14 @@ import com.vaushell.spipes.tools.scribe.OAuthException;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class LinkedInException
+public final class LinkedInException
     extends OAuthException
 {
     // PUBLIC
-    public LinkedInException( int httpCode ,
-                              int apiCode ,
-                              String message ,
-                              int status )
+    public LinkedInException( final int httpCode ,
+                              final int apiCode ,
+                              final String message ,
+                              final int status )
     {
         super( httpCode ,
                apiCode ,
@@ -46,16 +46,11 @@ public class LinkedInException
         return status;
     }
 
-    public void setStatus( int status )
-    {
-        this.status = status;
-    }
-
     @Override
     public String toString()
     {
         return "FacebookException{" + super.toString() + ", status=" + status + '}';
     }
     // PRIVATE
-    private int status;
+    private final int status;
 }

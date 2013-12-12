@@ -28,7 +28,7 @@ import java.net.URI;
 public interface I_URI
 {
     // PUBLIC
-    public URI getURI();
+    URI getURI();
 
-    public void setURI( URI uri );
+    void setURI( URI uri );
 }

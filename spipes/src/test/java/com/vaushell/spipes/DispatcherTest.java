@@ -23,36 +23,27 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.stub.N_MessageLogger;
 import com.vaushell.spipes.nodes.stub.N_NewsGenerator;
 import java.util.Properties;
-import javax.naming.ConfigurationException;
 import static org.testng.AssertJUnit.*;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Unit test
+ * Unit test.
  *
  * @see Dispatcher cs
+ * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class DispatcherTest
 {
     // PUBLIC
-    @BeforeClass
-    public void setUpClass()
-            throws ConfigurationException
+    public DispatcherTest()
     {
-    }
-
-    @AfterClass
-    public void tearDownClass()
-            throws Exception
-    {
+        // Nothing
     }
 
     @Test
     public void testAdd()
     {
-        Dispatcher dispatcher = new Dispatcher();
+        final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
                             N_NewsGenerator.class ,
@@ -62,19 +53,22 @@ public class DispatcherTest
                             N_MessageLogger.class ,
                             new Properties() );
 
-        A_Node node = dispatcher.nodes.get( "generator" );
-        assertEquals( node.getClass() ,
+        final A_Node node = dispatcher.nodes.get( "generator" );
+        assertEquals( "Node should be a N_NewsGenerator class" ,
+                      node.getClass() ,
                       N_NewsGenerator.class );
 
         dispatcher.addRoute( "generator" ,
                              "receptor" );
 
-        assertTrue( dispatcher.routes.get( "generator" ).contains( "receptor" ) );
+        assertTrue( "Generator route should contain receptor" ,
+                    dispatcher.routes.get( "generator" ).contains( "receptor" ) );
 
         dispatcher.addRoute( "generator" ,
                              "receptor" );
 
-        assertEquals( dispatcher.routes.get( "generator" ).size() ,
+        assertEquals( "Generator should only have one route" ,
+                      dispatcher.routes.get( "generator" ).size() ,
                       1 );
     }
 
@@ -84,7 +78,7 @@ public class DispatcherTest
     } )
     public void testNodeDuplicate()
     {
-        Dispatcher dispatcher = new Dispatcher();
+        final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
                             N_NewsGenerator.class ,
@@ -100,7 +94,7 @@ public class DispatcherTest
     } )
     public void testAddRouteBeforeNode()
     {
-        Dispatcher dispatcher = new Dispatcher();
+        final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addRoute( "generator" ,
                              "receptor" );

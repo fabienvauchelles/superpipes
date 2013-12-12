@@ -34,28 +34,27 @@ import org.slf4j.LoggerFactory;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class Dispatcher
+public final class Dispatcher
 {
     // PUBLIC
     public Dispatcher()
     {
-        this.properties = null;
         this.nodes = new HashMap<>();
         this.routes = new HashMap<>();
     }
 
-    public String getConfig( String key )
+    public String getConfig( final String key )
     {
         return properties.getProperty( key );
     }
 
-    public void addNode( String nodeID ,
-                         String type ,
-                         Properties properties )
+    public void addNode( final String nodeID ,
+                         final String type ,
+                         final Properties properties )
     {
         if ( nodeID == null || type == null || properties == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
         if ( nodes.containsKey( nodeID ) )
@@ -63,16 +62,16 @@ public class Dispatcher
             throw new IllegalArgumentException( "node '" + nodeID + "' already exists" );
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / properties.size=" + properties.
                 size() );
         }
 
         try
         {
-            A_Node node = (A_Node) Class.forName( type ).newInstance();
+            final A_Node node = (A_Node) Class.forName( type ).newInstance();
             node.config( nodeID ,
                          properties ,
                          this );
@@ -80,34 +79,34 @@ public class Dispatcher
             nodes.put( nodeID ,
                        node );
         }
-        catch( ClassNotFoundException |
-               IllegalAccessException |
-               InstantiationException ex )
+        catch( final ClassNotFoundException |
+                     IllegalAccessException |
+                     InstantiationException ex )
         {
             throw new RuntimeException( ex );
         }
     }
 
-    public void addNode( String nodeID ,
-                         Class<?> clazz ,
-                         Properties properties )
+    public void addNode( final String nodeID ,
+                         final Class<?> clazz ,
+                         final Properties properties )
     {
         addNode( nodeID ,
                  clazz.getName() ,
                  properties );
     }
 
-    public void addRoute( String sourceID ,
-                          String destinationID )
+    public void addRoute( final String sourceID ,
+                          final String destinationID )
     {
         if ( sourceID == null || destinationID == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] addRoute : sourceID=" + sourceID + " / destinationID=" + destinationID );
         }
 
@@ -135,24 +134,24 @@ public class Dispatcher
     public void start()
         throws Exception
     {
-        if ( logger.isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
-            logger.debug(
+            LOGGER.debug(
                 "[" + getClass().getSimpleName() + "] start" );
         }
 
         // Prepare nodes
-        for ( A_Node node : nodes.values() )
+        for ( final A_Node node : nodes.values() )
         {
-            if ( logger.isTraceEnabled() )
+            if ( LOGGER.isTraceEnabled() )
             {
-                logger.trace( "[" + node.getNodeID() + "] prepare" );
+                LOGGER.trace( "[" + node.getNodeID() + "] prepare" );
             }
             node.prepare();
         }
 
         // Start nodes
-        for ( A_Node node : nodes.values() )
+        for ( final A_Node node : nodes.values() )
         {
             node.start();
         }
@@ -161,58 +160,59 @@ public class Dispatcher
     public void stopAndWait()
         throws Exception
     {
-        if ( logger.isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
-            logger.debug(
+            LOGGER.debug(
                 "[" + getClass().getSimpleName() + "] stopAndWait" );
         }
 
-        for ( A_Node node : nodes.values() )
+        for ( final A_Node node : nodes.values() )
         {
             node.stopMe();
         }
 
-        for ( A_Node node : nodes.values() )
+        for ( final A_Node node : nodes.values() )
         {
             try
             {
                 node.join();
             }
-            catch( InterruptedException ignore )
+            catch( final InterruptedException ex )
             {
+                // Ignore
             }
         }
 
-        for ( A_Node node : nodes.values() )
+        for ( final A_Node node : nodes.values() )
         {
-            if ( logger.isTraceEnabled() )
+            if ( LOGGER.isTraceEnabled() )
             {
-                logger.trace( "[" + node.getNodeID() + "] terminate" );
+                LOGGER.trace( "[" + node.getNodeID() + "] terminate" );
             }
             node.terminate();
         }
     }
 
-    public void sendMessage( String sourceID ,
-                             Object message )
+    public void sendMessage( final String sourceID ,
+                             final Object message )
     {
 
         if ( sourceID == null || message == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getClass().getSimpleName() + "] sendMessage : sourceID=" + sourceID + " / message=" + message );
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] sendMessage : sourceID=" + sourceID + " / message=" + message );
         }
 
-        Set<String> subRoutes = routes.get( sourceID );
+        final Set<String> subRoutes = routes.get( sourceID );
         if ( subRoutes != null )
         {
-            for ( String destinationID : subRoutes )
+            for ( final String destinationID : subRoutes )
             {
-                A_Node destination = nodes.get( destinationID );
+                final A_Node destination = nodes.get( destinationID );
 
                 destination.receiveMessage( message );
             }
@@ -220,51 +220,49 @@ public class Dispatcher
 
     }
 
-    public void load( XMLConfiguration config )
+    public void load( final XMLConfiguration config )
     {
         if ( config == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
-            logger.debug( "[" + getClass().getSimpleName() + "] load" );
+            LOGGER.debug( "[" + getClass().getSimpleName() + "] load" );
         }
 
         // Load general configuration
         properties = readProperties( config.configurationAt( "general" ) );
 
         // Load nodes
-        List<HierarchicalConfiguration> cNodes = config.configurationsAt( "nodes.node" );
+        final List<HierarchicalConfiguration> cNodes = config.configurationsAt( "nodes.node" );
 
         if ( cNodes != null )
         {
-            for ( HierarchicalConfiguration cNode : cNodes )
+            for ( final HierarchicalConfiguration cNode : cNodes )
             {
-                String nodeID = cNode.getString( "id" );
-                String type = cNode.getString( "type" );
-                Properties nodeProperties = readProperties( cNode );
+                final Properties nodeProperties = readProperties( cNode );
 
-                addNode( nodeID ,
-                         type ,
+                addNode( cNode.getString( "id" ) ,
+                         cNode.getString( "type" ) ,
                          nodeProperties );
             }
         }
 
         // Load routes
-        List<HierarchicalConfiguration> cRoutes = config.configurationsAt( "routes.route" );
+        final List<HierarchicalConfiguration> cRoutes = config.configurationsAt( "routes.route" );
 
         if ( cRoutes != null )
         {
-            for ( HierarchicalConfiguration cRoute : cRoutes )
+            for ( final HierarchicalConfiguration cRoute : cRoutes )
             {
-                String[] sourcesID = cRoute.getStringArray( "source" );
-                String[] destinationsID = cRoute.getStringArray( "destination" );
+                final String[] sourcesID = cRoute.getStringArray( "source" );
+                final String[] destinationsID = cRoute.getStringArray( "destination" );
 
-                for ( String sourceID : sourcesID )
+                for ( final String sourceID : sourcesID )
                 {
-                    for ( String destinationID : destinationsID )
+                    for ( final String destinationID : destinationsID )
                     {
                         addRoute( sourceID ,
                                   destinationID );
@@ -273,24 +271,26 @@ public class Dispatcher
             }
         }
     }
+
     // DEFAULT
-    HashMap<String , A_Node> nodes;
-    HashMap<String , Set<String>> routes;
+    final HashMap<String , A_Node> nodes;
+    final HashMap<String , Set<String>> routes;
+
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( Dispatcher.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
     private Properties properties;
 
-    private Properties readProperties( HierarchicalConfiguration node )
+    private Properties readProperties( final HierarchicalConfiguration node )
     {
-        Properties nodeProperties = new Properties();
+        final Properties nodeProperties = new Properties();
 
-        List<HierarchicalConfiguration> hConfs = node.configurationsAt( "param" );
+        final List<HierarchicalConfiguration> hConfs = node.configurationsAt( "param" );
         if ( hConfs != null )
         {
-            for ( HierarchicalConfiguration hConf : hConfs )
+            for ( final HierarchicalConfiguration hConf : hConfs )
             {
-                String name = hConf.getString( "[@name]" );
-                String value = hConf.getString( "[@value]" );
+                final String name = hConf.getString( "[@name]" );
+                final String value = hConf.getString( "[@value]" );
 
                 if ( name != null && name.length() > 0 && value != null && value.length() > 0 )
                 {

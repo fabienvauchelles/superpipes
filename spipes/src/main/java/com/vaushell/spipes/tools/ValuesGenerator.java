@@ -27,20 +27,20 @@ import java.util.Set;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class ValuesGenerator
+public final class ValuesGenerator
 {
     // PUBLIC
-    public static String getRandomText( int minWords ,
-                                        int maxWords )
+    public static String getRandomText( final int minWords ,
+                                        final int maxWords )
     {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
 
-        int count = rnd.nextInt( maxWords - minWords ) + minWords;
+        final int count = RND.nextInt( maxWords - minWords ) + minWords;
         for ( int i = 0 ; i < count ; ++i )
         {
             if ( sb.length() > 0 )
             {
-                sb.append( " " );
+                sb.append( ' ' );
             }
 
             sb.append( getRandomWord( 3 ,
@@ -50,12 +50,12 @@ public class ValuesGenerator
         return sb.toString();
     }
 
-    public static Set<String> getRandomWordSet( int minWords ,
-                                                int maxWords )
+    public static Set<String> getRandomWordSet( final int minWords ,
+                                                final int maxWords )
     {
-        HashSet<String> s = new HashSet<>();
+        final HashSet<String> s = new HashSet<>();
 
-        int count = rnd.nextInt( maxWords - minWords ) + minWords;
+        final int count = RND.nextInt( maxWords - minWords ) + minWords;
         for ( int i = 0 ; i < count ; ++i )
         {
             s.add( getRandomWord( 3 ,
@@ -65,15 +65,15 @@ public class ValuesGenerator
         return s;
     }
 
-    public static String getRandomWord( int minLetters ,
-                                        int maxLetters )
+    public static String getRandomWord( final int minLetters ,
+                                        final int maxLetters )
     {
-        char[] str = new char[ rnd.nextInt( maxLetters - minLetters ) + minLetters ];
+        final char[] str = new char[ RND.nextInt( maxLetters - minLetters ) + minLetters ];
 
         for ( int i = 0 ; i < str.length ; ++i )
         {
-            int charCode = rnd.nextInt( 26 );
-            if ( rnd.nextBoolean() )
+            int charCode = RND.nextInt( 26 );
+            if ( RND.nextBoolean() )
             {
                 charCode += 65;
             }
@@ -88,5 +88,10 @@ public class ValuesGenerator
         return new String( str );
     }
     // PRIVATE
-    private final static Random rnd = new Random();
+    private static final Random RND = new Random();
+
+    private ValuesGenerator()
+    {
+        // Nothing
+    }
 }

@@ -21,7 +21,7 @@ package com.vaushell.spipes.tools.scribe.twitter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaushell.spipes.tools.scribe.A_OAuthClient;
+import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class TwitterClient
-    extends A_OAuthClient
+    extends OAuthClient
 {
     // PUBLIC
     public TwitterClient()
@@ -45,10 +45,10 @@ public class TwitterClient
         super();
     }
 
-    public void login( String key ,
-                       String secret ,
-                       Path tokenPath ,
-                       String loginText )
+    public void login( final String key ,
+                       final String secret ,
+                       final Path tokenPath ,
+                       final String loginText )
         throws IOException
     {
         loginImpl( TwitterApi.class ,
@@ -61,29 +61,29 @@ public class TwitterClient
                    loginText );
     }
 
-    public long tweet( String message )
+    public long tweet( final String message )
         throws IOException , OAuthException
     {
         if ( message == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] tweet() : message=" + message );
         }
 
-        OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                 "https://api.twitter.com/1.1/statuses/update.json" );
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://api.twitter.com/1.1/statuses/update.json" );
         request.addBodyParameter( "status" ,
                                   message );
 
-        Response response = sendSignedRequest( request );
+        final Response response = sendSignedRequest( request );
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
         checkErrors( response ,
                      node );
@@ -91,16 +91,16 @@ public class TwitterClient
         return node.get( "id" ).asLong();
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( TwitterClient.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( TwitterClient.class );
 
-    private void checkErrors( Response response ,
-                              JsonNode root )
+    private void checkErrors( final Response response ,
+                              final JsonNode root )
         throws OAuthException
     {
-        JsonNode error = root.get( "errors" );
+        final JsonNode error = root.get( "errors" );
         if ( error != null )
         {
-            JsonNode first = error.get( 0 );
+            final JsonNode first = error.get( 0 );
 
             throw new OAuthException( response.getCode() ,
                                       first.get( "code" ).asInt() ,

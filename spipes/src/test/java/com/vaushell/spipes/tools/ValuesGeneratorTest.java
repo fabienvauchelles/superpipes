@@ -20,14 +20,11 @@
 package com.vaushell.spipes.tools;
 
 import java.util.Set;
-import javax.naming.ConfigurationException;
 import static org.testng.AssertJUnit.*;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
- * Unit test
+ * Unit test.
  *
  * @see ValuesGenerator
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
@@ -35,16 +32,9 @@ import org.testng.annotations.Test;
 public class ValuesGeneratorTest
 {
     // PUBLIC
-    @BeforeClass
-    public void setUpClass()
-            throws ConfigurationException
+    public ValuesGeneratorTest()
     {
-    }
-
-    @AfterClass
-    public void tearDownClass()
-            throws Exception
-    {
+        // Nothing
     }
 
     @Test
@@ -52,13 +42,16 @@ public class ValuesGeneratorTest
     {
         for ( int i = 0 ; i < 1000 ; ++i )
         {
-            String word = ValuesGenerator.getRandomWord( 10 ,
-                                                         60 );
+            final String word = ValuesGenerator.getRandomWord( 10 ,
+                                                               60 );
 
-            assertTrue( word.length() >= 10 );
-            assertTrue( word.length() < 60 );
+            assertTrue( "Word length must be greather than 10 characters" ,
+                        word.length() >= 10 );
+            assertTrue( "Word length must be less than 60 characters" ,
+                        word.length() < 60 );
 
-            assertTrue( isWord( word ) );
+            assertTrue( "A word should only contain character" ,
+                        isWord( word ) );
         }
     }
 
@@ -67,12 +60,14 @@ public class ValuesGeneratorTest
     {
         for ( int i = 0 ; i < 1000 ; ++i )
         {
-            String text = ValuesGenerator.getRandomText( 10 ,
-                                                         60 );
-            String[] words = text.split( " " );
+            final String text = ValuesGenerator.getRandomText( 10 ,
+                                                               60 );
+            final String[] words = text.split( " " );
 
-            assertTrue( words.length >= 10 );
-            assertTrue( words.length < 60 );
+            assertTrue( "Text length must be greather than 10 characters" ,
+                        words.length >= 10 );
+            assertTrue( "Text length must be less than 60 characters" ,
+                        words.length < 60 );
         }
     }
 
@@ -81,20 +76,22 @@ public class ValuesGeneratorTest
     {
         for ( int i = 0 ; i < 1000 ; ++i )
         {
-            Set<String> s = ValuesGenerator.getRandomWordSet( 10 ,
-                                                              60 );
+            final Set<String> s = ValuesGenerator.getRandomWordSet( 10 ,
+                                                                    60 );
 
-            assertTrue( s.size() >= 10 );
-            assertTrue( s.size() < 60 );
+            assertTrue( "Set length must be greather than 10 characters" ,
+                        s.size() >= 10 );
+            assertTrue( "Set length must be less than 60 characters" ,
+                        s.size() < 60 );
         }
     }
 
     // PRIVATE
-    private boolean isWord( String word )
+    private boolean isWord( final String word )
     {
         for ( int i = 0 ; i < word.length() ; ++i )
         {
-            char c = word.charAt( i );
+            final char c = word.charAt( i );
 
             if ( !Character.isLetter( c ) )
             {

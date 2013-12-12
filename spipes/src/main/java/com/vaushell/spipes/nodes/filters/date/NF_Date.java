@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,37 +38,39 @@ public class NF_Date
     // PUBLIC
     public NF_Date()
     {
-        this.minDate = null;
-        this.maxDate = null;
+        super();
 
-        this.df = new SimpleDateFormat( "dd/MM/yyyy HH:ss" );
+        this.df = new SimpleDateFormat( "dd/MM/yyyy HH:ss" ,
+                                        Locale.ENGLISH );
     }
 
     @Override
     public void prepare()
         throws IOException
     {
-        String minDateStr = getConfig( "date-min" );
+        final String minDateStr = getConfig( "date-min" );
         if ( minDateStr != null )
         {
             try
             {
                 minDate = df.parse( minDateStr );
             }
-            catch( ParseException ignore )
+            catch( final ParseException ex )
             {
+                // Nothing
             }
         }
 
-        String maxDateStr = getConfig( "date-max" );
+        final String maxDateStr = getConfig( "date-max" );
         if ( maxDateStr != null )
         {
             try
             {
                 maxDate = df.parse( maxDateStr );
             }
-            catch( ParseException ignore )
+            catch( final ParseException ex )
             {
+                // Nothing
             }
         }
     }
@@ -75,6 +78,7 @@ public class NF_Date
     @Override
     public void terminate()
     {
+        // Nothing
     }
 
     // PROTECTED
@@ -82,11 +86,11 @@ public class NF_Date
     protected void loop()
         throws InterruptedException
     {
-        I_Date message = (I_Date) getLastMessageOrWait();
+        final I_Date message = (I_Date) getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] filter message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] filter message : " + message );
         }
 
         if ( message.getDate() == null )
@@ -107,8 +111,8 @@ public class NF_Date
         sendMessage( message );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( NF_Date.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( NF_Date.class );
     private Date minDate;
     private Date maxDate;
-    private SimpleDateFormat df;
+    private final SimpleDateFormat df;
 }

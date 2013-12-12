@@ -38,6 +38,8 @@ public class N_FB_PostLike
     // PUBLIC
     public N_FB_PostLike()
     {
+        super();
+
         this.client = new FacebookClient();
     }
 
@@ -45,9 +47,9 @@ public class N_FB_PostLike
     public void prepare()
         throws Exception
     {
-        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                    getNodeID() ,
-                                    "token" );
+        final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                          getNodeID() ,
+                                          "token" );
 
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
@@ -60,6 +62,7 @@ public class N_FB_PostLike
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
 
     // PROTECTED
@@ -68,17 +71,17 @@ public class N_FB_PostLike
         throws InterruptedException , IOException , FacebookException
     {
         // Receive
-        FB_Post post = (FB_Post) getLastMessageOrWait();
+        final FB_Post post = (FB_Post) getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive post and like it : " + post );
+            LOGGER.trace( "[" + getNodeID() + "] receive post and like it : " + post );
         }
 
         // Like
         client.likePost( post.getID() );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_FB_PostLike.class );
-    private FacebookClient client;
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_FB_PostLike.class );
+    private final FacebookClient client;
 }

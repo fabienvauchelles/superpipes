@@ -38,7 +38,7 @@ public class N_Bitly_Shorten
     // PUBLIC
     public N_Bitly_Shorten()
     {
-        this.bitly = null;
+        super();
     }
 
     @Override
@@ -55,25 +55,26 @@ public class N_Bitly_Shorten
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
-    // PROTECTED
 
+    // PROTECTED
     @Override
     protected void loop()
         throws InterruptedException , URISyntaxException
     {
         // Receive
-        I_URIshorten message = (I_URIshorten) getLastMessageOrWait();
+        final I_URIshorten message = (I_URIshorten) getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        URI longURI = message.getURI();
+        final URI longURI = message.getURI();
         if ( longURI != null )
         {
-            Url url = bitly.call( Bitly.shorten( longURI.toString() ) );
+            final Url url = bitly.call( Bitly.shorten( longURI.toString() ) );
 
             if ( url != null && url.getShortUrl() != null )
             {
@@ -85,6 +86,6 @@ public class N_Bitly_Shorten
         sendMessage( message );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_Bitly_Shorten.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_Bitly_Shorten.class );
     private Provider bitly;
 }

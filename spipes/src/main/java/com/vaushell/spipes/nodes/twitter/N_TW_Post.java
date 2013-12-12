@@ -27,6 +27,7 @@ import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,8 @@ public class N_TW_Post
     // PUBLIC
     public N_TW_Post()
     {
+        super();
+
         this.client = new TwitterClient();
     }
 
@@ -48,9 +51,9 @@ public class N_TW_Post
     public void prepare()
         throws Exception
     {
-        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                    getNodeID() ,
-                                    "token" );
+        final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                          getNodeID() ,
+                                          "token" );
 
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
@@ -62,23 +65,24 @@ public class N_TW_Post
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
-    // PROTECTED
 
+    // PROTECTED
     @Override
     protected void loop()
         throws InterruptedException , IOException , OAuthException
     {
         // Receive
-        Object message = getLastMessageOrWait();
+        final Object message = getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
         // Convert if possible
-        Tweet tweet;
+        final Tweet tweet;
         if ( message == null )
         {
             tweet = null;
@@ -105,49 +109,49 @@ public class N_TW_Post
         }
 
         // Send to Twitter
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] send tweet to twitter : " + tweet );
+            LOGGER.trace( "[" + getNodeID() + "] send tweet to twitter : " + tweet );
         }
 
-        long ID = client.tweet( tweet.getMessage() );
+        final long ID = client.tweet( tweet.getMessage() );
 
         tweet.setTweetID( ID );
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive ID : " + ID );
+            LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
         sendMessage( tweet );
     }
     // DEFAULT
-    final static int TWEET_SIZE = 140;
+    static final int TWEET_SIZE = 140;
 
-    static Tweet convertFromNews( News news )
+    static Tweet convertFromNews( final News news )
     {
         if ( news.getURI() == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        String uri = news.getURI().toString();
+        final String uri = news.getURI().toString();
         if ( uri.length() > TWEET_SIZE )
         {
             throw new IllegalArgumentException( "URL is too long" );
         }
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         if ( uri.length() > TWEET_SIZE - 15 )
         {
             sb.append( uri );
         }
         else
         {
-            String title = HTMLhelper.cleanHTML( news.getTitle() );
+            final String title = HTMLhelper.cleanHTML( news.getTitle() );
             if ( title != null )
             {
-                sb.append( " (" ).append( uri ).append( ")" );
+                sb.append( " (" ).append( uri ).append( ')' );
                 if ( title.length() + sb.length() > TWEET_SIZE )
                 {
                     sb.insert( 0 ,
@@ -163,17 +167,17 @@ public class N_TW_Post
 
             if ( news.getTags() != null )
             {
-                TreeSet<String> correctedTags = new TreeSet<>();
-                for ( String tag : news.getTags() )
+                final TreeSet<String> correctedTags = new TreeSet<>();
+                for ( final String tag : news.getTags() )
                 {
-                    String correctedTag = tag.toLowerCase();
+                    final String correctedTag = tag.toLowerCase( Locale.ENGLISH );
 
                     correctedTags.add( correctedTag );
                 }
 
-                for ( String correctedTag : correctedTags )
+                for ( final String correctedTag : correctedTags )
                 {
-                    String ct = " #" + correctedTag;
+                    final String ct = " #" + correctedTag;
 
                     if ( sb.length() + ct.length() <= TWEET_SIZE )
                     {
@@ -186,6 +190,6 @@ public class N_TW_Post
         return new Tweet( sb.toString() );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_TW_Post.class );
-    private TwitterClient client;
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
+    private final TwitterClient client;
 }

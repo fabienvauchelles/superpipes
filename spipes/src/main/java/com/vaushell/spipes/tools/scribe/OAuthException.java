@@ -26,10 +26,10 @@ package com.vaushell.spipes.tools.scribe;
 public class OAuthException
     extends Exception
 {
-    // PRIVATE
-    public OAuthException( int httpCode ,
-                           int apiCode ,
-                           String message )
+    // PUBLIC
+    public OAuthException( final int httpCode ,
+                           final int apiCode ,
+                           final String message )
     {
         super( message );
 
@@ -42,19 +42,9 @@ public class OAuthException
         return apiCode;
     }
 
-    public void setApiCode( int apiCode )
-    {
-        this.apiCode = apiCode;
-    }
-
     public int getHttpCode()
     {
         return httpCode;
-    }
-
-    public void setHttpCode( int httpCode )
-    {
-        this.httpCode = httpCode;
     }
 
     @Override
@@ -63,6 +53,6 @@ public class OAuthException
         return "A_OAuthException{" + super.toString() + ", apiCode=" + apiCode + ", httpCode=" + httpCode + '}';
     }
     // PRIVATE
-    private int apiCode;
-    private int httpCode;
+    private final int apiCode;
+    private final int httpCode;
 }

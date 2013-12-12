@@ -41,6 +41,8 @@ public class N_LNK_Post
     // PUBLIC
     public N_LNK_Post()
     {
+        super();
+
         this.client = new LinkedInClient();
     }
 
@@ -48,9 +50,9 @@ public class N_LNK_Post
     public void prepare()
         throws Exception
     {
-        Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                    getNodeID() ,
-                                    "token" );
+        final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                          getNodeID() ,
+                                          "token" );
 
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
@@ -62,23 +64,24 @@ public class N_LNK_Post
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
-    // PROTECTED
 
+    // PROTECTED
     @Override
     protected void loop()
         throws InterruptedException , IOException , OAuthException
     {
         // Receive
-        Object message = getLastMessageOrWait();
+        final Object message = getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
         // Convert if possible
-        LNK_Post post;
+        final LNK_Post post;
         if ( message == null )
         {
             post = null;
@@ -105,44 +108,44 @@ public class N_LNK_Post
         }
 
         // Send to Twitter
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] send update to LinkedIn : " + post );
+            LOGGER.trace( "[" + getNodeID() + "] send update to LinkedIn : " + post );
         }
 
-        String uri;
-        if ( post.getURI() != null )
-        {
-            uri = post.getURI().toString();
-        }
-        else
+        final String uri;
+        if ( post.getURI() == null )
         {
             uri = null;
         }
+        else
+        {
+            uri = post.getURI().toString();
+        }
 
-        String ID = client.updateStatus( post.getMessage() ,
-                                         uri ,
-                                         post.getUriName() ,
-                                         post.getUriDescription() );
+        final String ID = client.updateStatus( post.getMessage() ,
+                                               uri ,
+                                               post.getURIname() ,
+                                               post.getURIdescription() );
 
         post.setID( ID );
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receive ID : " + ID );
+            LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
         sendMessage( post );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_TW_Post.class );
-    private LinkedInClient client;
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
+    private final LinkedInClient client;
 
-    private static LNK_Post convertFromNews( News news )
+    private static LNK_Post convertFromNews( final News news )
     {
         if ( news.getURI() == null )
         {
-            throw new NullPointerException( "URI can not be null" );
+            throw new IllegalArgumentException( "URI can not be null" );
         }
 
         return new LNK_Post( null ,

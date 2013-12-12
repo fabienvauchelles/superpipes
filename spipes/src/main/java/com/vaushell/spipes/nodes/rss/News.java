@@ -24,6 +24,7 @@ import com.vaushell.spipes.nodes.filters.date.I_Date;
 import com.vaushell.spipes.nodes.filters.done.I_Identifier;
 import java.net.URI;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,28 +38,22 @@ public class News
     implements I_Identifier , I_Date , I_URIshorten
 {
     // PUBLIC
-    public static News create( String title ,
-                               String description ,
-                               URI uri ,
-                               URI uriSource ,
-                               String author ,
-                               String content ,
-                               Set<String> tags ,
-                               Date date )
+    public static News create( final String title ,
+                               final String description ,
+                               final URI uri ,
+                               final URI uriSource ,
+                               final String author ,
+                               final String content ,
+                               final Set<String> tags ,
+                               final Date date )
     {
-        if ( title == null || title.length() <= 0 || uri == null || uri.toString().length() <= 0 )
+        if ( title == null || title.length() <= 0 || uri == null || uri.toString().length() <= 0 || tags == null )
         {
-            throw new NullPointerException( "Title or URL can not be null" );
-        }
-
-        if ( tags == null )
-        {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
         // Calculate ID
-        StringBuilder sb = new StringBuilder();
-        sb.append( title );
+        final StringBuilder sb = new StringBuilder( title );
 
         if ( description != null && description.length() > 0 )
         {
@@ -82,16 +77,16 @@ public class News
             sb.append( date.toString() );
         }
 
-        TreeSet<String> correctedTags = new TreeSet<>();
-        for ( String tag : tags )
+        final TreeSet<String> correctedTags = new TreeSet<>();
+        for ( final String tag : tags )
         {
-            String correctedTag = tag.toLowerCase();
+            final String correctedTag = tag.toLowerCase( Locale.ENGLISH );
 
             correctedTags.add( correctedTag );
             sb.append( correctedTag );
         }
 
-        String ID = DigestUtils.md5Hex( sb.toString() );
+        final String ID = DigestUtils.md5Hex( sb.toString() );
 
         return new News( ID ,
                          title ,
@@ -111,7 +106,7 @@ public class News
     }
 
     @Override
-    public void setID( String ID )
+    public void setID( final String ID )
     {
         this.ID = ID;
     }
@@ -121,7 +116,7 @@ public class News
         return title;
     }
 
-    public void setTitle( String title )
+    public void setTitle( final String title )
     {
         this.title = title;
     }
@@ -131,7 +126,7 @@ public class News
         return description;
     }
 
-    public void setDescription( String description )
+    public void setDescription( final String description )
     {
         this.description = description;
     }
@@ -143,7 +138,7 @@ public class News
     }
 
     @Override
-    public void setURI( URI uri )
+    public void setURI( final URI uri )
     {
         this.uri = uri;
     }
@@ -153,7 +148,7 @@ public class News
         return author;
     }
 
-    public void setAuthor( String author )
+    public void setAuthor( final String author )
     {
         this.author = author;
     }
@@ -163,7 +158,7 @@ public class News
         return content;
     }
 
-    public void setContent( String content )
+    public void setContent( final String content )
     {
         this.content = content;
     }
@@ -173,8 +168,7 @@ public class News
         return tags;
     }
 
-    public void setTags(
-        Set<String> tags )
+    public void setTags( final Set<String> tags )
     {
         this.tags = tags;
     }
@@ -182,13 +176,27 @@ public class News
     @Override
     public Date getDate()
     {
-        return date;
+        if ( dateInMs == null )
+        {
+            return null;
+        }
+        else
+        {
+            return new Date( dateInMs );
+        }
     }
 
     @Override
-    public void setDate( Date date )
+    public void setDate( final Date date )
     {
-        this.date = date;
+        if ( date == null )
+        {
+            this.dateInMs = null;
+        }
+        else
+        {
+            this.dateInMs = date.getTime();
+        }
     }
 
     @Override
@@ -198,7 +206,7 @@ public class News
     }
 
     @Override
-    public void setURIsource( URI uriSource )
+    public void setURIsource( final URI uriSource )
     {
         this.uriSource = uriSource;
     }
@@ -207,6 +215,7 @@ public class News
     public int hashCode()
     {
         int hash = 5;
+
         hash = 37 * hash + Objects.hashCode( this.ID );
         hash = 37 * hash + Objects.hashCode( this.title );
         hash = 37 * hash + Objects.hashCode( this.description );
@@ -215,86 +224,98 @@ public class News
         hash = 37 * hash + Objects.hashCode( this.author );
         hash = 37 * hash + Objects.hashCode( this.content );
         hash = 37 * hash + Objects.hashCode( this.tags );
-        hash = 37 * hash + Objects.hashCode( this.date );
+        hash = 37 * hash + Objects.hashCode( this.dateInMs );
+
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( obj == null )
         {
             return false;
         }
+
         if ( getClass() != obj.getClass() )
         {
             return false;
         }
+
         final News other = (News) obj;
         if ( !Objects.equals( this.ID ,
                               other.ID ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.title ,
                               other.title ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.description ,
                               other.description ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uri ,
                               other.uri ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriSource ,
                               other.uriSource ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.author ,
                               other.author ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.content ,
                               other.content ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.tags ,
                               other.tags ) )
         {
             return false;
         }
-        if ( !Objects.equals( this.date ,
-                              other.date ) )
+
+        if ( !Objects.equals( this.dateInMs ,
+                              other.dateInMs ) )
         {
             return false;
         }
+
         return true;
     }
 
     @Override
     public String toString()
     {
-        return "News{" + "ID=" + ID + ", title=" + title + ", description=" + description + ", uri=" + uri + ", uriSource=" + uriSource + ", author=" + author + ", content=" + content + ", tags=" + tags + ", date=" + date + '}';
+        return "News{" + "ID=" + ID + ", title=" + title + ", description=" + description + ", uri=" + uri + ", uriSource=" + uriSource + ", author=" + author + ", content=" + content + ", tags=" + tags + ", dateInMs=" + dateInMs + '}';
     }
 
     // DEFAULT
-    News( String ID ,
-          String title ,
-          String description ,
-          URI uri ,
-          URI uriSource ,
-          String author ,
-          String content ,
-          Set<String> tags ,
-          Date date )
+    News( final String ID ,
+          final String title ,
+          final String description ,
+          final URI uri ,
+          final URI uriSource ,
+          final String author ,
+          final String content ,
+          final Set<String> tags ,
+          final Date date )
     {
         this.ID = ID;
         this.title = title;
@@ -304,7 +325,15 @@ public class News
         this.author = author;
         this.content = content;
         this.tags = tags;
-        this.date = date;
+
+        if ( date == null )
+        {
+            this.dateInMs = null;
+        }
+        else
+        {
+            this.dateInMs = date.getTime();
+        }
     }
     // PRIVATE
     private String ID;
@@ -315,5 +344,5 @@ public class News
     private String author;
     private String content;
     private Set<String> tags;
-    private Date date;
+    private Long dateInMs;
 }

@@ -25,14 +25,14 @@ import com.vaushell.spipes.tools.scribe.OAuthException;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class FacebookException
+public final class FacebookException
     extends OAuthException
 {
-    // PRIVATE
-    public FacebookException( int httpCode ,
-                              int apiCode ,
-                              String message ,
-                              String type )
+    // PUBLIC
+    public FacebookException( final int httpCode ,
+                              final int apiCode ,
+                              final String message ,
+                              final String type )
     {
         super( httpCode ,
                apiCode ,
@@ -46,16 +46,11 @@ public class FacebookException
         return type;
     }
 
-    public void setType( String type )
-    {
-        this.type = type;
-    }
-
     @Override
     public String toString()
     {
         return "FacebookException{" + super.toString() + ", type=" + type + '}';
     }
     // PRIVATE
-    private String type;
+    private final String type;
 }

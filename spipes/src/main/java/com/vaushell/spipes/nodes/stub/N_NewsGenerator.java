@@ -38,18 +38,21 @@ public class N_NewsGenerator
     // PUBLIC
     public N_NewsGenerator()
     {
+        super();
     }
 
     @Override
     public void prepare()
         throws Exception
     {
+        // Nothing
     }
 
     @Override
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
 
     // PROTECTED
@@ -57,29 +60,29 @@ public class N_NewsGenerator
     protected void loop()
         throws URISyntaxException
     {
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] generate post" );
+            LOGGER.trace( "[" + getNodeID() + "] generate post" );
         }
 
-        String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
-                                                                   20 );
-        News news = News.create( ValuesGenerator.getRandomText( 10 ,
-                                                                20 ) ,
-                                 ValuesGenerator.getRandomText( 20 ,
-                                                                30 ) ,
-                                 new URI( uriStr ) ,
-                                 new URI( uriStr ) ,
-                                 ValuesGenerator.getRandomText( 1 ,
-                                                                2 ) ,
-                                 ValuesGenerator.getRandomText( 100 ,
-                                                                200 ) ,
-                                 ValuesGenerator.getRandomWordSet( 3 ,
-                                                                   8 ) ,
-                                 new Date() );
+        final String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
+                                                                         20 );
+        final News news = News.create( ValuesGenerator.getRandomText( 10 ,
+                                                                      20 ) ,
+                                       ValuesGenerator.getRandomText( 20 ,
+                                                                      30 ) ,
+                                       new URI( uriStr ) ,
+                                       new URI( uriStr ) ,
+                                       ValuesGenerator.getRandomText( 1 ,
+                                                                      2 ) ,
+                                       ValuesGenerator.getRandomText( 100 ,
+                                                                      200 ) ,
+                                       ValuesGenerator.getRandomWordSet( 3 ,
+                                                                         8 ) ,
+                                       new Date() );
 
         sendMessage( news );
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_NewsGenerator.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_NewsGenerator.class );
 }

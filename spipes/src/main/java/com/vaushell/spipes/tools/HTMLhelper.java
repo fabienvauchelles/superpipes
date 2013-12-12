@@ -25,15 +25,16 @@ import org.apache.commons.lang.StringEscapeUtils;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class HTMLhelper
+public final class HTMLhelper
 {
+    // PUBLIC
     /**
-     * Remove html tags and normalize html chararacters
+     * Remove html tags and normalize html chararacters.
      *
-     * @param s
-     * @return
+     * @param s Source string
+     * @return cleaned string
      */
-    public static String cleanHTML( String s )
+    public static String cleanHTML( final String s )
     {
         if ( s == null )
         {
@@ -42,5 +43,11 @@ public class HTMLhelper
 
         return StringEscapeUtils.unescapeHtml( s.replaceAll( "<[^>]+>" ,
                                                              "" ) );
+    }
+
+    // PRIVATE
+    private HTMLhelper()
+    {
+        // Nothing
     }
 }

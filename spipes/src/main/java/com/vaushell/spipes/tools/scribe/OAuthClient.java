@@ -40,38 +40,36 @@ import org.slf4j.LoggerFactory;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public abstract class A_OAuthClient
+public class OAuthClient
 {
-    // PUBLIC
-    public A_OAuthClient()
+    // PROTECTED
+    protected OAuthClient()
     {
-        this.service = null;
-        this.accessToken = null;
+        // Nothing
     }
 
-    // PROTECTED
-    protected void loginImpl( Class<? extends Api> api ,
-                              String key ,
-                              String secret ,
-                              String scope ,
-                              String callback ,
-                              boolean useRequestToken ,
-                              Path tokenPath ,
-                              String loginText )
+    protected void loginImpl( final Class<? extends Api> api ,
+                              final String key ,
+                              final String secret ,
+                              final String scope ,
+                              final String callback ,
+                              final boolean useRequestToken ,
+                              final Path tokenPath ,
+                              final String loginText )
         throws IOException
     {
         if ( api == null || key == null || secret == null || tokenPath == null || loginText == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
-            logger.debug(
+            LOGGER.debug(
                 "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath + " / loginText=" + loginText );
         }
 
-        ServiceBuilder builder = new ServiceBuilder()
+        final ServiceBuilder builder = new ServiceBuilder()
             .provider( api )
             .apiKey( key )
             .apiSecret( secret );
@@ -92,21 +90,22 @@ public abstract class A_OAuthClient
         if ( accessToken == null )
         {
             // Get the request token
-            Token requestToken = useRequestToken ? service.getRequestToken() : null;
+            final Token requestToken = useRequestToken ? service.getRequestToken() : null;
 
             // Making the user validate your request token
-            String authUrl = service.getAuthorizationUrl( requestToken );
+            final String authUrl = service.getAuthorizationUrl( requestToken );
             System.out.println( loginText + " Use this URL :" );
             System.out.println( authUrl );
 
             System.out.println( loginText + " Enter code :" );
 
-            Scanner sc = new Scanner( System.in );
-            String code = sc.next();
+            final Scanner sc = new Scanner( System.in ,
+                                            "UTF-8" );
+            final String code = sc.next();
             System.out.println( loginText + " Read code is '" + code + "'" );
 
             // Get the access Token
-            Verifier v = new Verifier( code );
+            final Verifier v = new Verifier( code );
             accessToken = service.getAccessToken( requestToken ,
                                                   v );
 
@@ -115,16 +114,16 @@ public abstract class A_OAuthClient
         }
     }
 
-    protected Response sendSignedRequest( OAuthRequest request )
+    protected Response sendSignedRequest( final OAuthRequest request )
     {
         if ( request == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getClass().getSimpleName() + "] sendSignedRequest() : request=" + request );
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] sendSignedRequest() : request=" + request );
         }
 
         service.signRequest( accessToken ,
@@ -133,21 +132,21 @@ public abstract class A_OAuthClient
         return request.send();
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( A_OAuthClient.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( OAuthClient.class );
     private OAuthService service;
     private Token accessToken;
 
-    private static Token loadToken( Path path )
+    private static Token loadToken( final Path path )
         throws IOException
     {
         if ( path == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + A_OAuthClient.class.getSimpleName() + "] loadToken() : path=" + path );
+            LOGGER.trace( "[" + OAuthClient.class.getSimpleName() + "] loadToken() : path=" + path );
         }
 
         if ( Files.notExists( path ) )
@@ -155,40 +154,40 @@ public abstract class A_OAuthClient
             return null;
         }
 
-        try( BufferedReader bfr = Files.newBufferedReader( path ,
-                                                           Charset.forName( "utf-8" ) ) )
+        try( final BufferedReader bfr = Files.newBufferedReader( path ,
+                                                                 Charset.forName( "utf-8" ) ) )
         {
-            String token = bfr.readLine();
-            String secret = bfr.readLine();
-            String raw = bfr.readLine();
+            final String token = bfr.readLine();
+            final String secret = bfr.readLine();
+            final String raw = bfr.readLine();
 
-            if ( raw != null )
+            if ( raw == null )
+            {
+                return new Token( token ,
+                                  secret );
+            }
+            else
             {
                 return new Token( token ,
                                   secret ,
                                   raw );
             }
-            else
-            {
-                return new Token( token ,
-                                  secret );
-            }
         }
     }
 
-    private static void saveToken( Token accessToken ,
-                                   Path path )
+    private static void saveToken( final Token accessToken ,
+                                   final Path path )
         throws IOException
     {
         if ( path == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
-                "[" + A_OAuthClient.class.getSimpleName() + "] saveToken() : accessToken=" + accessToken + " / path=" + path );
+            LOGGER.trace(
+                "[" + OAuthClient.class.getSimpleName() + "] saveToken() : accessToken=" + accessToken + " / path=" + path );
         }
 
         if ( accessToken == null )
@@ -201,8 +200,8 @@ public abstract class A_OAuthClient
             Files.createDirectories( path.getParent() );
         }
 
-        try( BufferedWriter bfr = Files.newBufferedWriter( path ,
-                                                           Charset.forName( "utf-8" ) ) )
+        try( final BufferedWriter bfr = Files.newBufferedWriter( path ,
+                                                                 Charset.forName( "utf-8" ) ) )
         {
             bfr.write( accessToken.getToken() );
             bfr.newLine();

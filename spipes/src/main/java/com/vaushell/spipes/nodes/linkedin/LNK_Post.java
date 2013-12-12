@@ -32,10 +32,10 @@ public class LNK_Post
     implements I_Identifier , I_URI
 {
     // PUBLIC
-    public LNK_Post( String message ,
-                     URI uri ,
-                     String uriName ,
-                     String uriDescription )
+    public LNK_Post( final String message ,
+                     final URI uri ,
+                     final String uriName ,
+                     final String uriDescription )
     {
         this.ID = null;
         this.message = message;
@@ -51,7 +51,7 @@ public class LNK_Post
     }
 
     @Override
-    public void setID( String ID )
+    public void setID( final String ID )
     {
         this.ID = ID;
     }
@@ -61,7 +61,7 @@ public class LNK_Post
         return message;
     }
 
-    public void setMessage( String message )
+    public void setMessage( final String message )
     {
         this.message = message;
     }
@@ -73,27 +73,27 @@ public class LNK_Post
     }
 
     @Override
-    public void setURI( URI uri )
+    public void setURI( final URI uri )
     {
         this.uri = uri;
     }
 
-    public String getUriName()
+    public String getURIname()
     {
         return uriName;
     }
 
-    public void setUriName( String uriName )
+    public void setURIname( final String uriName )
     {
         this.uriName = uriName;
     }
 
-    public String getUriDescription()
+    public String getURIdescription()
     {
         return uriDescription;
     }
 
-    public void setUriDescription( String uriDescription )
+    public void setURIdescription( final String uriDescription )
     {
         this.uriDescription = uriDescription;
     }
@@ -102,51 +102,60 @@ public class LNK_Post
     public int hashCode()
     {
         int hash = 5;
+
         hash = 41 * hash + Objects.hashCode( this.ID );
         hash = 41 * hash + Objects.hashCode( this.message );
         hash = 41 * hash + Objects.hashCode( this.uri );
         hash = 41 * hash + Objects.hashCode( this.uriName );
         hash = 41 * hash + Objects.hashCode( this.uriDescription );
+
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( obj == null )
         {
             return false;
         }
+
         if ( getClass() != obj.getClass() )
         {
             return false;
         }
+
         final LNK_Post other = (LNK_Post) obj;
         if ( !Objects.equals( this.ID ,
                               other.ID ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.message ,
                               other.message ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uri ,
                               other.uri ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriName ,
                               other.uriName ) )
         {
             return false;
         }
+
         if ( !Objects.equals( this.uriDescription ,
                               other.uriDescription ) )
         {
             return false;
         }
+
         return true;
     }
 

@@ -19,50 +19,59 @@
 
 package com.vaushell.spipes;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Main
+ * Main class.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class App
+public final class App
 {
     // PUBLIC
-    public static void main( String[] args )
+    /**
+     * Main method.
+     *
+     * @param args Command line arguments
+     * @throws Exception
+     */
+    public static void main( final String... args )
+        throws Exception
     {
+        // My config
+        final XMLConfiguration config;
+        if ( args.length > 0 )
+        {
+            config = new XMLConfiguration( args[ 0] );
+        }
+        else
+        {
+            config = new XMLConfiguration( "conf/configuration.xml" );
+        }
+
+        final Dispatcher dispatcher = new Dispatcher();
+        dispatcher.load( config );
+
+        // Run
+        dispatcher.start();
+
+        // Wait
         try
         {
-            // Config
-            Dispatcher dispatcher = new Dispatcher();
-
-            XMLConfiguration config = new XMLConfiguration( "conf/configuration.xml" );
-            dispatcher.load( config );
-
-            // Run
-            dispatcher.start();
-
-            // Wait
-            try
-            {
-                Thread.sleep( 1000 * 10 );
-            }
-            catch( InterruptedException ignore )
-            {
-            }
-
-            // Stop
-            dispatcher.stopAndWait();
+            Thread.sleep( 1000 * 10 );
         }
-        catch( Exception ex )
+        catch( final InterruptedException ex )
         {
-            logger.error( "[Main] Error" ,
-                          ex );
+            // Ignore
         }
+
+        // Stop
+        dispatcher.stopAndWait();
     }
+
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( App.class );
+    private App()
+    {
+        // Nothing
+    }
 }

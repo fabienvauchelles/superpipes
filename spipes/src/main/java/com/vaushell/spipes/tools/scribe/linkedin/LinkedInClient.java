@@ -21,7 +21,7 @@ package com.vaushell.spipes.tools.scribe.linkedin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaushell.spipes.tools.scribe.A_OAuthClient;
+import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class LinkedInClient
-    extends A_OAuthClient
+    extends OAuthClient
 {
     // PUBLIC
     public LinkedInClient()
@@ -48,10 +48,10 @@ public class LinkedInClient
         super();
     }
 
-    public void login( String key ,
-                       String secret ,
-                       Path tokenPath ,
-                       String loginText )
+    public void login( final String key ,
+                       final String secret ,
+                       final Path tokenPath ,
+                       final String loginText )
         throws IOException
     {
         loginImpl( LinkedInApi.class ,
@@ -64,27 +64,27 @@ public class LinkedInClient
                    loginText );
     }
 
-    public String updateStatus( String message ,
-                                String uri ,
-                                String uriName ,
-                                String uriDescription )
+    public String updateStatus( final String message ,
+                                final String uri ,
+                                final String uriName ,
+                                final String uriDescription )
         throws IOException , OAuthException
     {
         if ( ( uri == null || uri.length() <= 0 ) && ( message == null || message.length() <= 0 ) )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] updateStatus() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription );
         }
 
-        OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                 "http://api.linkedin.com/v1/people/~/shares?format=json" );
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "http://api.linkedin.com/v1/people/~/shares?format=json" );
 
-        Element share = new Element( "share" );
+        final Element share = new Element( "share" );
 
         // Message
         if ( message != null && message.length() > 0 )
@@ -95,7 +95,7 @@ public class LinkedInClient
         // Content
         if ( uri != null && uri.length() > 0 )
         {
-            Element content = new Element( "content" );
+            final Element content = new Element( "content" );
 
             if ( uriName != null && uriName.length() > 0 )
             {
@@ -113,20 +113,20 @@ public class LinkedInClient
         }
 
         // Visiblity
-        Element visiblity = new Element( "visibility" );
+        final Element visiblity = new Element( "visibility" );
         visiblity.addContent( new Element( "code" ).setText( "anyone" ) );
         share.addContent( visiblity );
 
-        String xmlPayload = new XMLOutputter( Format.getPrettyFormat() ).outputString( share );
+        final String xmlPayload = new XMLOutputter( Format.getPrettyFormat() ).outputString( share );
 
         request.addHeader( "Content-Type" ,
                            "application/xml" );
         request.addPayload( xmlPayload );
 
-        Response response = sendSignedRequest( request );
+        final Response response = sendSignedRequest( request );
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
         checkErrors( response ,
                      node );
@@ -134,13 +134,13 @@ public class LinkedInClient
         return node.get( "updateKey" ).asText();
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( LinkedInClient.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( LinkedInClient.class );
 
-    private void checkErrors( Response response ,
-                              JsonNode root )
+    private void checkErrors( final Response response ,
+                              final JsonNode root )
         throws LinkedInException
     {
-        JsonNode error = root.get( "errorCode" );
+        final JsonNode error = root.get( "errorCode" );
         if ( error != null )
         {
             throw new LinkedInException( response.getCode() ,

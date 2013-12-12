@@ -21,7 +21,7 @@ package com.vaushell.spipes.tools.scribe.fb;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.vaushell.spipes.tools.scribe.A_OAuthClient;
+import com.vaushell.spipes.tools.scribe.OAuthClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.scribe.builder.api.FacebookApi;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class FacebookClient
-    extends A_OAuthClient
+    extends OAuthClient
 {
     // PUBLIC
     public FacebookClient()
@@ -44,11 +44,11 @@ public class FacebookClient
         super();
     }
 
-    public void login( String key ,
-                       String secret ,
-                       String scope ,
-                       Path tokenPath ,
-                       String loginText )
+    public void login( final String key ,
+                       final String secret ,
+                       final String scope ,
+                       final Path tokenPath ,
+                       final String loginText )
         throws IOException
     {
         loginImpl( FacebookApi.class ,
@@ -61,26 +61,26 @@ public class FacebookClient
                    loginText );
     }
 
-    public String post( String message ,
-                        String uri ,
-                        String uriName ,
-                        String uriCaption ,
-                        String uriDescription )
+    public String post( final String message ,
+                        final String uri ,
+                        final String uriName ,
+                        final String uriCaption ,
+                        final String uriDescription )
         throws FacebookException , IOException
     {
         if ( ( uri == null || uri.length() <= 0 ) && ( message == null || message.length() <= 0 ) )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] post() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription );
         }
 
-        OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                 "https://graph.facebook.com/me/feed" );
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://graph.facebook.com/me/feed" );
 
         if ( message != null && message.length() > 0 )
         {
@@ -112,10 +112,10 @@ public class FacebookClient
             }
         }
 
-        Response response = sendSignedRequest( request );
+        final Response response = sendSignedRequest( request );
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
         checkErrors( response ,
                      node );
@@ -123,21 +123,21 @@ public class FacebookClient
         return node.get( "id" ).asText();
     }
 
-    public boolean likePost( String postID )
+    public boolean likePost( final String postID )
         throws IOException , FacebookException
     {
         if ( postID == null || postID.length() <= 0 )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                 "https://graph.facebook.com/" + postID + "/likes" );
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://graph.facebook.com/" + postID + "/likes" );
 
-        Response response = sendSignedRequest( request );
+        final Response response = sendSignedRequest( request );
 
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
         checkErrors( response ,
                      node );
@@ -145,13 +145,13 @@ public class FacebookClient
         return node.asBoolean();
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( FacebookClient.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
 
-    private void checkErrors( Response response ,
-                              JsonNode root )
+    private void checkErrors( final Response response ,
+                              final JsonNode root )
         throws FacebookException
     {
-        JsonNode error = root.get( "error" );
+        final JsonNode error = root.get( "error" );
         if ( error != null )
         {
             throw new FacebookException( response.getCode() ,

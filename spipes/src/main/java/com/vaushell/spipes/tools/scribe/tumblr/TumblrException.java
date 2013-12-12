@@ -26,14 +26,14 @@ import java.util.List;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class TumblrException
+public final class TumblrException
     extends OAuthException
 {
-    // PRIVATE
-    public TumblrException( int httpCode ,
-                            int apiCode ,
-                            String message ,
-                            List<String> errors )
+    // PUBLIC
+    public TumblrException( final int httpCode ,
+                            final int apiCode ,
+                            final String message ,
+                            final List<String> errors )
     {
         super( httpCode ,
                apiCode ,
@@ -47,7 +47,7 @@ public class TumblrException
         return errors;
     }
 
-    public void addError( String error )
+    public void addError( final String error )
     {
         errors.add( error );
     }
@@ -58,5 +58,5 @@ public class TumblrException
         return super.getMessage() + " / errors=" + errors;
     }
     // PRIVATE
-    private List<String> errors;
+    private final List<String> errors;
 }

@@ -29,7 +29,7 @@ public interface I_URIshorten
     extends I_URI
 {
     // PUBLIC
-    public URI getURIsource();
+    URI getURIsource();
 
-    public void setURIsource( URI uriSource );
+    void setURIsource( URI uriSource );
 }

@@ -33,6 +33,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,39 +47,43 @@ public class N_RSS
     // PUBLIC
     public N_RSS()
     {
+        super();
     }
 
     @Override
     public void prepare()
         throws Exception
     {
+        // Nothing
     }
 
     @Override
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
 
     // PROTECTED
     @Override
+    @SuppressWarnings( "unchecked" )
     protected void loop()
-        throws URISyntaxException , IllegalArgumentException , FeedException , IOException
+        throws URISyntaxException , FeedException , IOException
     {
-        URL url = new URL( getConfig( "url" ) );
+        final URL url = new URL( getConfig( "url" ) );
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] read feed : " + url );
+            LOGGER.trace( "[" + getNodeID() + "] read feed : " + url );
         }
 
-        SyndFeedInput input = new SyndFeedInput();
-        SyndFeed feed = input.build( new XmlReader( url ) );
+        final SyndFeedInput input = new SyndFeedInput();
+        final SyndFeed feed = input.build( new XmlReader( url ) );
 
-        List<SyndEntry> entries = feed.getEntries();
-        for ( SyndEntry entry : entries )
+        final List<SyndEntry> entries = feed.getEntries();
+        for ( final SyndEntry entry : entries )
         {
-            News news = convert( entry );
+            final News news = convert( entry );
             if ( news != null )
             {
                 sendMessage( news );
@@ -86,38 +91,40 @@ public class N_RSS
         }
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_RSS.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_RSS.class );
 
-    private static News convert( SyndEntry entry )
+    @SuppressWarnings( "unchecked" )
+    private static News convert( final SyndEntry entry )
         throws URISyntaxException
     {
-        String uriStr = entry.getUri();
+        final String uriStr = entry.getUri();
         if ( uriStr == null )
         {
             return null;
         }
 
-        String description;
-        if ( entry.getDescription() != null )
-        {
-            description = entry.getDescription().getValue();
-        }
-        else
+        final String description;
+        if ( entry.getDescription() == null )
         {
             description = null;
         }
+        else
+        {
+            description = entry.getDescription().getValue();
+        }
 
-        StringBuilder sb = new StringBuilder();
-        List<SyndContent> scontents = entry.getContents();
+        final StringBuilder sb = new StringBuilder();
+
+        final List<SyndContent> scontents = entry.getContents();
         if ( scontents != null )
         {
-            for ( SyndContent scontent : scontents )
+            for ( final SyndContent scontent : scontents )
             {
                 sb.append( scontent.getValue() );
             }
         }
 
-        String content;
+        final String content;
         if ( sb.length() > 0 )
         {
             content = sb.toString();
@@ -127,20 +134,21 @@ public class N_RSS
             content = null;
         }
 
-        HashSet<String> tags;
-        List<SyndCategory> categories = entry.getCategories();
-        if ( categories != null )
-        {
-            tags = new HashSet<>();
+        final HashSet<String> tags;
 
-            for ( SyndCategory category : categories )
-            {
-                tags.add( category.getName().toLowerCase() );
-            }
+        final List<SyndCategory> categories = entry.getCategories();
+        if ( categories == null )
+        {
+            tags = null;
         }
         else
         {
-            tags = null;
+            tags = new HashSet<>();
+
+            for ( final SyndCategory category : categories )
+            {
+                tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
+            }
         }
 
         return News.create( entry.getTitle() ,

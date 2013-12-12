@@ -30,7 +30,7 @@ public class Tweet
     implements I_Identifier
 {
     // PUBLIC
-    public Tweet( String message )
+    public Tweet( final String message )
     {
         this.ID = Long.MIN_VALUE;
         this.message = message;
@@ -48,12 +48,12 @@ public class Tweet
     }
 
     @Override
-    public void setID( String ID )
+    public void setID( final String ID )
     {
         this.ID = Long.parseLong( ID );
     }
 
-    public void setTweetID( long ID )
+    public void setTweetID( final long ID )
     {
         this.ID = ID;
     }
@@ -63,7 +63,7 @@ public class Tweet
         return message;
     }
 
-    public void setMessage( String message )
+    public void setMessage( final String message )
     {
         this.message = message;
     }
@@ -72,32 +72,38 @@ public class Tweet
     public int hashCode()
     {
         int hash = 7;
+
         hash = 83 * hash + (int) ( this.ID ^ ( this.ID >>> 32 ) );
         hash = 83 * hash + Objects.hashCode( this.message );
+
         return hash;
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals( final Object obj )
     {
         if ( obj == null )
         {
             return false;
         }
+
         if ( getClass() != obj.getClass() )
         {
             return false;
         }
+
         final Tweet other = (Tweet) obj;
         if ( this.ID != other.ID )
         {
             return false;
         }
+
         if ( !Objects.equals( this.message ,
                               other.message ) )
         {
             return false;
         }
+
         return true;
     }
 

@@ -42,17 +42,18 @@ public class NF_Done
     // PUBLIC
     public NF_Done()
     {
+        super();
+
         this.ids = new HashSet<>();
-        this.path = null;
     }
 
     @Override
     public void prepare()
         throws IOException
     {
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] load already done ids" );
+            LOGGER.trace( "[" + getNodeID() + "] load already done ids" );
         }
 
         // Config
@@ -65,13 +66,15 @@ public class NF_Done
         // Load previous ID
         if ( Files.exists( path ) )
         {
-            try( BufferedReader bfr = Files.newBufferedReader( path ,
-                                                               Charset.forName( "utf-8" ) ) )
+            try( final BufferedReader bfr = Files.newBufferedReader( path ,
+                                                                     Charset.forName( "utf-8" ) ) )
             {
-                String line;
-                while ( ( line = bfr.readLine() ) != null )
+                String line = bfr.readLine();
+                while ( line != null )
                 {
                     ids.add( line );
+
+                    line = bfr.readLine();
                 }
             }
         }
@@ -80,6 +83,7 @@ public class NF_Done
     @Override
     public void terminate()
     {
+        // Nothing
     }
 
     // PROTECTED
@@ -87,11 +91,11 @@ public class NF_Done
     protected void loop()
         throws IOException , InterruptedException
     {
-        I_Identifier message = (I_Identifier) getLastMessageOrWait();
+        final I_Identifier message = (I_Identifier) getLastMessageOrWait();
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] filter message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] filter message : " + message );
         }
 
         if ( !ids.contains( message.getID() ) )
@@ -102,10 +106,10 @@ public class NF_Done
             // Save message ID. Won't be replay
             ids.add( message.getID() );
 
-            try( BufferedWriter bfw = Files.newBufferedWriter( path ,
-                                                               Charset.forName( "utf-8" ) ,
-                                                               StandardOpenOption.APPEND ,
-                                                               StandardOpenOption.CREATE ) )
+            try( final BufferedWriter bfw = Files.newBufferedWriter( path ,
+                                                                     Charset.forName( "utf-8" ) ,
+                                                                     StandardOpenOption.APPEND ,
+                                                                     StandardOpenOption.CREATE ) )
             {
                 bfw.write( message.getID() );
                 bfw.newLine();
@@ -113,7 +117,7 @@ public class NF_Done
         }
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( NF_Done.class );
-    private HashSet<String> ids;
+    private static final Logger LOGGER = LoggerFactory.getLogger( NF_Done.class );
+    private final HashSet<String> ids;
     private Path path;
 }

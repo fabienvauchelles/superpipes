@@ -28,7 +28,7 @@ import java.util.Date;
 public interface I_Date
 {
     // PUBLIC
-    public Date getDate();
+    Date getDate();
 
-    public void setDate( Date date );
+    void setDate( Date date );
 }

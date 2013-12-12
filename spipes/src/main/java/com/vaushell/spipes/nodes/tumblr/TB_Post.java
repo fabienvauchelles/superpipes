@@ -32,12 +32,12 @@ public class TB_Post
     implements I_Identifier , I_URIshorten
 {
     // PUBLIC
-    public TB_Post( String message ,
-                    URI uri ,
-                    URI uriSource ,
-                    String uriName ,
-                    String uriDescription ,
-                    Set<String> tags )
+    public TB_Post( final String message ,
+                    final URI uri ,
+                    final URI uriSource ,
+                    final String uriName ,
+                    final String uriDescription ,
+                    final Set<String> tags )
     {
         this.ID = Long.MIN_VALUE;
         this.message = message;
@@ -55,7 +55,7 @@ public class TB_Post
     }
 
     @Override
-    public void setID( String ID )
+    public void setID( final String ID )
     {
         this.ID = Long.parseLong( ID );
     }
@@ -65,7 +65,7 @@ public class TB_Post
         return ID;
     }
 
-    public void setTumblrID( long ID )
+    public void setTumblrID( final long ID )
     {
         this.ID = ID;
     }
@@ -75,7 +75,7 @@ public class TB_Post
         return message;
     }
 
-    public void setMessage( String message )
+    public void setMessage( final String message )
     {
         this.message = message;
     }
@@ -87,7 +87,7 @@ public class TB_Post
     }
 
     @Override
-    public void setURI( URI uri )
+    public void setURI( final URI uri )
     {
         this.uri = uri;
     }
@@ -99,7 +99,7 @@ public class TB_Post
     }
 
     @Override
-    public void setURIsource( URI uriSource )
+    public void setURIsource( final URI uriSource )
     {
         this.uriSource = uriSource;
     }
@@ -109,7 +109,7 @@ public class TB_Post
         return uriName;
     }
 
-    public void setURIname( String uriName )
+    public void setURIname( final String uriName )
     {
         this.uriName = uriName;
     }
@@ -119,7 +119,7 @@ public class TB_Post
         return uriDescription;
     }
 
-    public void setURIdescription( String uriDescription )
+    public void setURIdescription( final String uriDescription )
     {
         this.uriDescription = uriDescription;
     }
@@ -129,8 +129,7 @@ public class TB_Post
         return tags;
     }
 
-    public void setTags(
-        Set<String> tags )
+    public void setTags( final Set<String> tags )
     {
         this.tags = tags;
     }

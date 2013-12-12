@@ -33,18 +33,21 @@ public class N_MessageLogger
     // PUBLIC
     public N_MessageLogger()
     {
+        super();
     }
 
     @Override
     public void prepare()
         throws Exception
     {
+        // Nothing
     }
 
     @Override
     public void terminate()
         throws Exception
     {
+        // Nothing
     }
 
     // PROTECTED
@@ -52,13 +55,13 @@ public class N_MessageLogger
     protected void loop()
         throws InterruptedException
     {
-        Object message = getLastMessageOrWait();
+        final Object message = getLastMessageOrWait();
 
-        if ( logger.isInfoEnabled() )
+        if ( LOGGER.isInfoEnabled() )
         {
-            logger.info( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.info( "[" + getNodeID() + "] receive message : " + message );
         }
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( N_MessageLogger.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_MessageLogger.class );
 }

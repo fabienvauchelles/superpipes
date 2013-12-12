@@ -35,6 +35,8 @@ public abstract class A_Node
     // PUBLIC
     public A_Node()
     {
+        super();
+
         this.nodeID = null;
         this.properties = null;
         this.dispatcher = null;
@@ -53,9 +55,9 @@ public abstract class A_Node
         return nodeID;
     }
 
-    public void config( String nodeID ,
-                        Properties properties ,
-                        Dispatcher dispatcher )
+    public void config( final String nodeID ,
+                        final Properties properties ,
+                        final Dispatcher dispatcher )
     {
         this.nodeID = nodeID;
         this.properties = properties;
@@ -65,16 +67,16 @@ public abstract class A_Node
     @Override
     public void run()
     {
-        if ( logger.isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
-            logger.debug( "[" + getNodeID() + "] start thread" );
+            LOGGER.debug( "[" + getNodeID() + "] start thread" );
         }
 
         try
         {
-            if ( logger.isTraceEnabled() )
+            if ( LOGGER.isTraceEnabled() )
             {
-                logger.trace( "[" + getNodeID() + "] loopin'" );
+                LOGGER.trace( "[" + getNodeID() + "] loopin'" );
             }
             while ( isActive() )
             {
@@ -82,68 +84,73 @@ public abstract class A_Node
                 {
                     loop();
                 }
-                catch( InterruptedException ignore )
+                catch( final InterruptedException ex )
                 {
+                    // Ignore
                 }
-                catch( Throwable th )
+                catch( final Throwable ex )
                 {
-                    logger.error( "Error" ,
-                                  th );
+                    LOGGER.error( "Error" ,
+                                  ex );
                 }
 
-                String delayStr = getConfig( "delay" );
+                final String delayStr = getConfig( "delay" );
                 if ( delayStr != null )
                 {
                     try
                     {
                         Thread.sleep( Long.parseLong( delayStr ) );
                     }
-                    catch( InterruptedException ignore )
+                    catch( final InterruptedException ex )
                     {
+                        // Ignore
                     }
                 }
             }
         }
-        catch( Throwable th )
+        catch( final Throwable th )
         {
-            logger.error( "Error" ,
+            LOGGER.error( "Error" ,
                           th );
         }
 
-        if ( logger.isDebugEnabled() )
+        if ( LOGGER.isDebugEnabled() )
         {
-            logger.debug( "[" + getNodeID() + "] stop thread" );
+            LOGGER.debug( "[" + getNodeID() + "] stop thread" );
         }
     }
 
-    public void receiveMessage( Object message )
+    public void receiveMessage( final Object message )
     {
         if ( message == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] receiveMessage : message=" + message );
+            LOGGER.trace( "[" + getNodeID() + "] receiveMessage : message=" + message );
         }
 
         synchronized( internalStack )
         {
             internalStack.addFirst( message );
 
-            internalStack.notify();
+            internalStack.notifyAll();
         }
     }
 
-    public synchronized void stopMe()
+    public void stopMe()
     {
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] stopMe" );
+            LOGGER.trace( "[" + getNodeID() + "] stopMe" );
         }
 
-        activated = false;
+        synchronized( this )
+        {
+            activated = false;
+        }
 
         interrupt();
     }
@@ -152,43 +159,46 @@ public abstract class A_Node
     protected abstract void loop()
         throws Exception;
 
-    protected String getConfig( String key )
+    protected String getConfig( final String key )
     {
         return properties.getProperty( key );
     }
 
-    protected String getMainConfig( String key )
+    protected String getMainConfig( final String key )
     {
         return dispatcher.getConfig( key );
     }
 
-    protected void sendMessage( Object message )
+    protected void sendMessage( final Object message )
     {
         if ( message == null )
         {
-            throw new NullPointerException();
+            throw new IllegalArgumentException();
         }
 
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] sendMessage : message=" + message );
+            LOGGER.trace( "[" + getNodeID() + "] sendMessage : message=" + message );
         }
 
         dispatcher.sendMessage( nodeID ,
                                 message );
     }
 
-    protected synchronized boolean isActive()
+    protected boolean isActive()
     {
-        return activated;
+        synchronized( this )
+        {
+            return activated;
+        }
     }
 
     protected Object getLastMessageOrWait()
         throws InterruptedException
     {
-        if ( logger.isTraceEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            logger.trace( "[" + getNodeID() + "] getLastMessageOrWait" );
+            LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait" );
         }
 
         synchronized( internalStack )
@@ -202,10 +212,10 @@ public abstract class A_Node
         }
     }
     // PRIVATE
-    private final static Logger logger = LoggerFactory.getLogger( A_Node.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
     private String nodeID;
     private Properties properties;
     private Dispatcher dispatcher;
-    private final LinkedList internalStack;
+    private final LinkedList<Object> internalStack;
     private volatile boolean activated;
 }
