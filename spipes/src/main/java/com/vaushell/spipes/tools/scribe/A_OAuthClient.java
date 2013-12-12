@@ -1,7 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Fabien Vauchelles (fabien_AT_vauchelles_DOT_com).
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3, 29 June 2007, of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
  */
+
 package com.vaushell.spipes.tools.scribe;
 
 import java.io.BufferedReader;
@@ -43,7 +58,7 @@ public abstract class A_OAuthClient
                               boolean useRequestToken ,
                               Path tokenPath ,
                               String loginText )
-            throws IOException
+        throws IOException
     {
         if ( api == null || key == null || secret == null || tokenPath == null || loginText == null )
         {
@@ -53,13 +68,13 @@ public abstract class A_OAuthClient
         if ( logger.isDebugEnabled() )
         {
             logger.debug(
-                    "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath + " / loginText=" + loginText );
+                "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath + " / loginText=" + loginText );
         }
 
         ServiceBuilder builder = new ServiceBuilder()
-                .provider( api )
-                .apiKey( key )
-                .apiSecret( secret );
+            .provider( api )
+            .apiKey( key )
+            .apiSecret( secret );
 
         if ( scope != null )
         {
@@ -123,7 +138,7 @@ public abstract class A_OAuthClient
     private Token accessToken;
 
     private static Token loadToken( Path path )
-            throws IOException
+        throws IOException
     {
         if ( path == null )
         {
@@ -163,7 +178,7 @@ public abstract class A_OAuthClient
 
     private static void saveToken( Token accessToken ,
                                    Path path )
-            throws IOException
+        throws IOException
     {
         if ( path == null )
         {
@@ -173,7 +188,7 @@ public abstract class A_OAuthClient
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + A_OAuthClient.class.getSimpleName() + "] saveToken() : accessToken=" + accessToken + " / path=" + path );
+                "[" + A_OAuthClient.class.getSimpleName() + "] saveToken() : accessToken=" + accessToken + " / path=" + path );
         }
 
         if ( accessToken == null )

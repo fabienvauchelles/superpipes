@@ -1,7 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Fabien Vauchelles (fabien_AT_vauchelles_DOT_com).
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3, 29 June 2007, of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
  */
+
 package com.vaushell.spipes.tools.scribe.tumblr;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class TumblrClient
-        extends A_OAuthClient
+    extends A_OAuthClient
 {
     // PUBLIC
     public TumblrClient()
@@ -41,7 +56,7 @@ public class TumblrClient
                        String secret ,
                        Path tokenPath ,
                        String loginText )
-            throws IOException
+        throws IOException
     {
         if ( blogname == null )
         {
@@ -65,7 +80,7 @@ public class TumblrClient
                           String uriName ,
                           String uriDescription ,
                           Set<String> tags )
-            throws IOException , TumblrException
+        throws IOException , TumblrException
     {
         if ( uri == null || uri.length() <= 0 )
         {
@@ -75,7 +90,7 @@ public class TumblrClient
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] post() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags );
+                "[" + getClass().getSimpleName() + "] post() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags );
         }
 
         OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -141,7 +156,7 @@ public class TumblrClient
 
     private void checkErrors( Response response ,
                               JsonNode root )
-            throws TumblrException
+        throws TumblrException
     {
         JsonNode res = root.get( "response" );
         if ( response.getCode() != 201 )

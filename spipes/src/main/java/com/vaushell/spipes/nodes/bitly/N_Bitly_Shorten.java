@@ -1,7 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Fabien Vauchelles (fabien_AT_vauchelles_DOT_com).
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3, 29 June 2007, of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
  */
+
 package com.vaushell.spipes.nodes.bitly;
 
 import com.rosaloves.bitlyj.Bitly;
@@ -18,7 +33,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public class N_Bitly_Shorten
-        extends A_Node
+    extends A_Node
 {
     // PUBLIC
     public N_Bitly_Shorten()
@@ -28,7 +43,7 @@ public class N_Bitly_Shorten
 
     @Override
     public void prepare()
-            throws Exception
+        throws Exception
     {
         // https://bitly.com/a/your_api_key
         this.bitly = Bitly.as( getConfig( "username" ) ,
@@ -38,14 +53,14 @@ public class N_Bitly_Shorten
 
     @Override
     public void terminate()
-            throws Exception
+        throws Exception
     {
     }
     // PROTECTED
 
     @Override
     protected void loop()
-            throws InterruptedException , URISyntaxException
+        throws InterruptedException , URISyntaxException
     {
         // Receive
         I_URIshorten message = (I_URIshorten) getLastMessageOrWait();

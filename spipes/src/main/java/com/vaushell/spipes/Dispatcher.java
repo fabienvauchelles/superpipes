@@ -1,7 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Fabien Vauchelles (fabien_AT_vauchelles_DOT_com).
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3, 29 June 2007, of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
  */
+
 package com.vaushell.spipes;
 
 import com.vaushell.spipes.nodes.A_Node;
@@ -51,8 +66,8 @@ public class Dispatcher
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / properties.size=" + properties.
-                    size() );
+                "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / properties.size=" + properties.
+                size() );
         }
 
         try
@@ -93,7 +108,7 @@ public class Dispatcher
         if ( logger.isTraceEnabled() )
         {
             logger.trace(
-                    "[" + getClass().getSimpleName() + "] addRoute : sourceID=" + sourceID + " / destinationID=" + destinationID );
+                "[" + getClass().getSimpleName() + "] addRoute : sourceID=" + sourceID + " / destinationID=" + destinationID );
         }
 
         if ( !nodes.containsKey( sourceID ) )
@@ -118,12 +133,12 @@ public class Dispatcher
     }
 
     public void start()
-            throws Exception
+        throws Exception
     {
         if ( logger.isDebugEnabled() )
         {
             logger.debug(
-                    "[" + getClass().getSimpleName() + "] start" );
+                "[" + getClass().getSimpleName() + "] start" );
         }
 
         // Prepare nodes
@@ -144,12 +159,12 @@ public class Dispatcher
     }
 
     public void stopAndWait()
-            throws Exception
+        throws Exception
     {
         if ( logger.isDebugEnabled() )
         {
             logger.debug(
-                    "[" + getClass().getSimpleName() + "] stopAndWait" );
+                "[" + getClass().getSimpleName() + "] stopAndWait" );
         }
 
         for ( A_Node node : nodes.values() )

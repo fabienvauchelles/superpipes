@@ -1,7 +1,22 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013 Fabien Vauchelles (fabien_AT_vauchelles_DOT_com).
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3, 29 June 2007, of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
  */
+
 package com.vaushell.spipes.nodes;
 
 import com.vaushell.spipes.Dispatcher;
@@ -15,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
  */
 public abstract class A_Node
-        extends Thread
+    extends Thread
 {
     // PUBLIC
     public A_Node()
@@ -28,10 +43,10 @@ public abstract class A_Node
     }
 
     public abstract void prepare()
-            throws Exception;
+        throws Exception;
 
     public abstract void terminate()
-            throws Exception;
+        throws Exception;
 
     public String getNodeID()
     {
@@ -135,7 +150,7 @@ public abstract class A_Node
 
     // PROTECTED
     protected abstract void loop()
-            throws Exception;
+        throws Exception;
 
     protected String getConfig( String key )
     {
@@ -169,7 +184,7 @@ public abstract class A_Node
     }
 
     protected Object getLastMessageOrWait()
-            throws InterruptedException
+        throws InterruptedException
     {
         if ( logger.isTraceEnabled() )
         {
