@@ -23,7 +23,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  *
- * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
+ * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class HTMLhelper
 {

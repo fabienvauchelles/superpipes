@@ -21,7 +21,7 @@ package com.vaushell.spipes.nodes.filters.done;
 
 /**
  *
- * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
+ * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public interface I_Identifier
 {

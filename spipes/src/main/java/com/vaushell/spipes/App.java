@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Main
  *
- * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
+ * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class App
 {

@@ -31,7 +31,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 /**
  *
- * @author Fabien Vauchelles (fabien AT vauchelles DOT com)
+ * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class News
     implements I_Identifier , I_Date , I_URIshorten
