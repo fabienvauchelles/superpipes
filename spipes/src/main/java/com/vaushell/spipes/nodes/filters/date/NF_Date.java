@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Filter message between a min and max date.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

@@ -20,13 +20,24 @@
 package com.vaushell.spipes.nodes.filters.done;
 
 /**
+ * Represents an ID.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public interface I_Identifier
 {
     // PUBLIC
+    /**
+     * Get the ID.
+     *
+     * @return the ID
+     */
     String getID();
 
+    /**
+     * Set the ID.
+     *
+     * @param ID the ID
+     */
     void setID( String ID );
 }

@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Generate random news.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

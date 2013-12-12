@@ -23,6 +23,7 @@ import com.vaushell.spipes.tools.scribe.OAuthException;
 import java.util.List;
 
 /**
+ * Tumblr Exception.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -47,6 +48,11 @@ public final class TumblrException
         return errors;
     }
 
+    /**
+     * Add an error.
+     *
+     * @param error the Error
+     */
     public void addError( final String error )
     {
         errors.add( error );

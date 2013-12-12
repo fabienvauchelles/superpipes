@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Twitter client.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -45,6 +46,15 @@ public class TwitterClient
         super();
     }
 
+    /**
+     * Log in.
+     *
+     * @param key OAuth key
+     * @param secret OAuth secret
+     * @param tokenPath Path to save the token
+     * @param loginText Prefix message to request the token to the user
+     * @throws IOException
+     */
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
@@ -61,6 +71,14 @@ public class TwitterClient
                    loginText );
     }
 
+    /**
+     * Tweet message.
+     *
+     * @param message Tweet's content
+     * @return Tweet's ID
+     * @throws IOException
+     * @throws OAuthException
+     */
     public long tweet( final String message )
         throws IOException , OAuthException
     {

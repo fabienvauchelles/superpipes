@@ -22,6 +22,7 @@ package com.vaushell.spipes.tools.scribe.linkedin;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 
 /**
+ * LinkedIn Exception.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

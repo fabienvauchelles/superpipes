@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Tumblr client.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -52,6 +53,16 @@ public class TumblrClient
         this.blogname = null;
     }
 
+    /**
+     * Log in.
+     *
+     * @param blogname Blog name
+     * @param key OAuth key
+     * @param secret OAuth secret
+     * @param tokenPath Path to save the token
+     * @param loginText Prefix message to request the token to the user
+     * @throws IOException
+     */
     public void login( final String blogname ,
                        final String key ,
                        final String secret ,
@@ -76,6 +87,18 @@ public class TumblrClient
                    loginText );
     }
 
+    /**
+     * Post link to tumblr.
+     *
+     * @param message Message
+     * @param uri Link
+     * @param uriName Link's name
+     * @param uriDescription Link's description
+     * @param tags Link's set of tags
+     * @return Post ID
+     * @throws IOException
+     * @throws TumblrException
+     */
     public long postLink( final String message ,
                           final String uri ,
                           final String uriName ,

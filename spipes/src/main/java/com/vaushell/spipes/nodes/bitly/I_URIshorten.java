@@ -22,6 +22,7 @@ package com.vaushell.spipes.nodes.bitly;
 import java.net.URI;
 
 /**
+ * Represents the source, unmodified URI.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -29,7 +30,17 @@ public interface I_URIshorten
     extends I_URI
 {
     // PUBLIC
+    /**
+     * Get the source URI.
+     *
+     * @return the source URI
+     */
     URI getURIsource();
 
+    /**
+     * Set the source URI.
+     *
+     * @param uriSource the source URI
+     */
     void setURIsource( URI uriSource );
 }

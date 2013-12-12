@@ -22,6 +22,7 @@ package com.vaushell.spipes.tools.scribe.fb;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 
 /**
+ * Facebook Exception.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

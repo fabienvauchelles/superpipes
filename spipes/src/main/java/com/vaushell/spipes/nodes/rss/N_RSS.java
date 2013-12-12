@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Read a RSS feed.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

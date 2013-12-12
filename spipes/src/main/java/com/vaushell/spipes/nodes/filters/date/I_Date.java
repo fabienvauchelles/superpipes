@@ -22,13 +22,24 @@ package com.vaushell.spipes.nodes.filters.date;
 import java.util.Date;
 
 /**
+ * Represents a date.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public interface I_Date
 {
     // PUBLIC
+    /**
+     * Get the date.
+     *
+     * @return the date
+     */
     Date getDate();
 
+    /**
+     * Set the date.
+     *
+     * @param date the date
+     */
     void setDate( Date date );
 }

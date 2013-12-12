@@ -41,6 +41,11 @@ public class N_TW_PostTest
         // Nothing
     }
 
+    /**
+     * Check tweet content length.
+     *
+     * @throws URISyntaxException
+     */
     @Test
     public void testConvertNews()
         throws URISyntaxException
@@ -78,6 +83,11 @@ public class N_TW_PostTest
                       N_TW_Post.TWEET_SIZE );
     }
 
+    /**
+     * Check tweet content length (2).
+     *
+     * @throws URISyntaxException
+     */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class
@@ -98,6 +108,11 @@ public class N_TW_PostTest
         N_TW_Post.convertFromNews( news );
     }
 
+    /**
+     * Check tweet URL null.
+     *
+     * @throws URISyntaxException
+     */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class
@@ -118,6 +133,11 @@ public class N_TW_PostTest
         N_TW_Post.convertFromNews( news );
     }
 
+    /**
+     * Check tweet title null.
+     *
+     * @throws URISyntaxException
+     */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class

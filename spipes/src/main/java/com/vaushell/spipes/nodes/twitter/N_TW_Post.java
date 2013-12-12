@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Post a tweet to Twitter.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -128,6 +129,12 @@ public class N_TW_Post
     // DEFAULT
     static final int TWEET_SIZE = 140;
 
+    /**
+     * Convert a news to a tweet.
+     *
+     * @param news the News
+     * @return the Tweet
+     */
     static Tweet convertFromNews( final News news )
     {
         if ( news.getURI() == null )

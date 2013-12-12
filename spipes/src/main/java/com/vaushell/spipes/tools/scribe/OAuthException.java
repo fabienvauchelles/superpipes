@@ -20,6 +20,7 @@
 package com.vaushell.spipes.tools.scribe;
 
 /**
+ * OAuth exception.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

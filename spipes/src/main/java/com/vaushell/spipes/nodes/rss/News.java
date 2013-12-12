@@ -31,6 +31,7 @@ import java.util.TreeSet;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
+ * A RSS news.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -38,6 +39,19 @@ public class News
     implements I_Identifier , I_Date , I_URIshorten
 {
     // PUBLIC
+    /**
+     * Create a RSS news.
+     *
+     * @param title RSS' title
+     * @param description RSS's description
+     * @param uri RSS' URI
+     * @param uriSource RSS' source
+     * @param author RSS' author
+     * @param content RSS' content
+     * @param tags RSS' tags set
+     * @param date RSS' creation date
+     * @return the news
+     */
     public static News create( final String title ,
                                final String description ,
                                final URI uri ,

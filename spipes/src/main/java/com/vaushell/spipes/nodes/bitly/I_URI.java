@@ -22,13 +22,24 @@ package com.vaushell.spipes.nodes.bitly;
 import java.net.URI;
 
 /**
+ * Represents an URI.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public interface I_URI
 {
     // PUBLIC
+    /**
+     * Get the URI.
+     *
+     * @return the URI
+     */
     URI getURI();
 
+    /**
+     * Set the URI.
+     *
+     * @param uri the URI
+     */
     void setURI( URI uri );
 }

@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Facebook client.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -44,6 +45,16 @@ public class FacebookClient
         super();
     }
 
+    /**
+     * Log in.
+     *
+     * @param key Facebook key
+     * @param secret Facebook secret
+     * @param scope Facebook scope
+     * @param tokenPath Path to save the token
+     * @param loginText Prefix message to request the token to the user
+     * @throws IOException
+     */
     public void login( final String key ,
                        final String secret ,
                        final String scope ,
@@ -61,6 +72,18 @@ public class FacebookClient
                    loginText );
     }
 
+    /**
+     * Post a message to Facebook.
+     *
+     * @param message Message's content
+     * @param uri Message's link
+     * @param uriName Link's name
+     * @param uriCaption Link's caption
+     * @param uriDescription Link's description
+     * @return Post ID
+     * @throws FacebookException
+     * @throws IOException
+     */
     public String post( final String message ,
                         final String uri ,
                         final String uriName ,
@@ -123,6 +146,14 @@ public class FacebookClient
         return node.get( "id" ).asText();
     }
 
+    /**
+     * Like a Facebook Post.
+     *
+     * @param postID Post ID
+     * @return True if successfull
+     * @throws IOException
+     * @throws FacebookException
+     */
     public boolean likePost( final String postID )
         throws IOException , FacebookException
     {

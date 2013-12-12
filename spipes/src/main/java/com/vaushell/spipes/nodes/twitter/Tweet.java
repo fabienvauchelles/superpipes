@@ -23,6 +23,7 @@ import com.vaushell.spipes.nodes.filters.done.I_Identifier;
 import java.util.Objects;
 
 /**
+ * A tweet.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

@@ -37,6 +37,9 @@ public class ValuesGeneratorTest
         // Nothing
     }
 
+    /**
+     * Test word.
+     */
     @Test
     public void testWord()
     {
@@ -55,6 +58,9 @@ public class ValuesGeneratorTest
         }
     }
 
+    /**
+     * Test text.
+     */
     @Test
     public void testText()
     {
@@ -71,6 +77,9 @@ public class ValuesGeneratorTest
         }
     }
 
+    /**
+     * Test set.
+     */
     @Test
     public void testSet()
     {

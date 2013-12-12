@@ -24,12 +24,20 @@ import java.util.Random;
 import java.util.Set;
 
 /**
+ * Values generator.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public final class ValuesGenerator
 {
     // PUBLIC
+    /**
+     * Generate random text.
+     *
+     * @param minWords Minimum words count
+     * @param maxWords Maximum words count
+     * @return the Text
+     */
     public static String getRandomText( final int minWords ,
                                         final int maxWords )
     {
@@ -50,6 +58,13 @@ public final class ValuesGenerator
         return sb.toString();
     }
 
+    /**
+     * Generate random set.
+     *
+     * @param minWords Minimum words count
+     * @param maxWords Maximum words count
+     * @return the Set
+     */
     public static Set<String> getRandomWordSet( final int minWords ,
                                                 final int maxWords )
     {
@@ -65,6 +80,13 @@ public final class ValuesGenerator
         return s;
     }
 
+    /**
+     * Generate a random word.
+     *
+     * @param minLetters Minimum letters count
+     * @param maxLetters Maximum letters count
+     * @return The word
+     */
     public static String getRandomWord( final int minLetters ,
                                         final int maxLetters )
     {

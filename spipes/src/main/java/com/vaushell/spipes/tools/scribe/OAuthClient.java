@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * OAuth client pattern.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -48,6 +49,19 @@ public class OAuthClient
         // Nothing
     }
 
+    /**
+     * Log in.
+     *
+     * @param api Scribe API class
+     * @param key OAuth key
+     * @param secret OAuth secret
+     * @param scope OAuth scope (or null)
+     * @param callback OAuth URL callback (or null)
+     * @param useRequestToken OAuth use of request token ?
+     * @param tokenPath Path to save the token
+     * @param loginText Prefix message to request the token to the user
+     * @throws IOException
+     */
     protected void loginImpl( final Class<? extends Api> api ,
                               final String key ,
                               final String secret ,
@@ -114,6 +128,12 @@ public class OAuthClient
         }
     }
 
+    /**
+     * Send a signed request.
+     *
+     * @param request the request
+     * @return the response
+     */
     protected Response sendSignedRequest( final OAuthRequest request )
     {
         if ( request == null )

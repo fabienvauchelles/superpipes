@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Post a message to Tumblr.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

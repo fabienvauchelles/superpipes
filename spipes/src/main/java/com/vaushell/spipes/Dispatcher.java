@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Flow dispatcher.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -43,11 +44,24 @@ public final class Dispatcher
         this.routes = new HashMap<>();
     }
 
+    /**
+     * Retrieve main's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
     public String getConfig( final String key )
     {
         return properties.getProperty( key );
     }
 
+    /**
+     * Add a node to the flow.
+     *
+     * @param nodeID Node's ID
+     * @param type Node's type
+     * @param properties Node's properties
+     */
     public void addNode( final String nodeID ,
                          final String type ,
                          final Properties properties )
@@ -87,6 +101,13 @@ public final class Dispatcher
         }
     }
 
+    /**
+     * Add a node to the flow.
+     *
+     * @param nodeID Node's ID
+     * @param clazz Node's type class
+     * @param properties Node's properties
+     */
     public void addNode( final String nodeID ,
                          final Class<?> clazz ,
                          final Properties properties )
@@ -96,6 +117,12 @@ public final class Dispatcher
                  properties );
     }
 
+    /**
+     * Add a route between 2 nodes.
+     *
+     * @param sourceID source node ID
+     * @param destinationID destination node ID
+     */
     public void addRoute( final String sourceID ,
                           final String destinationID )
     {
@@ -131,6 +158,11 @@ public final class Dispatcher
         subRoutes.add( destinationID );
     }
 
+    /**
+     * Start the dispatcher.
+     *
+     * @throws Exception
+     */
     public void start()
         throws Exception
     {
@@ -157,6 +189,11 @@ public final class Dispatcher
         }
     }
 
+    /**
+     * Stop the dispatcher and wait all nodes to stop.
+     *
+     * @throws Exception
+     */
     public void stopAndWait()
         throws Exception
     {
@@ -193,6 +230,12 @@ public final class Dispatcher
         }
     }
 
+    /**
+     * Send a message, from a node.
+     *
+     * @param sourceID source node ID
+     * @param message message
+     */
     public void sendMessage( final String sourceID ,
                              final Object message )
     {
@@ -220,6 +263,11 @@ public final class Dispatcher
 
     }
 
+    /**
+     * Load configuration.
+     *
+     * @param config Configuration
+     */
     public void load( final XMLConfiguration config )
     {
         if ( config == null )

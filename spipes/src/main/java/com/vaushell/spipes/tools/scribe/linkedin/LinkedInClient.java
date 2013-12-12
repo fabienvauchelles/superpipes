@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * LinkedIn client.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -48,6 +49,15 @@ public class LinkedInClient
         super();
     }
 
+    /**
+     * Log in.
+     *
+     * @param key OAuth key
+     * @param secret OAuth secret
+     * @param tokenPath Path to save the token
+     * @param loginText Prefix message to request the token to the user
+     * @throws IOException
+     */
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
@@ -64,6 +74,17 @@ public class LinkedInClient
                    loginText );
     }
 
+    /**
+     * Update status.
+     *
+     * @param message Status's message
+     * @param uri Status's link
+     * @param uriName Link's name
+     * @param uriDescription Link's description
+     * @return Status ID
+     * @throws IOException
+     * @throws OAuthException
+     */
     public String updateStatus( final String message ,
                                 final String uri ,
                                 final String uriName ,

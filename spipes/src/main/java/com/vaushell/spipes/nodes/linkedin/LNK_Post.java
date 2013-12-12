@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.Objects;
 
 /**
+ * A LinkedIn post.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Post a message to LinkedIn.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

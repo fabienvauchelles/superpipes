@@ -40,6 +40,9 @@ public class DispatcherTest
         // Nothing
     }
 
+    /**
+     * Test add.
+     */
     @Test
     public void testAdd()
     {
@@ -72,6 +75,9 @@ public class DispatcherTest
                       1 );
     }
 
+    /**
+     * Test duplicate node insertion.
+     */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class
@@ -88,6 +94,9 @@ public class DispatcherTest
                             new Properties() );
     }
 
+    /**
+     * Test node/route insertion order.
+     */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class

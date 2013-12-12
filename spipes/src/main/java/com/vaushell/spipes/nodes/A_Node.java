@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * A processing node.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -44,9 +45,19 @@ public abstract class A_Node
         this.internalStack = new LinkedList<>();
     }
 
+    /**
+     * Prepare node's execution. Executed 1 time at the beginning.
+     *
+     * @throws Exception
+     */
     public abstract void prepare()
         throws Exception;
 
+    /**
+     * Close node's execution. Executed 1 time at the ending.
+     *
+     * @throws Exception
+     */
     public abstract void terminate()
         throws Exception;
 
@@ -55,6 +66,13 @@ public abstract class A_Node
         return nodeID;
     }
 
+    /**
+     * Configurate the node.
+     *
+     * @param nodeID Node's identifier
+     * @param properties Node's properties (String->String)
+     * @param dispatcher Main dispatcher
+     */
     public void config( final String nodeID ,
                         final Properties properties ,
                         final Dispatcher dispatcher )
@@ -120,6 +138,11 @@ public abstract class A_Node
         }
     }
 
+    /**
+     * Receive a message and stack it.
+     *
+     * @param message Object message
+     */
     public void receiveMessage( final Object message )
     {
         if ( message == null )
@@ -140,6 +163,9 @@ public abstract class A_Node
         }
     }
 
+    /**
+     * Stop the node.
+     */
     public void stopMe()
     {
         if ( LOGGER.isTraceEnabled() )
@@ -156,19 +182,41 @@ public abstract class A_Node
     }
 
     // PROTECTED
+    /**
+     * Loop execution. The execution is looped until message reception.
+     *
+     * @throws Exception
+     */
     protected abstract void loop()
         throws Exception;
 
+    /**
+     * Retrieve node's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
     protected String getConfig( final String key )
     {
         return properties.getProperty( key );
     }
 
+    /**
+     * Retrieve main's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
     protected String getMainConfig( final String key )
     {
         return dispatcher.getConfig( key );
     }
 
+    /**
+     * Send a message to every connected nodes.
+     *
+     * @param message Object message.
+     */
     protected void sendMessage( final Object message )
     {
         if ( message == null )
@@ -185,6 +233,11 @@ public abstract class A_Node
                                 message );
     }
 
+    /**
+     * Is the node alive ?
+     *
+     * @return True if alive
+     */
     protected boolean isActive()
     {
         synchronized( this )
@@ -193,6 +246,12 @@ public abstract class A_Node
         }
     }
 
+    /**
+     * Pop the last message.
+     *
+     * @return the message
+     * @throws InterruptedException
+     */
     protected Object getLastMessageOrWait()
         throws InterruptedException
     {
