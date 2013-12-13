@@ -1,3 +1,70 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <configuration>
+    <params>
+        <param name="datas-directory" value="conf-local/datas" />
+    </params>
+    <nodes>
+        <node id="rss-vauchelles" type="com.vaushell.spipes.nodes.rss.N_RSS">
+            <!-- RSS doesn't react to a message. It catchs news at regular interval -->
+            <params>
+                <param name="url" value="http://feeds.feedburner.com/fabienvauchelles" />
+                <param name="delay" value="2000" />
+            </params>
+            <transforms>
+                <transform type="com.vaushell.spipes.transforms.done.T_Done" />
+                <transform type="com.vaushell.spipes.transforms.date.T_Date">
+                    <!-- It's only a filter. Local works. So it's a transform. -->
+                    <params>
+                        <param name="date-min" value="11/11/2013 10:00" />
+                    </params>
+                </transform>
+            </transforms>
+        </node>
+        <node id="reduce" type="com.vaushell.spipes.nodes.bitly.N_Shorten">
+            <!-- Bitly works in SaaS (not local). So i use a node for respect man! -->
+            <params>
+                <param name="username" value="USERNAME" />
+                <param name="apikey" value="KEY" />
+            </params>
+        </node>
+        <node id="fbpost" type="com.vaushell.spipes.nodes.fb.N_FB_Post">
+            <params>
+                <param name="key" value="KEY" />
+                <param name="secret" value="SECRET" />
+            </params>
+        </node>
+        <node id="fbpostlike" type="com.vaushell.spipes.nodes.fb.N_FB_PostLike">
+            <params>
+                <param name="key" value="KEY" />
+                <param name="secret" value="SECRET" />
+            </params>
+        </node>
+        <node id="twpost" type="com.vaushell.spipes.nodes.twitter.N_TW_Post">
+            <params>
+                <param name="key" value="KEY" />
+                <param name="secret" value="SECRET" />
+            </params>
+        </node>
+        <node id="lnkpost" type="com.vaushell.spipes.nodes.linkedin.N_LNK_Post">
+            <params>
+                <param name="key" value="KEY" />
+                <param name="secret" value="SECRET" />
+            </params>
+        </node>
+        <node id="tbpost" type="com.vaushell.spipes.nodes.tumblr.N_TB_Post">
+            <params>
+                <param name="blogname" value="BLOGNAME" />
+                <param name="key" value="KEY" />
+                <param name="secret" value="SECRET" />
+            </params>
+        </node>
+    </nodes>
+    <routes>
+        <route source="rss-vauchelles" destination="reduce" />
+        <route source="reduce" destination="twpost" />
+        <route source="reduce" destination="fbpost" />
+        <route source="fbpost" destination="fbpostlike" />
+        <route source="reduce" destination="lnkpost" />
+        <route source="reduce" destination="tbpost" />
+    </routes>
 </configuration>
