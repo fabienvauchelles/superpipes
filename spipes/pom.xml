@@ -25,20 +25,36 @@ page at http://checkstyle.sourceforge.net/config.html
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.vaushell</groupId>
+        <artifactId>pom-exec</artifactId>
+        <version>2</version>
+    </parent>
 
     <groupId>com.vaushell</groupId>
     <artifactId>spipes</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>spipes</name>
-    <url>https://github.com/fabienvauchelles/spipes</url>
+    <description>SPipes rules flows between sources and destinations. It's like Yahoo Pipes, IFTTT, etc.</description>
+    <url>https://github.com/fabienvauchelles/${project.artifactId}</url>
+
+    <licenses>
+        <license>
+            <name>The GNU Lesser General Public Licence, Version 3.0</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <developers>
         <developer>
             <id>fabienvauchelles</id>
-            <name>Fabien VAUCHELLES</name>
+            <name>Fabien Vauchelles</name>
             <email>fabien_AT_vauchelles_DOT_com</email>
             <url>http://fabien.vauchelles.com</url>
             <organization>VAUSHELL</organization>
@@ -46,16 +62,14 @@ page at http://checkstyle.sourceforge.net/config.html
 
             <roles>
                 <role>Administrator</role>
+                <role>Java Developer</role>
             </roles>
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <build>
         <plugins>
+            <!-- Order is important ! Execution follows the declaration order -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -63,42 +77,70 @@ page at http://checkstyle.sourceforge.net/config.html
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
-                    <debug>true</debug>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.4</version>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.vaushell.spipes.App</mainClass>
-                        </manifest>
-                    </archive>
-                    <appendAssemblyId>false</appendAssemblyId>
-                    <finalName>spipes-${project.version}</finalName>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <!-- Order is important ! Execution follows the declaration order -->
+                    <plugin>
+                        <groupId>com.github.wvengen</groupId>
+                        <artifactId>proguard-maven-plugin</artifactId>
+                        <version>2.0.6</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>proguard</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <proguardInclude>src/proguard/exec.pro</proguardInclude>
+                            <obfuscate>true</obfuscate>
+                            <libs>
+                                <lib>${java.home}/lib/rt.jar</lib>
+                            </libs>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>net.sf.proguard</groupId>
+                                <artifactId>proguard-base</artifactId>
+                                <version>4.10</version>
+                                <scope>runtime</scope>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+
+                    <plugin>
+                        <!-- Create a artifact ready to use -->
+                        <!-- See : src/assemble/exec.xml -->
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.4</version>
+                        <configuration>
+                            <descriptor>src/assemble/exec.xml</descriptor>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <dependencies>
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8.7</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.5</version>
-        </dependency>
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
@@ -108,16 +150,6 @@ page at http://checkstyle.sourceforge.net/config.html
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.10</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
@@ -142,12 +174,17 @@ page at http://checkstyle.sourceforge.net/config.html
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.2.3</version>
+            <version>2.3.0</version>
         </dependency>
         <dependency>
-            <groupId>jdom</groupId>
+            <groupId>org.jdom</groupId>
             <artifactId>jdom</artifactId>
-            <version>1.1</version>
+            <version>2.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vaushell</groupId>
+            <artifactId>shaarli-java-api</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
 </project>
