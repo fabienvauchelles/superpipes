@@ -52,7 +52,7 @@ public class LinkedInClient
     /**
      * Log in.
      *
-     * @param key OAuth key
+     * @param key OAuth keyd
      * @param secret OAuth secret
      * @param tokenPath Path to save the token
      * @param loginText Prefix message to request the token to the user
@@ -68,7 +68,7 @@ public class LinkedInClient
                    key ,
                    secret ,
                    "r_basicprofile,rw_nus" ,
-                   null ,
+                   "http://www.linkedin.com/connect/login_success.html" ,
                    true ,
                    tokenPath ,
                    loginText );
