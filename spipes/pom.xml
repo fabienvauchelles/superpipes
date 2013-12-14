@@ -67,6 +67,11 @@ page at http://checkstyle.sourceforge.net/config.html
         </developer>
     </developers>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <netbeans.hint.license>lgpl3</netbeans.hint.license>
+    </properties>
+
     <build>
         <plugins>
             <!-- Order is important ! Execution follows the declaration order -->
