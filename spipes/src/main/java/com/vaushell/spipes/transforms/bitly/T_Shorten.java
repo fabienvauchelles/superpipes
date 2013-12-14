@@ -17,76 +17,73 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes.nodes.bitly;
+package com.vaushell.spipes.transforms.bitly;
 
 import com.rosaloves.bitlyj.Bitly;
 import com.rosaloves.bitlyj.Bitly.Provider;
 import com.rosaloves.bitlyj.Url;
-import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.transforms.A_Transform;
 import java.net.URI;
-import java.net.URISyntaxException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Node : shorten an URI in a message.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class N_Bitly_Shorten
-    extends A_Node
+public class T_Shorten
+    extends A_Transform
 {
     // PUBLIC
-    public N_Bitly_Shorten()
+    public T_Shorten()
     {
         super();
     }
 
-    // PROTECTED
     @Override
-    protected void prepareImpl()
+    public void prepare()
         throws Exception
     {
         // https://bitly.com/a/your_api_key
         this.bitly = Bitly.as( getConfig( "username" ) ,
                                getConfig( "apikey" ) );
-
     }
 
     @Override
-    protected void loop()
+    public Object transform( Object message )
         throws Exception
     {
         // Receive
-        final I_URIshorten message = (I_URIshorten) getLastMessageOrWait();
+        final I_URIshorten msg = (I_URIshorten) message;
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + msg );
         }
 
-        final URI longURI = message.getURI();
+        final URI longURI = msg.getURI();
         if ( longURI != null )
         {
             final Url url = bitly.call( Bitly.shorten( longURI.toString() ) );
 
             if ( url != null && url.getShortUrl() != null )
             {
-                message.setURI( new URI( url.getShortUrl() ) );
-                message.setURIsource( longURI );
+                msg.setURI( new URI( url.getShortUrl() ) );
+                msg.setURIsource( longURI );
             }
         }
 
-        sendMessage( message );
+        return msg;
     }
 
     @Override
-    protected void terminateImpl()
+    public void terminate()
         throws Exception
     {
         // Nothing
     }
+
     // PRIVATE
-    private static final Logger LOGGER = LoggerFactory.getLogger( N_Bitly_Shorten.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( T_Shorten.class );
     private Provider bitly;
 }

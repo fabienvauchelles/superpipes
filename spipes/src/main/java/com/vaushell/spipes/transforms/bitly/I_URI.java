@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes.nodes.bitly;
+package com.vaushell.spipes.transforms.bitly;
 
 import java.net.URI;
 

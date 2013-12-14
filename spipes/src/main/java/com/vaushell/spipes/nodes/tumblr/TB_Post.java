@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.nodes.tumblr;
 
-import com.vaushell.spipes.nodes.bitly.I_URIshorten;
+import com.vaushell.spipes.transforms.bitly.I_URIshorten;
 import com.vaushell.spipes.transforms.done.I_Identifier;
 import java.net.URI;
 import java.util.Set;

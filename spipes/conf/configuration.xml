@@ -18,14 +18,13 @@
                         <param name="date-min" value="11/11/2013 10:00" />
                     </params>
                 </transform>
+                <transform type="com.vaushell.spipes.transforms.bitly.T_Shorten">
+                    <params>
+                        <param name="username" value="USERNAME" />
+                        <param name="apikey" value="KEY" />
+                    </params>
+                </transform>
             </out>
-        </node>
-        <node id="reduce" type="com.vaushell.spipes.nodes.bitly.N_Shorten">
-            <!-- Bitly works in SaaS (not local). So i use a node for respect man! -->
-            <params>
-                <param name="username" value="USERNAME" />
-                <param name="apikey" value="KEY" />
-            </params>
         </node>
         <node id="fbpost" type="com.vaushell.spipes.nodes.fb.N_FB_Post">
             <params>
@@ -60,11 +59,10 @@
         </node>
     </nodes>
     <routes>
-        <route source="rss-vauchelles" destination="reduce" />
-        <route source="reduce" destination="twpost" />
-        <route source="reduce" destination="fbpost" />
+        <route source="rss-vauchelles" destination="twpost" />
+        <route source="rss-vauchelles" destination="fbpost" />
         <route source="fbpost" destination="fbpostlike" />
-        <route source="reduce" destination="lnkpost" />
-        <route source="reduce" destination="tbpost" />
+        <route source="rss-vauchelles" destination="lnkpost" />
+        <route source="rss-vauchelles" destination="tbpost" />
     </routes>
 </configuration>
