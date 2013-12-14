@@ -46,7 +46,8 @@ public abstract class A_Node
         this.dispatcher = null;
         this.activated = true;
         this.internalStack = new LinkedList<>();
-        this.transforms = new ArrayList<>();
+        this.transformsIN = new ArrayList<>();
+        this.transformsOUT = new ArrayList<>();
     }
 
     public String getNodeID()
@@ -92,9 +93,14 @@ public abstract class A_Node
         this.dispatcher = dispatcher;
     }
 
-    public void addTransform( A_Transform transform )
+    public void addTransformIN( A_Transform transform )
     {
-        transforms.add( transform );
+        transformsIN.add( transform );
+    }
+
+    public void addTransformOUT( A_Transform transform )
+    {
+        transformsOUT.add( transform );
     }
 
     public void prepare()
@@ -106,11 +112,20 @@ public abstract class A_Node
         }
         prepareImpl();
 
-        for ( A_Transform transform : transforms )
+        for ( A_Transform transform : transformsIN )
         {
             if ( LOGGER.isTraceEnabled() )
             {
-                LOGGER.trace( "[" + getNodeID() + "/" + transform.getClass().getSimpleName() + "] prepare" );
+                LOGGER.trace( "[" + getNodeID() + "/IN:" + transform.getClass().getSimpleName() + "] prepare" );
+            }
+            transform.prepare();
+        }
+
+        for ( A_Transform transform : transformsOUT )
+        {
+            if ( LOGGER.isTraceEnabled() )
+            {
+                LOGGER.trace( "[" + getNodeID() + "/OUT:" + transform.getClass().getSimpleName() + "] prepare" );
             }
             transform.prepare();
         }
@@ -175,11 +190,20 @@ public abstract class A_Node
     public void terminate()
         throws Exception
     {
-        for ( A_Transform transform : transforms )
+        for ( A_Transform transform : transformsOUT )
         {
             if ( LOGGER.isTraceEnabled() )
             {
-                LOGGER.trace( "[" + getNodeID() + "/" + transform.getClass().getSimpleName() + "] terminate" );
+                LOGGER.trace( "[" + getNodeID() + "/OUT:" + transform.getClass().getSimpleName() + "] terminate" );
+            }
+            transform.terminate();
+        }
+
+        for ( A_Transform transform : transformsIN )
+        {
+            if ( LOGGER.isTraceEnabled() )
+            {
+                LOGGER.trace( "[" + getNodeID() + "/IN:" + transform.getClass().getSimpleName() + "] terminate" );
             }
             transform.terminate();
         }
@@ -197,6 +221,7 @@ public abstract class A_Node
      * @param message Object message
      */
     public void receiveMessage( final Object message )
+        throws Exception
     {
         if ( message == null )
         {
@@ -208,9 +233,19 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] receiveMessage : message=" + message );
         }
 
+        Object result = message;
+        for ( final A_Transform transform : transformsIN )
+        {
+            result = transform.transform( result );
+            if ( result == null )
+            {
+                return;
+            }
+        }
+
         synchronized( internalStack )
         {
-            internalStack.addFirst( message );
+            internalStack.addFirst( result );
 
             internalStack.notifyAll();
         }
@@ -279,7 +314,7 @@ public abstract class A_Node
         }
 
         Object result = message;
-        for ( final A_Transform transform : transforms )
+        for ( final A_Transform transform : transformsOUT )
         {
             result = transform.transform( result );
             if ( result == null )
@@ -336,5 +371,6 @@ public abstract class A_Node
     private Dispatcher dispatcher;
     private final LinkedList<Object> internalStack;
     private volatile boolean activated;
-    private List<A_Transform> transforms;
+    private final List<A_Transform> transformsIN;
+    private final List<A_Transform> transformsOUT;
 }

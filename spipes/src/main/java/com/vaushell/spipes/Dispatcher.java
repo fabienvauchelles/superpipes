@@ -122,16 +122,16 @@ public final class Dispatcher
     }
 
     /**
-     * Add a transform to the node.
+     * Add a transform to the node input.
      *
      * @param node Node
      * @param type Transform's type
      * @param properties Transform's properties
      * @return the transform
      */
-    public A_Transform addTransform2node( final A_Node node ,
-                                          final String type ,
-                                          final Properties properties )
+    public A_Transform addTransformIN( final A_Node node ,
+                                       final String type ,
+                                       final Properties properties )
     {
         if ( node == null || type == null || properties == null )
         {
@@ -141,7 +141,7 @@ public final class Dispatcher
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] addTransform2Node : node=" + node.getId() + " / type=" + type + " / properties.size=" + properties.
+                "[" + getClass().getSimpleName() + "] addTransformIN : node=" + node.getId() + " / type=" + type + " / properties.size=" + properties.
                 size() );
         }
 
@@ -151,7 +151,49 @@ public final class Dispatcher
             transform.config( node ,
                               properties );
 
-            node.addTransform( transform );
+            node.addTransformIN( transform );
+
+            return transform;
+        }
+        catch( final ClassNotFoundException |
+                     IllegalAccessException |
+                     InstantiationException ex )
+        {
+            throw new RuntimeException( ex );
+        }
+    }
+
+    /**
+     * Add a transform to the node output.
+     *
+     * @param node Node
+     * @param type Transform's type
+     * @param properties Transform's properties
+     * @return the transform
+     */
+    public A_Transform addTransformOUT( final A_Node node ,
+                                        final String type ,
+                                        final Properties properties )
+    {
+        if ( node == null || type == null || properties == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] addTransformOUT : node=" + node.getId() + " / type=" + type + " / properties.size=" + properties.
+                size() );
+        }
+
+        try
+        {
+            final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
+            transform.config( node ,
+                              properties );
+
+            node.addTransformOUT( transform );
 
             return transform;
         }
@@ -276,6 +318,7 @@ public final class Dispatcher
      */
     public void sendMessage( final String sourceID ,
                              final Object message )
+        throws Exception
     {
 
         if ( sourceID == null || message == null )
@@ -334,17 +377,31 @@ public final class Dispatcher
                                              cNode.getString( "[@type]" ) ,
                                              nodeProperties );
 
-                // Load transforms
-                final List<HierarchicalConfiguration> cTransforms = cNode.configurationsAt( "transforms.transform" );
-                if ( cTransforms != null )
+                // Load transforms IN
+                final List<HierarchicalConfiguration> cTransformsIN = cNode.configurationsAt( "in.transform" );
+                if ( cTransformsIN != null )
                 {
-                    for ( final HierarchicalConfiguration cTransform : cTransforms )
+                    for ( final HierarchicalConfiguration cTransform : cTransformsIN )
                     {
                         final Properties transformProperties = readProperties( cTransform );
 
-                        addTransform2node( node ,
-                                           cTransform.getString( "[@type]" ) ,
-                                           transformProperties );
+                        addTransformIN( node ,
+                                        cTransform.getString( "[@type]" ) ,
+                                        transformProperties );
+                    }
+                }
+
+                // Load transforms OUT
+                final List<HierarchicalConfiguration> cTransformsOUT = cNode.configurationsAt( "out.transform" );
+                if ( cTransformsOUT != null )
+                {
+                    for ( final HierarchicalConfiguration cTransform : cTransformsOUT )
+                    {
+                        final Properties transformProperties = readProperties( cTransform );
+
+                        addTransformOUT( node ,
+                                         cTransform.getString( "[@type]" ) ,
+                                         transformProperties );
                     }
                 }
             }

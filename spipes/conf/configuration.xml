@@ -10,7 +10,7 @@
                 <param name="url" value="http://feeds.feedburner.com/fabienvauchelles" />
                 <param name="delay" value="2000" />
             </params>
-            <transforms>
+            <out>
                 <transform type="com.vaushell.spipes.transforms.done.T_Done" />
                 <transform type="com.vaushell.spipes.transforms.date.T_Date">
                     <!-- It's only a filter. Local works. So it's a transform. -->
@@ -18,7 +18,7 @@
                         <param name="date-min" value="11/11/2013 10:00" />
                     </params>
                 </transform>
-            </transforms>
+            </out>
         </node>
         <node id="reduce" type="com.vaushell.spipes.nodes.bitly.N_Shorten">
             <!-- Bitly works in SaaS (not local). So i use a node for respect man! -->
