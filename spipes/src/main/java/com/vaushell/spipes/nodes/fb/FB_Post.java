@@ -40,7 +40,6 @@ public class FB_Post
                     final String uriCaption ,
                     final String uriDescription )
     {
-        this.ID = null;
         this.message = message;
         this.uri = uri;
         this.uriSource = uriSource;

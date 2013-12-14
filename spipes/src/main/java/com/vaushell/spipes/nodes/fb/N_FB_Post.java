@@ -23,8 +23,6 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
-import com.vaushell.spipes.tools.scribe.fb.FacebookException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;

@@ -31,6 +31,7 @@ public abstract class A_Transform
     // PUBLIC
     public A_Transform()
     {
+        this.node = null;
         this.properties = null;
     }
 

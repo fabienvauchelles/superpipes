@@ -38,7 +38,6 @@ public class LNK_Post
                      final String uriName ,
                      final String uriDescription )
     {
-        this.ID = null;
         this.message = message;
         this.uri = uri;
         this.uriName = uriName;

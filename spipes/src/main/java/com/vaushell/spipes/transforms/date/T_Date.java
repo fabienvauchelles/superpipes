@@ -75,7 +75,7 @@ public class T_Date
     }
 
     @Override
-    public Object transform( Object message )
+    public Object transform( final Object message )
         throws Exception
     {
         final I_Date msg = (I_Date) message;

@@ -49,8 +49,6 @@ public class TumblrClient
     public TumblrClient()
     {
         super();
-
-        this.blogname = null;
     }
 
     /**

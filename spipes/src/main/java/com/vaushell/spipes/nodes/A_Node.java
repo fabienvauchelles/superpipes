@@ -41,9 +41,6 @@ public abstract class A_Node
     {
         super();
 
-        this.nodeID = null;
-        this.properties = null;
-        this.dispatcher = null;
         this.activated = true;
         this.internalStack = new LinkedList<>();
         this.transformsIN = new ArrayList<>();
@@ -93,12 +90,12 @@ public abstract class A_Node
         this.dispatcher = dispatcher;
     }
 
-    public void addTransformIN( A_Transform transform )
+    public void addTransformIN( final A_Transform transform )
     {
         transformsIN.add( transform );
     }
 
-    public void addTransformOUT( A_Transform transform )
+    public void addTransformOUT( final A_Transform transform )
     {
         transformsOUT.add( transform );
     }
@@ -112,7 +109,7 @@ public abstract class A_Node
         }
         prepareImpl();
 
-        for ( A_Transform transform : transformsIN )
+        for ( final A_Transform transform : transformsIN )
         {
             if ( LOGGER.isTraceEnabled() )
             {
@@ -121,7 +118,7 @@ public abstract class A_Node
             transform.prepare();
         }
 
-        for ( A_Transform transform : transformsOUT )
+        for ( final A_Transform transform : transformsOUT )
         {
             if ( LOGGER.isTraceEnabled() )
             {
@@ -190,7 +187,7 @@ public abstract class A_Node
     public void terminate()
         throws Exception
     {
-        for ( A_Transform transform : transformsOUT )
+        for ( final A_Transform transform : transformsOUT )
         {
             if ( LOGGER.isTraceEnabled() )
             {
@@ -199,7 +196,7 @@ public abstract class A_Node
             transform.terminate();
         }
 
-        for ( A_Transform transform : transformsIN )
+        for ( final A_Transform transform : transformsIN )
         {
             if ( LOGGER.isTraceEnabled() )
             {

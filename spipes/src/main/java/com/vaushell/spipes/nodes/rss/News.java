@@ -340,11 +340,7 @@ public class News
         this.content = content;
         this.tags = tags;
 
-        if ( date == null )
-        {
-            this.dateInMs = null;
-        }
-        else
+        if ( date != null )
         {
             this.dateInMs = date.getTime();
         }

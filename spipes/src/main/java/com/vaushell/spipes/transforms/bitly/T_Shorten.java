@@ -50,7 +50,7 @@ public class T_Shorten
     }
 
     @Override
-    public Object transform( Object message )
+    public Object transform( final Object message )
         throws Exception
     {
         // Receive
