@@ -37,21 +37,14 @@ public class N_MessageLogger
         super();
     }
 
-    @Override
-    public void prepare()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
     // PROTECTED
+    @Override
+    protected void prepareImpl()
+        throws Exception
+    {
+        // Nothing
+    }
+
     @Override
     protected void loop()
         throws InterruptedException
@@ -62,6 +55,13 @@ public class N_MessageLogger
         {
             LOGGER.info( "[" + getNodeID() + "] receive message : " + message );
         }
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_MessageLogger.class );

@@ -42,8 +42,9 @@ public class N_Bitly_Shorten
         super();
     }
 
+    // PROTECTED
     @Override
-    public void prepare()
+    protected void prepareImpl()
         throws Exception
     {
         // https://bitly.com/a/your_api_key
@@ -53,16 +54,8 @@ public class N_Bitly_Shorten
     }
 
     @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    // PROTECTED
-    @Override
     protected void loop()
-        throws InterruptedException , URISyntaxException
+        throws Exception
     {
         // Receive
         final I_URIshorten message = (I_URIshorten) getLastMessageOrWait();
@@ -85,6 +78,13 @@ public class N_Bitly_Shorten
         }
 
         sendMessage( message );
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Bitly_Shorten.class );

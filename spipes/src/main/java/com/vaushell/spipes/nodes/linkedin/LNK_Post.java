@@ -20,7 +20,7 @@
 package com.vaushell.spipes.nodes.linkedin;
 
 import com.vaushell.spipes.nodes.bitly.I_URI;
-import com.vaushell.spipes.nodes.filters.done.I_Identifier;
+import com.vaushell.spipes.transforms.done.I_Identifier;
 import java.net.URI;
 import java.util.Objects;
 

@@ -23,11 +23,9 @@ import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import com.vaushell.spipes.nodes.A_Node;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -51,25 +49,18 @@ public class N_RSS
         super();
     }
 
-    @Override
-    public void prepare()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
     // PROTECTED
+    @Override
+    protected void prepareImpl()
+        throws Exception
+    {
+        // Nothing
+    }
+
     @Override
     @SuppressWarnings( "unchecked" )
     protected void loop()
-        throws URISyntaxException , FeedException , IOException
+        throws Exception
     {
         final URL url = new URL( getConfig( "url" ) );
 
@@ -90,6 +81,13 @@ public class N_RSS
                 sendMessage( news );
             }
         }
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_RSS.class );

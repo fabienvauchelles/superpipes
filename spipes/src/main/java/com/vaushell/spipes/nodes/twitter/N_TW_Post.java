@@ -22,9 +22,7 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.tools.HTMLhelper;
-import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -48,8 +46,9 @@ public class N_TW_Post
         this.client = new TwitterClient();
     }
 
+    // PROTECTED
     @Override
-    public void prepare()
+    protected void prepareImpl()
         throws Exception
     {
         final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
@@ -63,16 +62,8 @@ public class N_TW_Post
     }
 
     @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    // PROTECTED
-    @Override
     protected void loop()
-        throws InterruptedException , IOException , OAuthException
+        throws Exception
     {
         // Receive
         final Object message = getLastMessageOrWait();
@@ -125,6 +116,13 @@ public class N_TW_Post
         }
 
         sendMessage( tweet );
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // DEFAULT
     static final int TWEET_SIZE = 140;

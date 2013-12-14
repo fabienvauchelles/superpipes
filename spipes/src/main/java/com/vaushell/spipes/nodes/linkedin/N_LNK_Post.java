@@ -23,9 +23,7 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.nodes.twitter.N_TW_Post;
 import com.vaushell.spipes.tools.HTMLhelper;
-import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.linkedin.LinkedInClient;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -47,8 +45,9 @@ public class N_LNK_Post
         this.client = new LinkedInClient();
     }
 
+    // PROTECTED
     @Override
-    public void prepare()
+    protected void prepareImpl()
         throws Exception
     {
         final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
@@ -62,16 +61,8 @@ public class N_LNK_Post
     }
 
     @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    // PROTECTED
-    @Override
     protected void loop()
-        throws InterruptedException , IOException , OAuthException
+        throws Exception
     {
         // Receive
         final Object message = getLastMessageOrWait();
@@ -137,6 +128,13 @@ public class N_LNK_Post
         }
 
         sendMessage( post );
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );

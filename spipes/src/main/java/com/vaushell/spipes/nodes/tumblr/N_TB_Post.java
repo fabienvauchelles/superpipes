@@ -23,8 +23,6 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.tumblr.TumblrClient;
-import com.vaushell.spipes.tools.scribe.tumblr.TumblrException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -46,8 +44,9 @@ public class N_TB_Post
         this.client = new TumblrClient();
     }
 
+    // PROTECTED
     @Override
-    public void prepare()
+    protected void prepareImpl()
         throws Exception
     {
         final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
@@ -62,16 +61,8 @@ public class N_TB_Post
     }
 
     @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    // PROTECTED
-    @Override
     protected void loop()
-        throws InterruptedException , TumblrException , IOException
+        throws Exception
     {
         // Receive
         final Object message = getLastMessageOrWait();
@@ -138,6 +129,13 @@ public class N_TB_Post
         }
 
         sendMessage( post );
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TB_Post.class );

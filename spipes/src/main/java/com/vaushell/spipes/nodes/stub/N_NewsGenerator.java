@@ -23,7 +23,6 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.tools.ValuesGenerator;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,24 +41,17 @@ public class N_NewsGenerator
         super();
     }
 
-    @Override
-    public void prepare()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
     // PROTECTED
     @Override
+    protected void prepareImpl()
+        throws Exception
+    {
+        // Nothing
+    }
+
+    @Override
     protected void loop()
-        throws URISyntaxException
+        throws Exception
     {
         if ( LOGGER.isTraceEnabled() )
         {
@@ -83,6 +75,13 @@ public class N_NewsGenerator
                                        new Date() );
 
         sendMessage( news );
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_NewsGenerator.class );

@@ -17,9 +17,9 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes.nodes.filters.done;
+package com.vaushell.spipes.transforms.done;
 
-import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.transforms.A_Transform;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -33,15 +33,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Filter all messages which have already processed.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class NF_Done
-    extends A_Node
+public class T_Done
+    extends A_Transform
 {
     // PUBLIC
-    public NF_Done()
+    public T_Done()
     {
         super();
 
@@ -52,11 +51,6 @@ public class NF_Done
     public void prepare()
         throws IOException
     {
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace( "[" + getNodeID() + "] load already done ids" );
-        }
-
         // Config
         path = Paths.get( getMainConfig( "datas-directory" ) ,
                           getNodeID() ,
@@ -82,43 +76,46 @@ public class NF_Done
     }
 
     @Override
-    public void terminate()
+    public Object transform( final Object message )
+        throws Exception
     {
-        // Nothing
-    }
-
-    // PROTECTED
-    @Override
-    protected void loop()
-        throws IOException , InterruptedException
-    {
-        final I_Identifier message = (I_Identifier) getLastMessageOrWait();
+        final I_Identifier msg = (I_Identifier) message;
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] filter message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + msg );
         }
 
-        if ( !ids.contains( message.getID() ) )
+        if ( ids.contains( msg.getID() ) )
         {
-            // Transfer message
-            sendMessage( message );
-
+            return null;
+        }
+        else
+        {
             // Save message ID. Won't be replay
-            ids.add( message.getID() );
+            ids.add( msg.getID() );
 
             try( final BufferedWriter bfw = Files.newBufferedWriter( path ,
                                                                      Charset.forName( "utf-8" ) ,
                                                                      StandardOpenOption.APPEND ,
                                                                      StandardOpenOption.CREATE ) )
             {
-                bfw.write( message.getID() );
+                bfw.write( msg.getID() );
                 bfw.newLine();
             }
+
+            return msg;
         }
     }
+
+    @Override
+    public void terminate()
+    {
+        // Nothing
+    }
+
     // PRIVATE
-    private static final Logger LOGGER = LoggerFactory.getLogger( NF_Done.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( T_Done.class );
     private final HashSet<String> ids;
     private Path path;
 }

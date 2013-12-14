@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.nodes.twitter;
 
-import com.vaushell.spipes.nodes.filters.done.I_Identifier;
+import com.vaushell.spipes.transforms.done.I_Identifier;
 import java.util.Objects;
 
 /**

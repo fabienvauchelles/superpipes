@@ -20,8 +20,8 @@
 package com.vaushell.spipes.nodes.rss;
 
 import com.vaushell.spipes.nodes.bitly.I_URIshorten;
-import com.vaushell.spipes.nodes.filters.date.I_Date;
-import com.vaushell.spipes.nodes.filters.done.I_Identifier;
+import com.vaushell.spipes.transforms.date.I_Date;
+import com.vaushell.spipes.transforms.done.I_Identifier;
 import java.net.URI;
 import java.util.Date;
 import java.util.Locale;

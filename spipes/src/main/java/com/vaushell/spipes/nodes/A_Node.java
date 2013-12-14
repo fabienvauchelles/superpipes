@@ -20,7 +20,10 @@
 package com.vaushell.spipes.nodes;
 
 import com.vaushell.spipes.Dispatcher;
+import com.vaushell.spipes.transforms.A_Transform;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,27 +46,34 @@ public abstract class A_Node
         this.dispatcher = null;
         this.activated = true;
         this.internalStack = new LinkedList<>();
+        this.transforms = new ArrayList<>();
     }
-
-    /**
-     * Prepare node's execution. Executed 1 time at the beginning.
-     *
-     * @throws Exception
-     */
-    public abstract void prepare()
-        throws Exception;
-
-    /**
-     * Close node's execution. Executed 1 time at the ending.
-     *
-     * @throws Exception
-     */
-    public abstract void terminate()
-        throws Exception;
 
     public String getNodeID()
     {
         return nodeID;
+    }
+
+    /**
+     * Retrieve node's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
+    public String getConfig( final String key )
+    {
+        return properties.getProperty( key );
+    }
+
+    /**
+     * Retrieve main's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
+    public String getMainConfig( final String key )
+    {
+        return dispatcher.getConfig( key );
     }
 
     /**
@@ -80,6 +90,30 @@ public abstract class A_Node
         this.nodeID = nodeID;
         this.properties = properties;
         this.dispatcher = dispatcher;
+    }
+
+    public void addTransform( A_Transform transform )
+    {
+        transforms.add( transform );
+    }
+
+    public void prepare()
+        throws Exception
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "[" + getNodeID() + "] prepare" );
+        }
+        prepareImpl();
+
+        for ( A_Transform transform : transforms )
+        {
+            if ( LOGGER.isTraceEnabled() )
+            {
+                LOGGER.trace( "[" + getNodeID() + "/" + transform.getClass().getSimpleName() + "] prepare" );
+            }
+            transform.prepare();
+        }
     }
 
     @Override
@@ -138,6 +172,25 @@ public abstract class A_Node
         }
     }
 
+    public void terminate()
+        throws Exception
+    {
+        for ( A_Transform transform : transforms )
+        {
+            if ( LOGGER.isTraceEnabled() )
+            {
+                LOGGER.trace( "[" + getNodeID() + "/" + transform.getClass().getSimpleName() + "] terminate" );
+            }
+            transform.terminate();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "[" + getNodeID() + "] terminate" );
+        }
+        terminateImpl();
+    }
+
     /**
      * Receive a message and stack it.
      *
@@ -183,6 +236,14 @@ public abstract class A_Node
 
     // PROTECTED
     /**
+     * Prepare node's execution. Executed 1 time at the beginning.
+     *
+     * @throws Exception
+     */
+    protected abstract void prepareImpl()
+        throws Exception;
+
+    /**
      * Loop execution. The execution is looped until message reception.
      *
      * @throws Exception
@@ -191,33 +252,21 @@ public abstract class A_Node
         throws Exception;
 
     /**
-     * Retrieve node's parameter.
+     * Close node's execution. Executed 1 time at the ending.
      *
-     * @param key Key of parameter
-     * @return the value
+     * @throws Exception
      */
-    protected String getConfig( final String key )
-    {
-        return properties.getProperty( key );
-    }
-
-    /**
-     * Retrieve main's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    protected String getMainConfig( final String key )
-    {
-        return dispatcher.getConfig( key );
-    }
+    protected abstract void terminateImpl()
+        throws Exception;
 
     /**
      * Send a message to every connected nodes.
      *
      * @param message Object message.
+     * @throws java.lang.Exception
      */
     protected void sendMessage( final Object message )
+        throws Exception
     {
         if ( message == null )
         {
@@ -229,8 +278,18 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] sendMessage : message=" + message );
         }
 
+        Object result = message;
+        for ( final A_Transform transform : transforms )
+        {
+            result = transform.transform( result );
+            if ( result == null )
+            {
+                return;
+            }
+        }
+
         dispatcher.sendMessage( nodeID ,
-                                message );
+                                result );
     }
 
     /**
@@ -277,4 +336,5 @@ public abstract class A_Node
     private Dispatcher dispatcher;
     private final LinkedList<Object> internalStack;
     private volatile boolean activated;
+    private List<A_Transform> transforms;
 }

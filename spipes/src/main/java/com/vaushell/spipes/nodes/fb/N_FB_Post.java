@@ -46,8 +46,9 @@ public class N_FB_Post
         this.client = new FacebookClient();
     }
 
+    // PROTECTED
     @Override
-    public void prepare()
+    protected void prepareImpl()
         throws Exception
     {
         final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
@@ -62,16 +63,8 @@ public class N_FB_Post
     }
 
     @Override
-    public void terminate()
-        throws Exception
-    {
-        // Nothing
-    }
-
-    // PROTECTED
-    @Override
     protected void loop()
-        throws InterruptedException , FacebookException , IOException
+        throws Exception
     {
         // Receive
         final Object message = getLastMessageOrWait();
@@ -138,6 +131,13 @@ public class N_FB_Post
         }
 
         sendMessage( post );
+    }
+
+    @Override
+    protected void terminateImpl()
+        throws Exception
+    {
+        // Nothing
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_FB_Post.class );

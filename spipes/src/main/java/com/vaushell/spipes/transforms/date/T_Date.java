@@ -17,10 +17,9 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes.nodes.filters.date;
+package com.vaushell.spipes.transforms.date;
 
-import com.vaushell.spipes.nodes.A_Node;
-import java.io.IOException;
+import com.vaushell.spipes.transforms.A_Transform;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -29,15 +28,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Filter message between a min and max date.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class NF_Date
-    extends A_Node
+public class T_Date
+    extends A_Transform
 {
     // PUBLIC
-    public NF_Date()
+    public T_Date()
     {
         super();
 
@@ -47,7 +45,7 @@ public class NF_Date
 
     @Override
     public void prepare()
-        throws IOException
+        throws Exception
     {
         final String minDateStr = getConfig( "date-min" );
         if ( minDateStr != null )
@@ -77,42 +75,43 @@ public class NF_Date
     }
 
     @Override
+    public Object transform( Object message )
+        throws Exception
+    {
+        final I_Date msg = (I_Date) message;
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + msg );
+        }
+
+        if ( msg.getDate() == null )
+        {
+            return null;
+        }
+
+        if ( minDate != null && minDate.after( msg.getDate() ) )
+        {
+            return null;
+        }
+
+        if ( maxDate != null && maxDate.before( msg.getDate() ) )
+        {
+            return null;
+        }
+
+        return message;
+    }
+
+    @Override
     public void terminate()
+        throws Exception
     {
         // Nothing
     }
 
-    // PROTECTED
-    @Override
-    protected void loop()
-        throws InterruptedException
-    {
-        final I_Date message = (I_Date) getLastMessageOrWait();
-
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace( "[" + getNodeID() + "] filter message : " + message );
-        }
-
-        if ( message.getDate() == null )
-        {
-            return;
-        }
-
-        if ( minDate != null && minDate.after( message.getDate() ) )
-        {
-            return;
-        }
-
-        if ( maxDate != null && maxDate.before( message.getDate() ) )
-        {
-            return;
-        }
-
-        sendMessage( message );
-    }
     // PRIVATE
-    private static final Logger LOGGER = LoggerFactory.getLogger( NF_Date.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( T_Date.class );
     private Date minDate;
     private Date maxDate;
     private final SimpleDateFormat df;

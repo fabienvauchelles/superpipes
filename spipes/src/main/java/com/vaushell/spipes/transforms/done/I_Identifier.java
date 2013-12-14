@@ -17,29 +17,27 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes.nodes.filters.date;
-
-import java.util.Date;
+package com.vaushell.spipes.transforms.done;
 
 /**
- * Represents a date.
+ * Represents an ID.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public interface I_Date
+public interface I_Identifier
 {
     // PUBLIC
     /**
-     * Get the date.
+     * Get the ID.
      *
-     * @return the date
+     * @return the ID
      */
-    Date getDate();
+    String getID();
 
     /**
-     * Set the date.
+     * Set the ID.
      *
-     * @param date the date
+     * @param ID the ID
      */
-    void setDate( Date date );
+    void setID( String ID );
 }
