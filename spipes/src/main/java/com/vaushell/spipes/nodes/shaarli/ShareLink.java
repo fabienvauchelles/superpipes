@@ -59,6 +59,28 @@ public class ShareLink
                               tags );
     }
 
+    public static ShareLink create( final String title ,
+                                    final String description ,
+                                    final URI uri ,
+                                    final URI uriSource ,
+                                    final Set<String> tags )
+    {
+        if ( title == null || title.isEmpty()
+             || uri == null || uri.toString().isEmpty()
+             || tags == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        return new ShareLink( null ,
+                              title ,
+                              description ,
+                              uri ,
+                              uriSource ,
+                              null ,
+                              tags );
+    }
+
     @Override
     public String getID()
     {
