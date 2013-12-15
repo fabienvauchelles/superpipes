@@ -21,6 +21,7 @@ package com.vaushell.spipes.nodes.shaarli;
 
 import com.vaushell.spipes.transforms.bitly.I_URIshorten;
 import com.vaushell.spipes.transforms.done.I_Identifier;
+import com.vaushell.spipes.transforms.tags.I_Tags;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Set;
@@ -30,7 +31,7 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class ShareLink
-    implements I_Identifier , I_URIshorten
+    implements I_Identifier , I_URIshorten , I_Tags
 {
     // PUBLIC
     public static ShareLink create( final String ID ,
@@ -147,11 +148,13 @@ public class ShareLink
         this.permaURI = permaURI;
     }
 
+    @Override
     public Set<String> getTags()
     {
         return tags;
     }
 
+    @Override
     public void setTags( final Set<String> tags )
     {
         this.tags = tags;

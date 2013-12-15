@@ -21,6 +21,7 @@ package com.vaushell.spipes.nodes.tumblr;
 
 import com.vaushell.spipes.transforms.bitly.I_URIshorten;
 import com.vaushell.spipes.transforms.done.I_Identifier;
+import com.vaushell.spipes.transforms.tags.I_Tags;
 import java.net.URI;
 import java.util.Set;
 
@@ -30,7 +31,7 @@ import java.util.Set;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class TB_Post
-    implements I_Identifier , I_URIshorten
+    implements I_Identifier , I_URIshorten , I_Tags
 {
     // PUBLIC
     public TB_Post( final String message ,
@@ -125,11 +126,13 @@ public class TB_Post
         this.uriDescription = uriDescription;
     }
 
+    @Override
     public Set<String> getTags()
     {
         return tags;
     }
 
+    @Override
     public void setTags( final Set<String> tags )
     {
         this.tags = tags;

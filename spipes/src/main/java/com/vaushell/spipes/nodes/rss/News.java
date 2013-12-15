@@ -22,6 +22,7 @@ package com.vaushell.spipes.nodes.rss;
 import com.vaushell.spipes.transforms.bitly.I_URIshorten;
 import com.vaushell.spipes.transforms.date.I_Date;
 import com.vaushell.spipes.transforms.done.I_Identifier;
+import com.vaushell.spipes.transforms.tags.I_Tags;
 import java.net.URI;
 import java.util.Date;
 import java.util.Locale;
@@ -36,7 +37,7 @@ import org.apache.commons.codec.digest.DigestUtils;
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class News
-    implements I_Identifier , I_Date , I_URIshorten
+    implements I_Identifier , I_Date , I_URIshorten , I_Tags
 {
     // PUBLIC
     /**
@@ -179,11 +180,13 @@ public class News
         this.content = content;
     }
 
+    @Override
     public Set<String> getTags()
     {
         return tags;
     }
 
+    @Override
     public void setTags( final Set<String> tags )
     {
         this.tags = tags;
