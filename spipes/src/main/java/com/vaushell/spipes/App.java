@@ -39,14 +39,16 @@ public final class App
         throws Exception
     {
         // My config
-        final XMLConfiguration config;
+        final XMLConfiguration config = new XMLConfiguration();
+        config.setDelimiterParsingDisabled( true );
+
         if ( args.length > 0 )
         {
-            config = new XMLConfiguration( args[ 0] );
+            config.load( args[ 0] );
         }
         else
         {
-            config = new XMLConfiguration( "conf/configuration.xml" );
+            config.load( "conf/configuration.xml" );
         }
 
         final Dispatcher dispatcher = new Dispatcher();
