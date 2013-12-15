@@ -61,7 +61,9 @@ public class News
                                final Set<String> tags ,
                                final Date date )
     {
-        if ( title == null || title.length() <= 0 || uri == null || uri.toString().length() <= 0 || tags == null )
+        if ( title == null || title.isEmpty()
+             || uri == null || uri.toString().isEmpty()
+             || tags == null )
         {
             throw new IllegalArgumentException();
         }
