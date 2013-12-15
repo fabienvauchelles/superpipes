@@ -51,7 +51,7 @@ page at http://checkstyle.sourceforge.net/config.html
     </appender>
 
     <logger name="com.vaushell">
-        <level value="trace" />
+        <level value="debug" />
     </logger>
 
     <root>
