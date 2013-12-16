@@ -72,13 +72,13 @@ public class N_FB_Post
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        if ( !message.contains( "uri" ) )
+        if ( !message.contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to FB
-        final URI uri = (URI) message.getProperty( "uri" );
+        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -90,9 +90,9 @@ public class N_FB_Post
         }
 
         final String caption;
-        if ( message.contains( "uri-source" ) )
+        if ( message.contains( Message.KeyIndex.URI_SOURCE ) )
         {
-            caption = ( (URI) message.getProperty( "uri-source" ) ).getHost();
+            caption = ( (URI) message.getProperty( Message.KeyIndex.URI_SOURCE ) ).getHost();
         }
         else
         {
@@ -101,9 +101,9 @@ public class N_FB_Post
 
         final String ID = client.post( null ,
                                        uriStr ,
-                                       (String) message.getProperty( "title" ) ,
+                                       (String) message.getProperty( Message.KeyIndex.TITLE ) ,
                                        caption ,
-                                       (String) message.getProperty( "description" ) );
+                                       (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) );
 
         if ( LOGGER.isTraceEnabled() )
         {

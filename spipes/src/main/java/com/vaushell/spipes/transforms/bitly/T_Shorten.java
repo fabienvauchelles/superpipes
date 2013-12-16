@@ -60,17 +60,17 @@ public class T_Shorten
             LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
-        if ( message.contains( "uri" ) )
+        if ( message.contains( Message.KeyIndex.URI ) )
         {
-            final URI longURI = (URI) message.getProperty( "uri" );
+            final URI longURI = (URI) message.getProperty( Message.KeyIndex.URI );
 
             final Url url = bitly.call( Bitly.shorten( longURI.toString() ) );
 
             if ( url != null && url.getShortUrl() != null )
             {
-                message.setProperty( "uri" ,
+                message.setProperty( Message.KeyIndex.URI ,
                                      new URI( url.getShortUrl() ) );
-                message.setProperty( "uri-source" ,
+                message.setProperty( Message.KeyIndex.URI_SOURCE ,
                                      longURI );
             }
         }

@@ -72,13 +72,13 @@ public class N_LNK_Post
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        if ( !message.contains( "uri" ) )
+        if ( !message.contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to Twitter
-        final URI uri = (URI) message.getProperty( "uri" );
+        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -91,7 +91,7 @@ public class N_LNK_Post
 
         final String ID = client.updateStatus( null ,
                                                uriStr ,
-                                               (String) message.getProperty( "title" ) ,
+                                               (String) message.getProperty( Message.KeyIndex.TITLE ) ,
                                                null );
 
         if ( LOGGER.isTraceEnabled() )

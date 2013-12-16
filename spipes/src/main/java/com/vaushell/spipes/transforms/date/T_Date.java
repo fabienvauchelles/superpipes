@@ -84,12 +84,12 @@ public class T_Date
             LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
-        if ( !message.contains( "published-date" ) )
+        if ( !message.contains( Message.KeyIndex.PUBLISHED_DATE ) )
         {
             return null;
         }
 
-        final Date date = new Date( (Long) message.getProperty( "published-date" ) );
+        final Date date = new Date( (Long) message.getProperty( Message.KeyIndex.PUBLISHED_DATE ) );
         if ( minDate != null && minDate.after( date ) )
         {
             return null;

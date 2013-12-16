@@ -74,13 +74,13 @@ public class N_TB_Post
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        if ( !message.contains( "uri" ) )
+        if ( !message.contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to TB
-        final URI uri = (URI) message.getProperty( "uri" );
+        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -93,9 +93,9 @@ public class N_TB_Post
 
         final long ID = client.postLink( null ,
                                          uriStr ,
-                                         (String) message.getProperty( "title" ) ,
-                                         (String) message.getProperty( "description" ) ,
-                                         (Set<String>) message.getProperty( "tags" ) );
+                                         (String) message.getProperty( Message.KeyIndex.TITLE ) ,
+                                         (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                         (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) );
 
         if ( LOGGER.isTraceEnabled() )
         {

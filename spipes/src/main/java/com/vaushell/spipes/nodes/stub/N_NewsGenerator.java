@@ -60,34 +60,34 @@ public class N_NewsGenerator
 
         final Message message = new Message();
 
-        message.setProperty( "title" ,
+        message.setProperty( Message.KeyIndex.TITLE ,
                              ValuesGenerator.getRandomText( 10 ,
                                                             20 ) );
 
-        message.setProperty( "description" ,
+        message.setProperty( Message.KeyIndex.DESCRIPTION ,
                              ValuesGenerator.getRandomText( 20 ,
                                                             30 ) );
 
         final String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
                                                                          20 );
-        message.setProperty( "uri" ,
+        message.setProperty( Message.KeyIndex.URI ,
                              new URI( uriStr ) );
-        message.setProperty( "uri-source" ,
+        message.setProperty( Message.KeyIndex.URI_SOURCE ,
                              new URI( uriStr ) );
 
-        message.setProperty( "author" ,
+        message.setProperty( Message.KeyIndex.AUTHOR ,
                              ValuesGenerator.getRandomText( 1 ,
                                                             2 ) );
 
-        message.setProperty( "content" ,
+        message.setProperty( Message.KeyIndex.CONTENT ,
                              ValuesGenerator.getRandomText( 100 ,
                                                             200 ) );
 
-        message.setProperty( "tags" ,
+        message.setProperty( Message.KeyIndex.TAGS ,
                              ValuesGenerator.getRandomWordSet( 3 ,
                                                                8 ) );
 
-        message.setProperty( "published-date" ,
+        message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
                              new Date().getTime() );
 
         sendMessage( message );

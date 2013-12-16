@@ -105,12 +105,12 @@ public class N_TW_Post
     @SuppressWarnings( "unchecked" )
     static String createContent( final Message message )
     {
-        if ( message == null || !message.contains( "uri" ) )
+        if ( message == null || !message.contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException();
         }
 
-        final String uri = message.getProperty( "uri" ).toString();
+        final String uri = message.getProperty( Message.KeyIndex.URI ).toString();
         if ( uri.length() > TWEET_SIZE )
         {
             throw new IllegalArgumentException( "URL is too long" );
@@ -123,9 +123,9 @@ public class N_TW_Post
         }
         else
         {
-            if ( message.contains( "title" ) )
+            if ( message.contains( Message.KeyIndex.TITLE ) )
             {
-                final String title = (String) message.getProperty( "title" );
+                final String title = (String) message.getProperty( Message.KeyIndex.TITLE );
 
                 sb.append( " (" ).append( uri ).append( ')' );
                 if ( title.length() + sb.length() > TWEET_SIZE )
@@ -141,9 +141,9 @@ public class N_TW_Post
                 }
             }
 
-            if ( message.contains( "tags" ) )
+            if ( message.contains( Message.KeyIndex.TAGS ) )
             {
-                final Set<String> tags = (Set<String>) message.getProperty( "tags" );
+                final Set<String> tags = (Set<String>) message.getProperty( Message.KeyIndex.TAGS );
                 for ( final String tag : tags )
                 {
                     final String ct = " #" + tag;

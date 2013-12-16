@@ -76,15 +76,15 @@ public class N_Shaarli
                 final Message message = new Message();
 
                 // URI
-                message.setProperty( "uri" ,
+                message.setProperty( Message.KeyIndex.URI ,
                                      new URI( sl.getUrl() ) );
 
                 // Title
-                message.setProperty( "title" ,
+                message.setProperty( Message.KeyIndex.TITLE ,
                                      sl.getTitle() );
 
                 // Description
-                message.setProperty( "description" ,
+                message.setProperty( Message.KeyIndex.DESCRIPTION ,
                                      sl.getDescription() );
 
                 // Shaarli ID
@@ -105,7 +105,7 @@ public class N_Shaarli
                 {
                     tags.add( tag.toLowerCase( Locale.ENGLISH ) );
                 }
-                message.setProperty( "tags" ,
+                message.setProperty( Message.KeyIndex.TAGS ,
                                      tags );
 
                 sendMessage( message );

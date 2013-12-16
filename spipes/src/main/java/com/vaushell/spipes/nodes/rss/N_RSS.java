@@ -81,27 +81,27 @@ public class N_RSS
             if ( entry.getUri() != null )
             {
                 // URI
-                message.setProperty( "uri" ,
+                message.setProperty( Message.KeyIndex.URI ,
                                      new URI( entry.getUri() ) );
 
                 // Title
                 if ( entry.getTitle() != null )
                 {
-                    message.setProperty( "title" ,
+                    message.setProperty( Message.KeyIndex.TITLE ,
                                          HTMLhelper.cleanHTML( entry.getTitle() ) );
                 }
 
                 // Description
                 if ( entry.getDescription() != null )
                 {
-                    message.setProperty( "description" ,
+                    message.setProperty( Message.KeyIndex.DESCRIPTION ,
                                          HTMLhelper.cleanHTML( entry.getDescription().getValue() ) );
                 }
 
                 // Author
                 if ( entry.getAuthor() != null )
                 {
-                    message.setProperty( "author" ,
+                    message.setProperty( Message.KeyIndex.AUTHOR ,
                                          entry.getAuthor() );
                 }
 
@@ -116,13 +116,13 @@ public class N_RSS
                         tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
                     }
                 }
-                message.setProperty( "tags" ,
+                message.setProperty( Message.KeyIndex.TAGS ,
                                      tags );
 
                 // Published date
                 if ( entry.getPublishedDate() != null )
                 {
-                    message.setProperty( "published-date" ,
+                    message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
                                          entry.getPublishedDate().getTime() );
                 }
 
@@ -138,7 +138,7 @@ public class N_RSS
 
                     if ( sb.length() > 0 )
                     {
-                        message.setProperty( "content" ,
+                        message.setProperty( Message.KeyIndex.CONTENT ,
                                              sb.toString() );
                     }
                 }

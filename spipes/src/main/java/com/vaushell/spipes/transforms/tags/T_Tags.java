@@ -71,12 +71,12 @@ public class T_Tags
             LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
-        if ( !message.contains( "tags" ) )
+        if ( !message.contains( Message.KeyIndex.TAGS ) )
         {
             return null;
         }
 
-        final Set<String> mTags = (Set<String>) message.getProperty( "tags" );
+        final Set<String> mTags = (Set<String>) message.getProperty( Message.KeyIndex.TAGS );
 
         switch( op )
         {

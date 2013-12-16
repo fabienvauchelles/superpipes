@@ -30,6 +30,27 @@ import org.apache.commons.codec.digest.DigestUtils;
 public class Message
 {
     // PUBLIC
+    public enum KeyIndex
+    {
+        // PUBLIC
+        TITLE( "title" ),
+        DESCRIPTION( "description" ),
+        URI( "uri" ),
+        URI_SOURCE( "uri-source" ),
+        AUTHOR( "author" ),
+        TAGS( "tags" ),
+        PUBLISHED_DATE( "published-date" ),
+        CONTENT( "content" );
+
+        // PRIVATE
+        private final String index;
+
+        private KeyIndex( final String index )
+        {
+            this.index = index;
+        }
+    }
+
     public Message()
     {
         this.ID = null;
@@ -49,9 +70,19 @@ public class Message
         return ID;
     }
 
+    public boolean contains( final KeyIndex key )
+    {
+        return contains( key.index );
+    }
+
     public boolean contains( final String key )
     {
         return properties.containsKey( key );
+    }
+
+    public Object getProperty( final KeyIndex key )
+    {
+        return getProperty( key.index );
     }
 
     public Object getProperty( final String key )
@@ -59,11 +90,23 @@ public class Message
         return properties.get( key );
     }
 
+    public void removeProperty( final KeyIndex key )
+    {
+        removeProperty( key.index );
+    }
+
     public void removeProperty( final String key )
     {
         properties.remove( key );
 
         hasToRebuildID = true;
+    }
+
+    public void setProperty( final KeyIndex key ,
+                             final Object value )
+    {
+        setProperty( key.index ,
+                     value );
     }
 
     public void setProperty( final String key ,

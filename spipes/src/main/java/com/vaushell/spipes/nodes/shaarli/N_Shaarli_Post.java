@@ -62,7 +62,9 @@ public class N_Shaarli_Post
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        if ( !message.contains( "uri" ) || !message.contains( "title" ) || !message.contains( "tags" ) )
+        if ( !message.contains( Message.KeyIndex.URI )
+             || !message.contains( Message.KeyIndex.TITLE )
+             || !message.contains( Message.KeyIndex.TAGS ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri, a title or a set of tags" );
         }
@@ -75,7 +77,7 @@ public class N_Shaarli_Post
             throw new IllegalArgumentException( "Login error" );
         }
 
-        final URI uri = (URI) message.getProperty( "uri" );
+        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -87,9 +89,9 @@ public class N_Shaarli_Post
         }
 
         final String ID = client.createOrUpdateLink( uriStr ,
-                                                     (String) message.getProperty( "title" ) ,
-                                                     (String) message.getProperty( "description" ) ,
-                                                     (Set<String>) message.getProperty( "tags" ) ,
+                                                     (String) message.getProperty( Message.KeyIndex.TITLE ) ,
+                                                     (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                                     (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) ,
                                                      false );
 
         if ( LOGGER.isTraceEnabled() )
