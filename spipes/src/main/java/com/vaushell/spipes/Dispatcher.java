@@ -317,7 +317,7 @@ public final class Dispatcher
      * @param message message
      */
     public void sendMessage( final String sourceID ,
-                             final Object message )
+                             final Message message )
         throws Exception
     {
 

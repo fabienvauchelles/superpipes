@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.nodes.fb;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import com.vaushell.spipes.tools.scribe.fb.FacebookException;
@@ -65,15 +66,20 @@ public class N_FB_PostLike
         throws InterruptedException , IOException , FacebookException
     {
         // Receive
-        final FB_Post post = (FB_Post) getLastMessageOrWait();
+        final Message message = (Message) getLastMessageOrWait();
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive post and like it : " + post );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+        }
+
+        if ( !message.contains( "id-facebook" ) )
+        {
+            throw new IllegalArgumentException( "message doesn't have an post id" );
         }
 
         // Like
-        client.likePost( post.getID() );
+        client.likePost( (String) message.getProperty( "id-facebook" ) );
     }
 
     @Override

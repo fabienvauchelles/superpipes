@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.transforms.done;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -76,36 +77,32 @@ public class T_Done
     }
 
     @Override
-    public Object transform( final Object message )
+    public Message transform( final Message message )
         throws Exception
     {
-        final I_Identifier msg = (I_Identifier) message;
-
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + msg );
+            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
-        if ( ids.contains( msg.getID() ) )
+        if ( ids.contains( message.getID() ) )
         {
             return null;
         }
-        else
+
+        // Save message ID. Won't be replay
+        ids.add( message.getID() );
+
+        try( final BufferedWriter bfw = Files.newBufferedWriter( path ,
+                                                                 Charset.forName( "utf-8" ) ,
+                                                                 StandardOpenOption.APPEND ,
+                                                                 StandardOpenOption.CREATE ) )
         {
-            // Save message ID. Won't be replay
-            ids.add( msg.getID() );
-
-            try( final BufferedWriter bfw = Files.newBufferedWriter( path ,
-                                                                     Charset.forName( "utf-8" ) ,
-                                                                     StandardOpenOption.APPEND ,
-                                                                     StandardOpenOption.CREATE ) )
-            {
-                bfw.write( msg.getID() );
-                bfw.newLine();
-            }
-
-            return msg;
+            bfw.write( message.getID() );
+            bfw.newLine();
         }
+
+        return message;
     }
 
     @Override

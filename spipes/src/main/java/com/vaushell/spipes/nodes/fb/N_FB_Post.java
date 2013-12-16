@@ -19,10 +19,10 @@
 
 package com.vaushell.spipes.nodes.fb;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.nodes.rss.News;
-import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -65,70 +65,55 @@ public class N_FB_Post
         throws Exception
     {
         // Receive
-        final Object message = getLastMessageOrWait();
+        final Message message = getLastMessageOrWait();
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        // Convert if possible
-        final FB_Post post;
-        if ( message == null )
+        if ( !message.contains( "uri" ) )
         {
-            post = null;
-        }
-        else
-        {
-            if ( message instanceof FB_Post )
-            {
-                post = (FB_Post) message;
-            }
-            else if ( message instanceof News )
-            {
-                post = convertFromNews( (News) message );
-            }
-            else
-            {
-                post = null;
-            }
-        }
-
-        if ( post == null )
-        {
-            throw new IllegalArgumentException( "message type is unknown : " + message.getClass().getName() );
+            throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to FB
-        if ( LOGGER.isTraceEnabled() )
+        final URI uri = (URI) message.getProperty( "uri" );
+        String uriStr;
+        if ( uri == null )
         {
-            LOGGER.trace( "[" + getNodeID() + "] send post to facebook : " + post );
-        }
-
-        final String uri;
-        if ( post.getURI() == null )
-        {
-            uri = null;
+            uriStr = null;
         }
         else
         {
-            uri = post.getURI().toURL().toString();
+            uriStr = uri.toString();
         }
 
-        final String ID = client.post( post.getMessage() ,
-                                       uri ,
-                                       post.getURIname() ,
-                                       post.getURIcaption() ,
-                                       post.getURIdescription() );
+        final String caption;
+        if ( message.contains( "uri-source" ) )
+        {
+            caption = ( (URI) message.getProperty( "uri-source" ) ).getHost();
+        }
+        else
+        {
+            caption = null;
+        }
 
-        post.setID( ID );
+        final String ID = client.post( null ,
+                                       uriStr ,
+                                       (String) message.getProperty( "title" ) ,
+                                       caption ,
+                                       (String) message.getProperty( "description" ) );
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        sendMessage( post );
+        message.setProperty( "id-facebook" ,
+                             ID );
+
+        sendMessage( message );
     }
 
     @Override
@@ -140,29 +125,4 @@ public class N_FB_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_FB_Post.class );
     private final FacebookClient client;
-
-    private static FB_Post convertFromNews( final News news )
-    {
-        if ( news.getURI() == null )
-        {
-            throw new IllegalArgumentException( "URI can not be null" );
-        }
-
-        final String caption;
-        if ( news.getURIsource() == null )
-        {
-            caption = null;
-        }
-        else
-        {
-            caption = news.getURIsource().getHost();
-        }
-
-        return new FB_Post( null ,
-                            news.getURI() ,
-                            news.getURIsource() ,
-                            HTMLhelper.cleanHTML( news.getTitle() ) ,
-                            caption ,
-                            HTMLhelper.cleanHTML( news.getDescription() ) );
-    }
 }

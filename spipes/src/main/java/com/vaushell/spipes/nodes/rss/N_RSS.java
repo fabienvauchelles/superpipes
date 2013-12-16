@@ -25,13 +25,14 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.tools.HTMLhelper;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,10 +76,74 @@ public class N_RSS
         final List<SyndEntry> entries = feed.getEntries();
         for ( final SyndEntry entry : entries )
         {
-            final News news = convert( entry );
-            if ( news != null )
+            final Message message = new Message();
+
+            if ( entry.getUri() != null )
             {
-                sendMessage( news );
+                // URI
+                message.setProperty( "uri" ,
+                                     new URI( entry.getUri() ) );
+
+                // Title
+                if ( entry.getTitle() != null )
+                {
+                    message.setProperty( "title" ,
+                                         HTMLhelper.cleanHTML( entry.getTitle() ) );
+                }
+
+                // Description
+                if ( entry.getDescription() != null )
+                {
+                    message.setProperty( "description" ,
+                                         HTMLhelper.cleanHTML( entry.getDescription().getValue() ) );
+                }
+
+                // Author
+                if ( entry.getAuthor() != null )
+                {
+                    message.setProperty( "author" ,
+                                         entry.getAuthor() );
+                }
+
+                // Tags
+                final TreeSet<String> tags = new TreeSet<>();
+
+                final List<SyndCategory> categories = entry.getCategories();
+                if ( categories != null )
+                {
+                    for ( final SyndCategory category : categories )
+                    {
+                        tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
+                    }
+                }
+                message.setProperty( "tags" ,
+                                     tags );
+
+                // Published date
+                if ( entry.getPublishedDate() != null )
+                {
+                    message.setProperty( "published-date" ,
+                                         entry.getPublishedDate().getTime() );
+                }
+
+                // Content
+                final List<SyndContent> scontents = entry.getContents();
+                if ( scontents != null )
+                {
+                    final StringBuilder sb = new StringBuilder();
+                    for ( final SyndContent scontent : scontents )
+                    {
+                        sb.append( scontent.getValue() );
+                    }
+
+                    if ( sb.length() > 0 )
+                    {
+                        message.setProperty( "content" ,
+                                             sb.toString() );
+                    }
+                }
+
+                sendMessage( message );
             }
         }
     }
@@ -91,72 +156,4 @@ public class N_RSS
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_RSS.class );
-
-    @SuppressWarnings( "unchecked" )
-    private static News convert( final SyndEntry entry )
-        throws URISyntaxException
-    {
-        final String uriStr = entry.getUri();
-        if ( uriStr == null )
-        {
-            return null;
-        }
-
-        final String description;
-        if ( entry.getDescription() == null )
-        {
-            description = null;
-        }
-        else
-        {
-            description = entry.getDescription().getValue();
-        }
-
-        final StringBuilder sb = new StringBuilder();
-
-        final List<SyndContent> scontents = entry.getContents();
-        if ( scontents != null )
-        {
-            for ( final SyndContent scontent : scontents )
-            {
-                sb.append( scontent.getValue() );
-            }
-        }
-
-        final String content;
-        if ( sb.length() > 0 )
-        {
-            content = sb.toString();
-        }
-        else
-        {
-            content = null;
-        }
-
-        final HashSet<String> tags;
-
-        final List<SyndCategory> categories = entry.getCategories();
-        if ( categories == null )
-        {
-            tags = null;
-        }
-        else
-        {
-            tags = new HashSet<>();
-
-            for ( final SyndCategory category : categories )
-            {
-                tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
-            }
-        }
-
-        return News.create( entry.getTitle() ,
-                            description ,
-                            new URI( uriStr ) ,
-                            new URI( uriStr ) ,
-                            entry.getAuthor() ,
-                            content ,
-                            tags ,
-                            entry.getPublishedDate() );
-    }
 }

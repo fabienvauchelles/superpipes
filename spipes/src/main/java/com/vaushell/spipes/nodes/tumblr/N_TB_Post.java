@@ -19,12 +19,13 @@
 
 package com.vaushell.spipes.nodes.tumblr;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.nodes.rss.News;
-import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.tumblr.TumblrClient;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,75 +61,51 @@ public class N_TB_Post
                       "[" + getClass().getName() + " / " + getNodeID() + "]" );
     }
 
+    @SuppressWarnings( "unchecked" )
     @Override
     protected void loop()
         throws Exception
     {
         // Receive
-        final Object message = getLastMessageOrWait();
+        final Message message = getLastMessageOrWait();
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        // Convert if possible
-        final TB_Post post;
-        if ( message == null )
+        if ( !message.contains( "uri" ) )
         {
-            post = null;
+            throw new IllegalArgumentException( "message doesn't have an uri" );
+        }
+
+        // Send to TB
+        final URI uri = (URI) message.getProperty( "uri" );
+        String uriStr;
+        if ( uri == null )
+        {
+            uriStr = null;
         }
         else
         {
-            if ( message instanceof TB_Post )
-            {
-                post = (TB_Post) message;
-            }
-            else if ( message instanceof News )
-            {
-                post = convertFromNews( (News) message );
-            }
-            else
-            {
-                post = null;
-            }
+            uriStr = uri.toString();
         }
 
-        if ( post == null )
-        {
-            throw new IllegalArgumentException( "message type is unknown : " + message.getClass().getName() );
-        }
-
-        // Send to FB
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace( "[" + getNodeID() + "] send post to facebook : " + post );
-        }
-
-        final String uri;
-        if ( post.getURI() == null )
-        {
-            uri = null;
-        }
-        else
-        {
-            uri = post.getURI().toURL().toString();
-        }
-
-        final long ID = client.postLink( post.getMessage() ,
-                                         uri ,
-                                         post.getURIname() ,
-                                         post.getURIdescription() ,
-                                         post.getTags() );
-
-        post.setTumblrID( ID );
+        final long ID = client.postLink( null ,
+                                         uriStr ,
+                                         (String) message.getProperty( "title" ) ,
+                                         (String) message.getProperty( "description" ) ,
+                                         (Set<String>) message.getProperty( "tags" ) );
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        sendMessage( post );
+        message.setProperty( "id-tumblr" ,
+                             ID );
+
+        sendMessage( message );
     }
 
     @Override
@@ -140,19 +117,4 @@ public class N_TB_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TB_Post.class );
     private final TumblrClient client;
-
-    private static TB_Post convertFromNews( final News news )
-    {
-        if ( news.getURI() == null )
-        {
-            throw new IllegalArgumentException( "URI can not be null" );
-        }
-
-        return new TB_Post( null ,
-                            news.getURI() ,
-                            news.getURIsource() ,
-                            HTMLhelper.cleanHTML( news.getTitle() ) ,
-                            HTMLhelper.cleanHTML( news.getDescription() ) ,
-                            news.getTags() );
-    }
 }

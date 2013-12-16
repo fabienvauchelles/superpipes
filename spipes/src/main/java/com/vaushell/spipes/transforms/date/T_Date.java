@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.transforms.date;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -75,27 +76,26 @@ public class T_Date
     }
 
     @Override
-    public Object transform( final Object message )
+    public Message transform( final Message message )
         throws Exception
     {
-        final I_Date msg = (I_Date) message;
-
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + msg );
+            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
-        if ( msg.getDate() == null )
+        if ( !message.contains( "published-date" ) )
         {
             return null;
         }
 
-        if ( minDate != null && minDate.after( msg.getDate() ) )
+        final Date date = new Date( (Long) message.getProperty( "published-date" ) );
+        if ( minDate != null && minDate.after( date ) )
         {
             return null;
         }
 
-        if ( maxDate != null && maxDate.before( msg.getDate() ) )
+        if ( maxDate != null && maxDate.before( date ) )
         {
             return null;
         }

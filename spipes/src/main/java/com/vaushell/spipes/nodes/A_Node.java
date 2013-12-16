@@ -20,6 +20,7 @@
 package com.vaushell.spipes.nodes;
 
 import com.vaushell.spipes.Dispatcher;
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -215,9 +216,9 @@ public abstract class A_Node
     /**
      * Receive a message and stack it.
      *
-     * @param message Object message
+     * @param message Message
      */
-    public void receiveMessage( final Object message )
+    public void receiveMessage( final Message message )
         throws Exception
     {
         if ( message == null )
@@ -230,7 +231,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] receiveMessage : message=" + message );
         }
 
-        Object result = message;
+        Message result = message;
         for ( final A_Transform transform : transformsIN )
         {
             result = transform.transform( result );
@@ -294,10 +295,10 @@ public abstract class A_Node
     /**
      * Send a message to every connected nodes.
      *
-     * @param message Object message.
+     * @param message Message.
      * @throws java.lang.Exception
      */
-    protected void sendMessage( final Object message )
+    protected void sendMessage( final Message message )
         throws Exception
     {
         if ( message == null )
@@ -310,7 +311,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] sendMessage : message=" + message );
         }
 
-        Object result = message;
+        Message result = message;
         for ( final A_Transform transform : transformsOUT )
         {
             result = transform.transform( result );
@@ -343,7 +344,7 @@ public abstract class A_Node
      * @return the message
      * @throws InterruptedException
      */
-    protected Object getLastMessageOrWait()
+    protected Message getLastMessageOrWait()
         throws InterruptedException
     {
         if ( LOGGER.isTraceEnabled() )
@@ -366,7 +367,7 @@ public abstract class A_Node
     private String nodeID;
     private Properties properties;
     private Dispatcher dispatcher;
-    private final LinkedList<Object> internalStack;
+    private final LinkedList<Message> internalStack;
     private volatile boolean activated;
     private final List<A_Transform> transformsIN;
     private final List<A_Transform> transformsOUT;

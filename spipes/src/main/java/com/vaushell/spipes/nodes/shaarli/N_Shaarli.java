@@ -21,11 +21,12 @@ package com.vaushell.spipes.nodes.shaarli;
 
 import com.vaushell.shaarlijavaapi.ShaarliClient;
 import com.vaushell.shaarlijavaapi.ShaarliLink;
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +67,48 @@ public class N_Shaarli
         final Iterator<ShaarliLink> it = client.searchAllIterator();
         while ( it.hasNext() && count < max )
         {
-            final ShareLink link = convert( it.next() );
-            if ( link != null )
+            final ShaarliLink sl = it.next();
+
+            if ( sl.getUrl() != null
+                 && sl.getTitle() != null
+                 && ( sl.getID() != null || sl.getPermaID() != null ) )
             {
-                sendMessage( link );
+                final Message message = new Message();
+
+                // URI
+                message.setProperty( "uri" ,
+                                     new URI( sl.getUrl() ) );
+
+                // Title
+                message.setProperty( "title" ,
+                                     sl.getTitle() );
+
+                // Description
+                message.setProperty( "description" ,
+                                     sl.getDescription() );
+
+                // Shaarli ID
+                message.setProperty( "id-shaarli" ,
+                                     sl.getID() );
+
+                // Permanent ID
+                message.setProperty( "id-permanent" ,
+                                     sl.getPermaID() );
+
+                // Permanent URI
+                message.setProperty( "uri-permanent" ,
+                                     sl.getPermaURL( client.getEndpoint() ) );
+
+                // Tags
+                final TreeSet<String> tags = new TreeSet<>();
+                for ( final String tag : sl.getTags() )
+                {
+                    tags.add( tag.toLowerCase( Locale.ENGLISH ) );
+                }
+                message.setProperty( "tags" ,
+                                     tags );
+
+                sendMessage( message );
             }
 
             ++count;
@@ -85,31 +124,4 @@ public class N_Shaarli
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Shaarli.class );
     private ShaarliClient client;
-
-    private ShareLink convert( final ShaarliLink entry )
-        throws URISyntaxException
-    {
-        if ( entry == null || entry.getUrl() == null || entry.getTitle() == null || ( entry.getID() == null && entry.getPermaID() == null ) )
-        {
-            return null;
-        }
-
-        String ID;
-        if ( entry.getID() == null )
-        {
-            ID = entry.getPermaID();
-        }
-        else
-        {
-            ID = entry.getID();
-        }
-
-        return ShareLink.create( ID ,
-                                 entry.getTitle() ,
-                                 entry.getDescription() ,
-                                 new URI( entry.getUrl() ) ,
-                                 null ,
-                                 new URI( entry.getPermaURL( client.getEndpoint() ) ) ,
-                                 entry.getTags() );
-    }
 }

@@ -19,11 +19,11 @@
 
 package com.vaushell.spipes.nodes.linkedin;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.nodes.twitter.N_TW_Post;
-import com.vaushell.spipes.tools.HTMLhelper;
 import com.vaushell.spipes.tools.scribe.linkedin.LinkedInClient;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -65,69 +65,44 @@ public class N_LNK_Post
         throws Exception
     {
         // Receive
-        final Object message = getLastMessageOrWait();
+        final Message message = getLastMessageOrWait();
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
         }
 
-        // Convert if possible
-        final LNK_Post post;
-        if ( message == null )
+        if ( !message.contains( "uri" ) )
         {
-            post = null;
-        }
-        else
-        {
-            if ( message instanceof LNK_Post )
-            {
-                post = (LNK_Post) message;
-            }
-            else if ( message instanceof News )
-            {
-                post = convertFromNews( (News) message );
-            }
-            else
-            {
-                post = null;
-            }
-        }
-
-        if ( post == null )
-        {
-            throw new IllegalArgumentException( "message type is unknown : " + message.getClass().getName() );
+            throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to Twitter
-        if ( LOGGER.isTraceEnabled() )
+        final URI uri = (URI) message.getProperty( "uri" );
+        String uriStr;
+        if ( uri == null )
         {
-            LOGGER.trace( "[" + getNodeID() + "] send update to LinkedIn : " + post );
-        }
-
-        final String uri;
-        if ( post.getURI() == null )
-        {
-            uri = null;
+            uriStr = null;
         }
         else
         {
-            uri = post.getURI().toString();
+            uriStr = uri.toString();
         }
 
-        final String ID = client.updateStatus( post.getMessage() ,
-                                               uri ,
-                                               post.getURIname() ,
-                                               post.getURIdescription() );
-
-        post.setID( ID );
+        final String ID = client.updateStatus( null ,
+                                               uriStr ,
+                                               (String) message.getProperty( "title" ) ,
+                                               null );
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        sendMessage( post );
+        message.setProperty( "id-linkedin" ,
+                             ID );
+
+        sendMessage( message );
     }
 
     @Override
@@ -139,17 +114,4 @@ public class N_LNK_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
     private final LinkedInClient client;
-
-    private static LNK_Post convertFromNews( final News news )
-    {
-        if ( news.getURI() == null )
-        {
-            throw new IllegalArgumentException( "URI can not be null" );
-        }
-
-        return new LNK_Post( null ,
-                             news.getURI() ,
-                             HTMLhelper.cleanHTML( news.getTitle() ) ,
-                             null );
-    }
 }

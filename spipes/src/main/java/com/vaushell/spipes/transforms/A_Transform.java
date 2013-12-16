@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.transforms;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.util.Properties;
 
@@ -43,7 +44,7 @@ public abstract class A_Transform
     public abstract void prepare()
         throws Exception;
 
-    public abstract Object transform( final Object message )
+    public abstract Message transform( final Message message )
         throws Exception;
 
     /**

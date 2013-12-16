@@ -22,6 +22,7 @@ package com.vaushell.spipes.transforms.bitly;
 import com.rosaloves.bitlyj.Bitly;
 import com.rosaloves.bitlyj.Bitly.Provider;
 import com.rosaloves.bitlyj.Url;
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.net.URI;
 import org.slf4j.Logger;
@@ -50,30 +51,31 @@ public class T_Shorten
     }
 
     @Override
-    public Object transform( final Object message )
+    public Message transform( final Message message )
         throws Exception
     {
         // Receive
-        final I_URIshorten msg = (I_URIshorten) message;
-
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + msg );
+            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
-        final URI longURI = msg.getURI();
-        if ( longURI != null )
+        if ( message.contains( "uri" ) )
         {
+            final URI longURI = (URI) message.getProperty( "uri" );
+
             final Url url = bitly.call( Bitly.shorten( longURI.toString() ) );
 
             if ( url != null && url.getShortUrl() != null )
             {
-                msg.setURI( new URI( url.getShortUrl() ) );
-                msg.setURIsource( longURI );
+                message.setProperty( "uri" ,
+                                     new URI( url.getShortUrl() ) );
+                message.setProperty( "uri-source" ,
+                                     longURI );
             }
         }
 
-        return msg;
+        return message;
     }
 
     @Override

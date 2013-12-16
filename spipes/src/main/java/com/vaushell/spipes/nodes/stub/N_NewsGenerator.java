@@ -19,8 +19,8 @@
 
 package com.vaushell.spipes.nodes.stub;
 
+import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.nodes.rss.News;
 import com.vaushell.spipes.tools.ValuesGenerator;
 import java.net.URI;
 import java.util.Date;
@@ -58,23 +58,39 @@ public class N_NewsGenerator
             LOGGER.trace( "[" + getNodeID() + "] generate post" );
         }
 
+        final Message message = new Message();
+
+        message.setProperty( "title" ,
+                             ValuesGenerator.getRandomText( 10 ,
+                                                            20 ) );
+
+        message.setProperty( "description" ,
+                             ValuesGenerator.getRandomText( 20 ,
+                                                            30 ) );
+
         final String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
                                                                          20 );
-        final News news = News.create( ValuesGenerator.getRandomText( 10 ,
-                                                                      20 ) ,
-                                       ValuesGenerator.getRandomText( 20 ,
-                                                                      30 ) ,
-                                       new URI( uriStr ) ,
-                                       new URI( uriStr ) ,
-                                       ValuesGenerator.getRandomText( 1 ,
-                                                                      2 ) ,
-                                       ValuesGenerator.getRandomText( 100 ,
-                                                                      200 ) ,
-                                       ValuesGenerator.getRandomWordSet( 3 ,
-                                                                         8 ) ,
-                                       new Date() );
+        message.setProperty( "uri" ,
+                             new URI( uriStr ) );
+        message.setProperty( "uri-source" ,
+                             new URI( uriStr ) );
 
-        sendMessage( news );
+        message.setProperty( "author" ,
+                             ValuesGenerator.getRandomText( 1 ,
+                                                            2 ) );
+
+        message.setProperty( "content" ,
+                             ValuesGenerator.getRandomText( 100 ,
+                                                            200 ) );
+
+        message.setProperty( "tags" ,
+                             ValuesGenerator.getRandomWordSet( 3 ,
+                                                               8 ) );
+
+        message.setProperty( "published-date" ,
+                             new Date().getTime() );
+
+        sendMessage( message );
     }
 
     @Override
