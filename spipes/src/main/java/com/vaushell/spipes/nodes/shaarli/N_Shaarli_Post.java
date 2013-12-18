@@ -88,11 +88,11 @@ public class N_Shaarli_Post
             uriStr = uri.toString();
         }
 
-        final String ID = client.createOrUpdateLink( uriStr ,
-                                                     (String) message.getProperty( Message.KeyIndex.TITLE ) ,
-                                                     (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                                     (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) ,
-                                                     false );
+        final String ID = client.createLink( uriStr ,
+                                             (String) message.getProperty( Message.KeyIndex.TITLE ) ,
+                                             (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                             (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) ,
+                                             false );
 
         if ( LOGGER.isTraceEnabled() )
         {

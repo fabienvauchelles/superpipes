@@ -31,7 +31,7 @@ page at http://checkstyle.sourceforge.net/config.html
     <parent>
         <groupId>com.vaushell</groupId>
         <artifactId>pom-exec</artifactId>
-        <version>2</version>
+        <version>3</version>
     </parent>
 
     <groupId>com.vaushell</groupId>
@@ -189,7 +189,7 @@ page at http://checkstyle.sourceforge.net/config.html
         <dependency>
             <groupId>com.vaushell</groupId>
             <artifactId>shaarli-java-api</artifactId>
-            <version>1.0.4-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 </project>
