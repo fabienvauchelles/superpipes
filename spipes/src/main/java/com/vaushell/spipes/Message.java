@@ -19,7 +19,12 @@
 
 package com.vaushell.spipes;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -27,7 +32,8 @@ import org.apache.commons.codec.digest.DigestUtils;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class Message
+public final class Message
+    implements Serializable
 {
     // PUBLIC
     public enum KeyIndex
@@ -55,7 +61,7 @@ public class Message
     {
         this.ID = null;
         this.properties = new TreeMap<>();
-        this.hasToRebuildID = false;
+        this.hasToRebuildID = true;
     }
 
     public String getID()
@@ -80,12 +86,12 @@ public class Message
         return properties.containsKey( key );
     }
 
-    public Object getProperty( final KeyIndex key )
+    public Serializable getProperty( final KeyIndex key )
     {
         return getProperty( key.index );
     }
 
-    public Object getProperty( final String key )
+    public Serializable getProperty( final String key )
     {
         return properties.get( key );
     }
@@ -103,14 +109,14 @@ public class Message
     }
 
     public void setProperty( final KeyIndex key ,
-                             final Object value )
+                             final Serializable value )
     {
         setProperty( key.index ,
                      value );
     }
 
     public void setProperty( final String key ,
-                             final Object value )
+                             final Serializable value )
     {
         if ( value == null )
         {
@@ -125,13 +131,18 @@ public class Message
         hasToRebuildID = true;
     }
 
+    public Set<String> getKeys()
+    {
+        return properties.keySet();
+    }
+
     @Override
     public String toString()
     {
         final StringBuilder sb = new StringBuilder( "Message{ID=" );
         sb.append( getID() );
 
-        for ( final Entry<String , Object> entry : properties.entrySet() )
+        for ( final Entry<String , Serializable> entry : properties.entrySet() )
         {
             sb.append( ", " )
                 .append( entry.getKey() )
@@ -145,14 +156,15 @@ public class Message
     }
 
     // PRIVATE
-    private String ID;
-    private final TreeMap<String , Object> properties;
-    private boolean hasToRebuildID;
+    private static final long serialVersionUID = 944934823467345234L;
+    private transient String ID;
+    private TreeMap<String , Serializable> properties;
+    private transient boolean hasToRebuildID;
 
     private void rebuildID()
     {
         final StringBuilder sb = new StringBuilder();
-        for ( final Entry<String , Object> entry : properties.entrySet() )
+        for ( final Entry<String , Serializable> entry : properties.entrySet() )
         {
             sb.append( entry.getKey() )
                 .append( '#' )
@@ -160,5 +172,19 @@ public class Message
         }
 
         ID = DigestUtils.md5Hex( sb.toString() );
+    }
+
+    private void writeObject( final ObjectOutputStream out )
+        throws IOException
+    {
+        out.writeObject( properties );
+    }
+
+    private void readObject( final ObjectInputStream in )
+        throws IOException , ClassNotFoundException
+    {
+        this.ID = null;
+        properties = (TreeMap<String , Serializable>) in.readObject();
+        hasToRebuildID = true;
     }
 }

@@ -21,7 +21,6 @@ package com.vaushell.spipes.tools;
 
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * Values generator.
@@ -65,8 +64,8 @@ public final class ValuesGenerator
      * @param maxWords Maximum words count
      * @return the Set
      */
-    public static Set<String> getRandomWordSet( final int minWords ,
-                                                final int maxWords )
+    public static HashSet<String> getRandomWordSet( final int minWords ,
+                                                    final int maxWords )
     {
         final HashSet<String> s = new HashSet<>();
 

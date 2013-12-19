@@ -66,7 +66,7 @@ public class N_TW_PostTest
         message.setProperty( Message.KeyIndex.CONTENT ,
                              "Le contenu, je m'en fous" );
 
-        final Set<String> tags = new TreeSet<>();
+        final TreeSet<String> tags = new TreeSet<>();
         tags.add( "ceci" );
         tags.add( "est" );
         tags.add( "un" );

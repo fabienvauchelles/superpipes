@@ -21,11 +21,18 @@ package com.vaushell.spipes.nodes.buffer;
 
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
+import java.util.TreeSet;
 
 /**
  *
@@ -40,6 +47,7 @@ public class N_Buffer
         super();
 
         this.slots = new ArrayList<>();
+        this.messageIDs = new TreeSet<>();
         this.lastWrite = null;
     }
 
@@ -48,9 +56,25 @@ public class N_Buffer
     protected void prepareImpl()
         throws Exception
     {
-        if ( slots.isEmpty() )
+        // Load slots
+
+        flowLimit = Long.parseLong( getConfig( "flow-limit" ) );
+
+        messagesPath = Paths.get( getMainConfig( "datas-directory" ) ,
+                                  getNodeID() );
+
+        Files.createDirectories( messagesPath );
+
+        try( final DirectoryStream<Path> stream = Files.newDirectoryStream( messagesPath ) )
         {
-            throw new IllegalArgumentException( "must have slots" );
+            final Iterator<Path> it = stream.iterator();
+
+            while ( it.hasNext() )
+            {
+                final Path p = it.next();
+
+                messageIDs.add( p.getFileName().toString() );
+            }
         }
     }
 
@@ -64,36 +88,34 @@ public class N_Buffer
         final long ttw = getTimeToWait( cal );
         if ( ttw > 0 )
         {
-            try
+            final Message message = getLastMessageOrWait( ttw );
+            if ( message != null )
             {
-                Thread.sleep( ttw );
+                pushMessage( message );
             }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-
-            return;
         }
-
-        // 2. Pop from stack
-        Message message = popMessage();
-        if ( message == null )
+        else
         {
-            // Nothing : we wait for external
-            message = getLastMessageOrWait();
+            // 2. Pop from stack
+            Message message = popMessage();
+            if ( message == null )
+            {
+                // Nothing : we wait for external
+                message = getLastMessageOrWait();
 
-            // Push to stack
-            pushMessage( message );
+                // Push to stack
+                pushMessage( message );
 
-            // And loop to check if we're allowed to publish.
-            return;
+                // And loop to check if we're allowed to publish.
+            }
+            else
+            {
+                // 3. We published
+                lastWrite = cal.getTimeInMillis();
+
+                sendMessage( message );
+            }
         }
-
-        // 3. We published
-        lastWrite = cal.getTimeInMillis();
-
-        sendMessage( message );
     }
 
     @Override
@@ -105,32 +127,75 @@ public class N_Buffer
     // PRIVATE
     private long flowLimit;
     private final List<Slot> slots;
+    private final TreeSet<String> messageIDs;
     private Long lastWrite;
+    private Path messagesPath;
 
     private Message popMessage()
+        throws IOException , ClassNotFoundException
     {
-        throw new UnsupportedOperationException();
+        if ( messageIDs.isEmpty() )
+        {
+            return null;
+        }
+
+        final String ID = messageIDs.pollFirst();
+
+        final Path p = Paths.get( messagesPath.toString() ,
+                                  ID );
+
+        final Message m = readMessage( p );
+
+        Files.delete( p );
+
+        return m;
     }
 
     private void pushMessage( final Message message )
+        throws IOException
     {
-        throw new UnsupportedOperationException();
+        final String ID = Long.toString( Calendar.getInstance().getTimeInMillis() );
+
+        Path p = Paths.get( messagesPath.toString() ,
+                            ID );
+
+        int i = 2;
+        while ( Files.exists( p ) )
+        {
+            p = Paths.get( messagesPath.toString() ,
+                           ID + i );
+
+            ++i;
+        }
+
+        writeMessage( p ,
+                      message );
+
+        messageIDs.add( ID );
     }
 
     private long getTimeToWait( final Calendar calendar )
     {
         // Best slot
-        long minTime = Long.MAX_VALUE;
-        for ( final Slot slot : slots )
+        long minTime;
+        if ( slots.isEmpty() )
         {
-            final long time = slot.getSmallestDiffInMs( calendar );
-            if ( time < minTime )
+            minTime = 0;
+        }
+        else
+        {
+            minTime = Long.MAX_VALUE;
+            for ( final Slot slot : slots )
             {
-                minTime = time;
-
-                if ( minTime == 0 )
+                final long time = slot.getSmallestDiffInMs( calendar );
+                if ( time < minTime )
                 {
-                    break;
+                    minTime = time;
+
+                    if ( minTime == 0 )
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -138,7 +203,7 @@ public class N_Buffer
         // Anti burst
         if ( lastWrite != null )
         {
-            long diff = calendar.getTimeInMillis() - lastWrite;
+            final long diff = calendar.getTimeInMillis() - lastWrite;
             if ( diff < flowLimit )
             {
                 minTime = Math.max( minTime ,
@@ -147,5 +212,24 @@ public class N_Buffer
         }
 
         return minTime;
+    }
+
+    private static void writeMessage( final Path p ,
+                                      final Message m )
+        throws IOException
+    {
+        try( ObjectOutputStream os = new ObjectOutputStream( Files.newOutputStream( p ) ) )
+        {
+            os.writeObject( m );
+        }
+    }
+
+    private static Message readMessage( final Path p )
+        throws IOException , ClassNotFoundException
+    {
+        try( ObjectInputStream is = new ObjectInputStream( Files.newInputStream( p ) ) )
+        {
+            return (Message) is.readObject();
+        }
     }
 }
