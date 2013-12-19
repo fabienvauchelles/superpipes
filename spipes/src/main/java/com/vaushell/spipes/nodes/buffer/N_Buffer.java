@@ -32,6 +32,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TreeSet;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -104,6 +107,12 @@ public class N_Buffer
         final long ttw = getTimeToWait( cal );
         if ( ttw > 0 )
         {
+            if ( LOGGER.isTraceEnabled() )
+            {
+                LOGGER.trace(
+                    "[" + getNodeID() + "] time to wait : " + ttw + "ms. During this time, we're trying to catch an incoming message." );
+            }
+
             final Message message = getLastMessageOrWait( ttw );
             if ( message != null )
             {
@@ -116,6 +125,12 @@ public class N_Buffer
             Message message = popMessage();
             if ( message == null )
             {
+                if ( LOGGER.isTraceEnabled() )
+                {
+                    LOGGER.trace(
+                        "[" + getNodeID() + "] no time to wait and not message in buffer. We're waiting an incoming message" );
+                }
+
                 // Nothing : we wait for external
                 message = getLastMessageOrWait();
 
@@ -127,6 +142,12 @@ public class N_Buffer
             else
             {
                 // 3. We published
+                if ( LOGGER.isTraceEnabled() )
+                {
+                    LOGGER.trace(
+                        "[" + getNodeID() + "] no time to wait and we found a message in the buffer. We're sending it." );
+                }
+
                 lastWrite = cal.getTimeInMillis();
 
                 sendMessage( message );
@@ -141,6 +162,7 @@ public class N_Buffer
     }
 
     // PRIVATE
+    private static final Logger LOGGER = LoggerFactory.getLogger( N_Buffer.class );
     private long flowLimit;
     private final List<Slot> slots;
     private final TreeSet<String> messageIDs;

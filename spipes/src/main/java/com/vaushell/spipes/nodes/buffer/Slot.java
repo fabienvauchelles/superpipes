@@ -97,6 +97,10 @@ public final class Slot
                             minHour.get( Calendar.HOUR_OF_DAY ) );
             minDayHour.set( Calendar.MINUTE ,
                             minHour.get( Calendar.MINUTE ) );
+            minDayHour.set( Calendar.SECOND ,
+                            0 );
+            minDayHour.set( Calendar.MILLISECOND ,
+                            0 );
 
             if ( minDayHour.before( mdate ) )
             {
@@ -127,6 +131,11 @@ public final class Slot
                         minHour.get( Calendar.HOUR_OF_DAY ) );
         minDayHour.set( Calendar.MINUTE ,
                         minHour.get( Calendar.MINUTE ) );
+        minDayHour.set( Calendar.SECOND ,
+                        0 );
+        minDayHour.set( Calendar.MILLISECOND ,
+                        0 );
+
         if ( mdate.before( minDayHour ) )
         {
             return false;
@@ -137,6 +146,10 @@ public final class Slot
                         maxHour.get( Calendar.HOUR_OF_DAY ) );
         maxDayHour.set( Calendar.MINUTE ,
                         maxHour.get( Calendar.MINUTE ) );
+        maxDayHour.set( Calendar.SECOND ,
+                        0 );
+        maxDayHour.set( Calendar.MILLISECOND ,
+                        0 );
         if ( maxDayHour.before( mdate ) )
         {
             return false;
