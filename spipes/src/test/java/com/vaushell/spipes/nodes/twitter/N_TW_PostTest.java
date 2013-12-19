@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 /**
  * Unit test.
  *
+ * @see N_TW_Post
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class N_TW_PostTest

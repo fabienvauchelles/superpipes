@@ -28,6 +28,7 @@ import org.testng.annotations.Test;
 /**
  * Unit test.
  *
+ * @see Slot
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class SlotTest

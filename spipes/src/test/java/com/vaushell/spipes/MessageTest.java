@@ -35,6 +35,7 @@ import org.testng.annotations.Test;
 /**
  * Unit test.
  *
+ * @see Message
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class MessageTest
