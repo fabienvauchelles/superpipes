@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Buffer node. Regulate the flow.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -90,7 +91,7 @@ public class N_Buffer
 
         try( final DirectoryStream<Path> stream = Files.newDirectoryStream( messagesPath ) )
         {
-            for ( Path p : stream )
+            for ( final Path p : stream )
             {
                 messageIDs.add( p.getFileName().toString() );
             }
@@ -159,6 +160,7 @@ public class N_Buffer
     protected void terminateImpl()
         throws Exception
     {
+        // Nothing
     }
 
     // PRIVATE

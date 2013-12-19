@@ -26,6 +26,7 @@ import java.util.Properties;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
 /**
+ * A transform filter.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -43,6 +44,12 @@ public abstract class A_Transform
         this.node = node;
     }
 
+    /**
+     * Load configuration for this transform.
+     *
+     * @param cNode Configuration
+     * @throws Exception
+     */
     public void load( final HierarchicalConfiguration cNode )
         throws Exception
     {
@@ -58,6 +65,13 @@ public abstract class A_Transform
     public abstract void prepare()
         throws Exception;
 
+    /**
+     * Transform's execution. Executed for each message.
+     *
+     * @param message the Message
+     * @return the transformed message
+     * @throws Exception
+     */
     public abstract Message transform( final Message message )
         throws Exception;
 

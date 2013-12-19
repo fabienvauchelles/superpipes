@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Filter already known message by ID.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

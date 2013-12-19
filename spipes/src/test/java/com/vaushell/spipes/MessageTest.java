@@ -33,6 +33,7 @@ import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
 /**
+ * Unit test.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -44,6 +45,13 @@ public class MessageTest
         // Nothing
     }
 
+    /**
+     * Test of message serialization.
+     *
+     * @throws URISyntaxException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     @Test
     public void testSerialization()
         throws URISyntaxException , IOException , ClassNotFoundException

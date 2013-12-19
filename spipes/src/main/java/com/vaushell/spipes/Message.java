@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
 
 /**
+ * Message object.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -36,6 +37,9 @@ public final class Message
     implements Serializable
 {
     // PUBLIC
+    /**
+     * Properties indexes list.
+     */
     public enum KeyIndex
     {
         // PUBLIC
@@ -64,6 +68,11 @@ public final class Message
         this.hasToRebuildID = true;
     }
 
+    /**
+     * Return the message ID. Generate lazy initialization.
+     *
+     * @return the ID
+     */
     public String getID()
     {
         if ( hasToRebuildID )
@@ -76,31 +85,65 @@ public final class Message
         return ID;
     }
 
+    /**
+     * Does the message contain this property ?
+     *
+     * @param key Property index
+     * @return true or not
+     */
     public boolean contains( final KeyIndex key )
     {
         return contains( key.index );
     }
 
+    /**
+     * Does the message contain this property ?
+     *
+     * @param key Property index
+     * @return true or not
+     */
     public boolean contains( final String key )
     {
         return properties.containsKey( key );
     }
 
+    /**
+     * Return the property value.
+     *
+     * @param key Property index
+     * @return the property value
+     */
     public Serializable getProperty( final KeyIndex key )
     {
         return getProperty( key.index );
     }
 
+    /**
+     * Return the property value.
+     *
+     * @param key Property index
+     * @return the property value
+     */
     public Serializable getProperty( final String key )
     {
         return properties.get( key );
     }
 
+    /**
+     * Remove a property.
+     *
+     * @param key Property index
+     */
     public void removeProperty( final KeyIndex key )
     {
         removeProperty( key.index );
     }
 
+    /**
+     * Remove a property.
+     *
+     * @param key Property index
+     */
     public void removeProperty( final String key )
     {
         properties.remove( key );
@@ -108,6 +151,12 @@ public final class Message
         hasToRebuildID = true;
     }
 
+    /**
+     * Set the property value.
+     *
+     * @param key Property index
+     * @param value Property value
+     */
     public void setProperty( final KeyIndex key ,
                              final Serializable value )
     {
@@ -115,6 +164,12 @@ public final class Message
                      value );
     }
 
+    /**
+     * Set the property value.
+     *
+     * @param key Property index
+     * @param value Property value
+     */
     public void setProperty( final String key ,
                              final Serializable value )
     {
@@ -131,6 +186,11 @@ public final class Message
         hasToRebuildID = true;
     }
 
+    /**
+     * Return the properties indexes list.
+     *
+     * @return a set of keys
+     */
     public Set<String> getKeys()
     {
         return properties.keySet();
@@ -174,17 +234,18 @@ public final class Message
         ID = DigestUtils.md5Hex( sb.toString() );
     }
 
-    private void writeObject( final ObjectOutputStream out )
+    private void writeObject( final ObjectOutputStream os )
         throws IOException
     {
-        out.writeObject( properties );
+        os.writeObject( properties );
     }
 
-    private void readObject( final ObjectInputStream in )
+    @SuppressWarnings( "unchecked" )
+    private void readObject( final ObjectInputStream is )
         throws IOException , ClassNotFoundException
     {
         this.ID = null;
-        properties = (TreeMap<String , Serializable>) in.readObject();
+        properties = (TreeMap<String , Serializable>) is.readObject();
         hasToRebuildID = true;
     }
 }

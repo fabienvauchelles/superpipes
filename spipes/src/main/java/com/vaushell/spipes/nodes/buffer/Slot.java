@@ -26,12 +26,22 @@ import java.util.Locale;
 import java.util.TreeSet;
 
 /**
+ * Time slot which allow messages to pass the buffer.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public final class Slot
 {
     // PUBLIC
+    /**
+     * Create a slot and parse value.
+     *
+     * @param days List of days, separated by a comma.
+     * @param start Inclusive starting hour (format: HH:MM)
+     * @param end Exclusive ending hour (format: HH:MM)
+     * @return the slot
+     * @throws ParseException
+     */
     public static Slot parse( final String days ,
                               final String start ,
                               final String end )
@@ -61,8 +71,10 @@ public final class Slot
         maxHour.setTime( dfHour.parse( end ) );
 
         return new Slot( rDays ,
-                         minHour ,
-                         maxHour );
+                         minHour.get( Calendar.HOUR_OF_DAY ) ,
+                         minHour.get( Calendar.MINUTE ) ,
+                         maxHour.get( Calendar.HOUR_OF_DAY ) ,
+                         maxHour.get( Calendar.MINUTE ) );
     }
 
     public TreeSet<Integer> getDays()
@@ -70,16 +82,32 @@ public final class Slot
         return days;
     }
 
-    public Calendar getMinHour()
+    public int getMinHour()
     {
         return minHour;
     }
 
-    public Calendar getMaxHour()
+    public int getMinMinute()
+    {
+        return minMinute;
+    }
+
+    public int getMaxHour()
     {
         return maxHour;
     }
 
+    public int getMaxMinute()
+    {
+        return maxMinute;
+    }
+
+    /**
+     * Return the time to wait to be in a slot and not to burst.
+     *
+     * @param mdate Actuam date
+     * @return the time to wait (in ms)
+     */
     public long getSmallestDiffInMs( final Calendar mdate )
     {
         if ( areWeInside( mdate ) )
@@ -94,9 +122,9 @@ public final class Slot
             minDayHour.set( Calendar.DAY_OF_WEEK ,
                             dow );
             minDayHour.set( Calendar.HOUR_OF_DAY ,
-                            minHour.get( Calendar.HOUR_OF_DAY ) );
+                            minHour );
             minDayHour.set( Calendar.MINUTE ,
-                            minHour.get( Calendar.MINUTE ) );
+                            minMinute );
             minDayHour.set( Calendar.SECOND ,
                             0 );
             minDayHour.set( Calendar.MILLISECOND ,
@@ -119,6 +147,12 @@ public final class Slot
     }
 
     // DEFAULT
+    /**
+     * Are we inside this slot ?
+     *
+     * @param mdate Actual date
+     * @return true or not
+     */
     boolean areWeInside( final Calendar mdate )
     {
         if ( !days.contains( mdate.get( Calendar.DAY_OF_WEEK ) ) )
@@ -128,9 +162,9 @@ public final class Slot
 
         final Calendar minDayHour = (Calendar) mdate.clone();
         minDayHour.set( Calendar.HOUR_OF_DAY ,
-                        minHour.get( Calendar.HOUR_OF_DAY ) );
+                        minHour );
         minDayHour.set( Calendar.MINUTE ,
-                        minHour.get( Calendar.MINUTE ) );
+                        minMinute );
         minDayHour.set( Calendar.SECOND ,
                         0 );
         minDayHour.set( Calendar.MILLISECOND ,
@@ -143,9 +177,9 @@ public final class Slot
 
         final Calendar maxDayHour = (Calendar) mdate.clone();
         maxDayHour.set( Calendar.HOUR_OF_DAY ,
-                        maxHour.get( Calendar.HOUR_OF_DAY ) );
+                        maxHour );
         maxDayHour.set( Calendar.MINUTE ,
-                        maxHour.get( Calendar.MINUTE ) );
+                        maxMinute );
         maxDayHour.set( Calendar.SECOND ,
                         0 );
         maxDayHour.set( Calendar.MILLISECOND ,
@@ -160,16 +194,23 @@ public final class Slot
 
     // PRIVATE
     private final TreeSet<Integer> days;
-    private final Calendar minHour;
-    private final Calendar maxHour;
+    private final int minHour;
+    private final int minMinute;
+    private final int maxHour;
+    private final int maxMinute;
 
     private Slot( final TreeSet<Integer> days ,
-                  final Calendar minHour ,
-                  final Calendar maxHour )
+                  final int minHour ,
+                  final int minMinute ,
+                  final int maxHour ,
+                  final int maxMinute
+    )
     {
         this.days = days;
         this.minHour = minHour;
+        this.minMinute = minMinute;
         this.maxHour = maxHour;
+        this.maxMinute = maxMinute;
     }
 
 }

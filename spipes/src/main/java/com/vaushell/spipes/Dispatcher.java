@@ -308,6 +308,12 @@ public final class Dispatcher
         }
     }
 
+    /**
+     * Read configurations properties. Must inside tags 'params' with 'param'
+     *
+     * @param props Properties to fill
+     * @param cNode Configuration
+     */
     public static void readProperties( final Properties props ,
                                        final HierarchicalConfiguration cNode )
     {

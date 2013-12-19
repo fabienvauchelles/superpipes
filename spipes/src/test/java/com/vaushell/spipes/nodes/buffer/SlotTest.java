@@ -26,6 +26,7 @@ import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
 /**
+ * Unit test.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -53,17 +54,22 @@ public class SlotTest
         final TreeSet<Integer> days = new TreeSet<>();
         days.add( Calendar.TUESDAY );
         days.add( Calendar.SATURDAY );
-        assertArrayEquals( days.toArray() ,
+        assertArrayEquals( "Days should be the same" ,
+                           days.toArray() ,
                            slot.getDays().toArray() );
 
-        assertEquals( 17 ,
-                      slot.getMinHour().get( Calendar.HOUR_OF_DAY ) );
-        assertEquals( 0 ,
-                      slot.getMinHour().get( Calendar.MINUTE ) );
-        assertEquals( 18 ,
-                      slot.getMaxHour().get( Calendar.HOUR_OF_DAY ) );
-        assertEquals( 30 ,
-                      slot.getMaxHour().get( Calendar.MINUTE ) );
+        assertEquals( "Hours should be the same" ,
+                      17 ,
+                      slot.getMinHour() );
+        assertEquals( "Minutes should be the same" ,
+                      0 ,
+                      slot.getMinMinute() );
+        assertEquals( "Hours should be the same" ,
+                      18 ,
+                      slot.getMaxHour() );
+        assertEquals( "Minutes should be the same" ,
+                      30 ,
+                      slot.getMaxMinute() );
     }
 
     /**
@@ -122,6 +128,10 @@ public class SlotTest
                  16 );
         cal.set( Calendar.MINUTE ,
                  59 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertFalse( "TUE 16:59 inside TUE, SAT with 17:00-18:30" ,
                      slot.areWeInside( cal ) );
 
@@ -133,6 +143,10 @@ public class SlotTest
                  17 );
         cal.set( Calendar.MINUTE ,
                  1 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertTrue( "TUE 17:01 inside TUE, SAT with 17:00-18:30" ,
                     slot.areWeInside( cal ) );
 
@@ -144,6 +158,10 @@ public class SlotTest
                  18 );
         cal.set( Calendar.MINUTE ,
                  1 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertTrue( "TUE 18:01 inside TUE, SAT with 17:00-18:30" ,
                     slot.areWeInside( cal ) );
 
@@ -154,6 +172,10 @@ public class SlotTest
         cal.set( Calendar.HOUR_OF_DAY ,
                  19 );
         cal.set( Calendar.MINUTE ,
+                 0 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
                  0 );
         assertFalse( "TUE 19:00 inside TUE, SAT with 17:00-18:30" ,
                      slot.areWeInside( cal ) );
@@ -166,6 +188,10 @@ public class SlotTest
                  17 );
         cal.set( Calendar.MINUTE ,
                  30 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertFalse( "MON 17:30 inside TUE, SAT with 17:00-18:30" ,
                      slot.areWeInside( cal ) );
 
@@ -177,6 +203,10 @@ public class SlotTest
                  17 );
         cal.set( Calendar.MINUTE ,
                  30 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertTrue( "SAT 17:30 inside TUE, SAT with 17:00-18:30" ,
                     slot.areWeInside( cal ) );
 
@@ -193,6 +223,10 @@ public class SlotTest
                  0 );
         cal.set( Calendar.MINUTE ,
                  0 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertTrue( "MON 00:00 inside MON with 00:00-23:58" ,
                     slot.areWeInside( cal ) );
 
@@ -204,6 +238,10 @@ public class SlotTest
                  23 );
         cal.set( Calendar.MINUTE ,
                  58 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertTrue( "MON 23:58 inside MON with 00:00-23:58" ,
                     slot.areWeInside( cal ) );
 
@@ -215,6 +253,10 @@ public class SlotTest
                  23 );
         cal.set( Calendar.MINUTE ,
                  59 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertFalse( "MON 23:59 inside MON with 00:00-23:58" ,
                      slot.areWeInside( cal ) );
     }
@@ -241,6 +283,10 @@ public class SlotTest
                  16 );
         cal.set( Calendar.MINUTE ,
                  0 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertEquals( "TUE, 16:00 inside TUE, SAT with 17:00-18:30" ,
                       3600000 ,
                       slot.getSmallestDiffInMs( cal ) );
@@ -252,6 +298,10 @@ public class SlotTest
         cal.set( Calendar.HOUR_OF_DAY ,
                  17 );
         cal.set( Calendar.MINUTE ,
+                 0 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
                  0 );
         assertEquals( "MON, 17:00 inside TUE, SAT with 17:00-18:30" ,
                       86400000 ,
@@ -265,6 +315,10 @@ public class SlotTest
                  17 );
         cal.set( Calendar.MINUTE ,
                  0 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertEquals( "WED, 17:00 inside TUE, SAT with 17:00-18:30" ,
                       259200000 ,
                       slot.getSmallestDiffInMs( cal ) );
@@ -277,6 +331,10 @@ public class SlotTest
                  18 );
         cal.set( Calendar.MINUTE ,
                  31 );
+        cal.set( Calendar.SECOND ,
+                 0 );
+        cal.set( Calendar.MILLISECOND ,
+                 0 );
         assertEquals( "SAT, 18:01 inside TUE, SAT with 17:00-18:30" ,
                       253740000 ,
                       slot.getSmallestDiffInMs( cal ) );

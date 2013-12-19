@@ -90,6 +90,12 @@ public abstract class A_Node
         this.dispatcher = dispatcher;
     }
 
+    /**
+     * Load configuration for this node.
+     *
+     * @param cNode Configuration
+     * @throws Exception
+     */
     public void load( final HierarchicalConfiguration cNode )
         throws Exception
     {
@@ -195,6 +201,11 @@ public abstract class A_Node
         }
     }
 
+    /**
+     * Prepare node's execution. Executed 1 time at the beginning. Generic implementation.
+     *
+     * @throws Exception
+     */
     public void prepare()
         throws Exception
     {
@@ -279,6 +290,11 @@ public abstract class A_Node
         }
     }
 
+    /**
+     * Close node's execution. Executed 1 time at the ending. Generic implementation.
+     *
+     * @throws Exception
+     */
     public void terminate()
         throws Exception
     {
@@ -311,6 +327,7 @@ public abstract class A_Node
      * Receive a message and stack it.
      *
      * @param message Message
+     * @throws java.lang.Exception
      */
     public void receiveMessage( final Message message )
         throws Exception
@@ -467,6 +484,11 @@ public abstract class A_Node
     protected Message getLastMessageOrWait( final long timeout )
         throws InterruptedException
     {
+        if ( timeout <= 0 )
+        {
+            throw new IllegalArgumentException( "you should use getLastMessageOrWait with a timeout=0" );
+        }
+
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait() : timeout=" + timeout );
@@ -474,9 +496,17 @@ public abstract class A_Node
 
         synchronized( internalStack )
         {
-            if ( internalStack.isEmpty() )
+            long start = System.currentTimeMillis();
+            long remaining = timeout;
+            while ( internalStack.isEmpty()
+                    && remaining > 0 )
             {
-                internalStack.wait( timeout );
+                internalStack.wait( remaining );
+
+                final long actual = System.currentTimeMillis();
+                final long elapsed = actual - start;
+                remaining -= elapsed;
+                start = actual;
             }
 
             return internalStack.pollLast();

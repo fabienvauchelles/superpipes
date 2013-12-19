@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Filter message if he has no tags, or exlude some tags, or include, etc.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -33,6 +34,9 @@ public class T_Tags
     extends A_Transform
 {
     // PUBLIC
+    /**
+     * Tags filter operation type.
+     */
     public enum OpType
     {
         INCLUDE_ONE,

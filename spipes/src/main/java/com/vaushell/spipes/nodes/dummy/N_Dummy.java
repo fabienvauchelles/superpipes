@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Dummy node. Just pass the message (and you can add transform!)
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Exclude message which has no published-date or the published date is not in a range.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */

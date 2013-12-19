@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Shorten url with Bitly service.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
