@@ -362,6 +362,32 @@ public abstract class A_Node
             return internalStack.pollLast();
         }
     }
+
+    /**
+     * Pop the last message.
+     *
+     * @param timeout max time to wait (in ms)
+     * @return the message (or null if empty)
+     * @throws InterruptedException
+     */
+    protected Message getLastMessageOrWait( final long timeout )
+        throws InterruptedException
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait() : timeout=" + timeout );
+        }
+
+        synchronized( internalStack )
+        {
+            if ( internalStack.isEmpty() )
+            {
+                internalStack.wait( timeout );
+            }
+
+            return internalStack.pollLast();
+        }
+    }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
     private String nodeID;
