@@ -19,24 +19,65 @@
 
 package com.vaushell.spipes.nodes.buffer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Locale;
 import java.util.TreeSet;
 
 /**
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class Slot
+public final class Slot
 {
-
-    public Slot( TreeSet<Integer> days ,
-                 Calendar minHour ,
-                 Calendar maxHour )
+    // PUBLIC
+    public static Slot parse( final String days ,
+                              final String start ,
+                              final String end )
+        throws ParseException
     {
-        this.days = days;
-        this.minHour = minHour;
-        this.maxHour = maxHour;
+        // Days
+        final SimpleDateFormat dfDay = new SimpleDateFormat( "E" ,
+                                                             Locale.ENGLISH );
+
+        final TreeSet<Integer> rDays = new TreeSet<>();
+        for ( final String sDay : days.split( "," ) )
+        {
+            final Calendar cDay = Calendar.getInstance();
+            cDay.setTime( dfDay.parse( sDay ) );
+
+            rDays.add( cDay.get( Calendar.DAY_OF_WEEK ) );
+        }
+
+        // Hours
+        final SimpleDateFormat dfHour = new SimpleDateFormat( "HH:mm" ,
+                                                              Locale.ENGLISH );
+
+        final Calendar minHour = Calendar.getInstance();
+        minHour.setTime( dfHour.parse( start ) );
+
+        final Calendar maxHour = Calendar.getInstance();
+        maxHour.setTime( dfHour.parse( end ) );
+
+        return new Slot( rDays ,
+                         minHour ,
+                         maxHour );
+    }
+
+    public TreeSet<Integer> getDays()
+    {
+        return days;
+    }
+
+    public Calendar getMinHour()
+    {
+        return minHour;
+    }
+
+    public Calendar getMaxHour()
+    {
+        return maxHour;
     }
 
     public long getSmallestDiffInMs( final Calendar mdate )
@@ -105,8 +146,17 @@ public class Slot
     }
 
     // PRIVATE
-    private TreeSet<Integer> days;
-    private Calendar minHour;
-    private Calendar maxHour;
+    private final TreeSet<Integer> days;
+    private final Calendar minHour;
+    private final Calendar maxHour;
+
+    private Slot( final TreeSet<Integer> days ,
+                  final Calendar minHour ,
+                  final Calendar maxHour )
+    {
+        this.days = days;
+        this.minHour = minHour;
+        this.maxHour = maxHour;
+    }
 
 }

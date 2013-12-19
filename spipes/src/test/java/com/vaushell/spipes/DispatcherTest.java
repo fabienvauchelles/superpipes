@@ -22,7 +22,6 @@ package com.vaushell.spipes;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.stub.N_MessageLogger;
 import com.vaushell.spipes.nodes.stub.N_NewsGenerator;
-import java.util.Properties;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -49,12 +48,10 @@ public class DispatcherTest
         final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
-                            N_NewsGenerator.class ,
-                            new Properties() );
+                            N_NewsGenerator.class );
 
         dispatcher.addNode( "receptor" ,
-                            N_MessageLogger.class ,
-                            new Properties() );
+                            N_MessageLogger.class );
 
         final A_Node node = dispatcher.nodes.get( "generator" );
         assertEquals( "Node should be a N_NewsGenerator class" ,
@@ -87,11 +84,9 @@ public class DispatcherTest
         final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
-                            N_NewsGenerator.class ,
-                            new Properties() );
+                            N_NewsGenerator.class );
         dispatcher.addNode( "generator" ,
-                            N_NewsGenerator.class ,
-                            new Properties() );
+                            N_NewsGenerator.class );
     }
 
     /**

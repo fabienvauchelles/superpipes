@@ -20,7 +20,6 @@
 package com.vaushell.spipes;
 
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.transforms.A_Transform;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +42,7 @@ public final class Dispatcher
     {
         this.nodes = new HashMap<>();
         this.routes = new HashMap<>();
+        this.properties = new Properties();
     }
 
     /**
@@ -61,14 +61,12 @@ public final class Dispatcher
      *
      * @param nodeID Node's ID
      * @param type Node's type
-     * @param properties Node's properties
      * @return the node
      */
     public A_Node addNode( final String nodeID ,
-                           final String type ,
-                           final Properties properties )
+                           final String type )
     {
-        if ( nodeID == null || type == null || properties == null )
+        if ( nodeID == null || type == null )
         {
             throw new IllegalArgumentException();
         }
@@ -88,9 +86,8 @@ public final class Dispatcher
         try
         {
             final A_Node node = (A_Node) Class.forName( type ).newInstance();
-            node.config( nodeID ,
-                         properties ,
-                         this );
+            node.setParameters( nodeID ,
+                                this );
 
             nodes.put( nodeID ,
                        node );
@@ -110,99 +107,12 @@ public final class Dispatcher
      *
      * @param nodeID Node's ID
      * @param clazz Node's type class
-     * @param properties Node's properties
      */
     public void addNode( final String nodeID ,
-                         final Class<?> clazz ,
-                         final Properties properties )
+                         final Class<?> clazz )
     {
         addNode( nodeID ,
-                 clazz.getName() ,
-                 properties );
-    }
-
-    /**
-     * Add a transform to the node input.
-     *
-     * @param node Node
-     * @param type Transform's type
-     * @param properties Transform's properties
-     * @return the transform
-     */
-    public A_Transform addTransformIN( final A_Node node ,
-                                       final String type ,
-                                       final Properties properties )
-    {
-        if ( node == null || type == null || properties == null )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] addTransformIN : node=" + node.getId() + " / type=" + type + " / properties.size=" + properties.
-                size() );
-        }
-
-        try
-        {
-            final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
-            transform.config( node ,
-                              properties );
-
-            node.addTransformIN( transform );
-
-            return transform;
-        }
-        catch( final ClassNotFoundException |
-                     IllegalAccessException |
-                     InstantiationException ex )
-        {
-            throw new RuntimeException( ex );
-        }
-    }
-
-    /**
-     * Add a transform to the node output.
-     *
-     * @param node Node
-     * @param type Transform's type
-     * @param properties Transform's properties
-     * @return the transform
-     */
-    public A_Transform addTransformOUT( final A_Node node ,
-                                        final String type ,
-                                        final Properties properties )
-    {
-        if ( node == null || type == null || properties == null )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] addTransformOUT : node=" + node.getId() + " / type=" + type + " / properties.size=" + properties.
-                size() );
-        }
-
-        try
-        {
-            final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
-            transform.config( node ,
-                              properties );
-
-            node.addTransformOUT( transform );
-
-            return transform;
-        }
-        catch( final ClassNotFoundException |
-                     IllegalAccessException |
-                     InstantiationException ex )
-        {
-            throw new RuntimeException( ex );
-        }
+                 clazz.getName() );
     }
 
     /**
@@ -315,6 +225,7 @@ public final class Dispatcher
      *
      * @param sourceID source node ID
      * @param message message
+     * @throws java.lang.Exception
      */
     public void sendMessage( final String sourceID ,
                              final Message message )
@@ -348,8 +259,10 @@ public final class Dispatcher
      * Load configuration.
      *
      * @param config Configuration
+     * @throws java.lang.Exception
      */
     public void load( final XMLConfiguration config )
+        throws Exception
     {
         if ( config == null )
         {
@@ -362,54 +275,26 @@ public final class Dispatcher
         }
 
         // Load general configuration
-        properties = readProperties( config );
+        readProperties( properties ,
+                        config );
 
         // Load nodes
+        nodes.clear();
         final List<HierarchicalConfiguration> cNodes = config.configurationsAt( "nodes.node" );
-
         if ( cNodes != null )
         {
             for ( final HierarchicalConfiguration cNode : cNodes )
             {
-                final Properties nodeProperties = readProperties( cNode );
-
                 final A_Node node = addNode( cNode.getString( "[@id]" ) ,
-                                             cNode.getString( "[@type]" ) ,
-                                             nodeProperties );
+                                             cNode.getString( "[@type]" ) );
 
-                // Load transforms IN
-                final List<HierarchicalConfiguration> cTransformsIN = cNode.configurationsAt( "in.transform" );
-                if ( cTransformsIN != null )
-                {
-                    for ( final HierarchicalConfiguration cTransform : cTransformsIN )
-                    {
-                        final Properties transformProperties = readProperties( cTransform );
-
-                        addTransformIN( node ,
-                                        cTransform.getString( "[@type]" ) ,
-                                        transformProperties );
-                    }
-                }
-
-                // Load transforms OUT
-                final List<HierarchicalConfiguration> cTransformsOUT = cNode.configurationsAt( "out.transform" );
-                if ( cTransformsOUT != null )
-                {
-                    for ( final HierarchicalConfiguration cTransform : cTransformsOUT )
-                    {
-                        final Properties transformProperties = readProperties( cTransform );
-
-                        addTransformOUT( node ,
-                                         cTransform.getString( "[@type]" ) ,
-                                         transformProperties );
-                    }
-                }
+                node.load( cNode );
             }
         }
 
         // Load routes
+        routes.clear();
         final List<HierarchicalConfiguration> cRoutes = config.configurationsAt( "routes.route" );
-
         if ( cRoutes != null )
         {
             for ( final HierarchicalConfiguration cRoute : cRoutes )
@@ -423,21 +308,14 @@ public final class Dispatcher
         }
     }
 
-    // DEFAULT
-    final HashMap<String , A_Node> nodes;
-    final HashMap<String , Set<String>> routes;
-
-    // PRIVATE
-    private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
-    private Properties properties;
-
-    private Properties readProperties( final HierarchicalConfiguration node )
+    public static void readProperties( final Properties props ,
+                                       final HierarchicalConfiguration cNode )
     {
-        final Properties nodeProperties = new Properties();
+        props.clear();
 
-        if ( node != null )
+        if ( cNode != null )
         {
-            final List<HierarchicalConfiguration> hConfs = node.configurationsAt( "params.param" );
+            final List<HierarchicalConfiguration> hConfs = cNode.configurationsAt( "params.param" );
             if ( hConfs != null )
             {
                 for ( final HierarchicalConfiguration hConf : hConfs )
@@ -447,13 +325,19 @@ public final class Dispatcher
 
                     if ( name != null && name.length() > 0 && value != null && value.length() > 0 )
                     {
-                        nodeProperties.put( name ,
-                                            value );
+                        props.put( name ,
+                                   value );
                     }
                 }
             }
         }
-
-        return nodeProperties;
     }
+
+    // DEFAULT
+    final HashMap<String , A_Node> nodes;
+    final HashMap<String , Set<String>> routes;
+
+    // PRIVATE
+    private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
+    private final Properties properties;
 }

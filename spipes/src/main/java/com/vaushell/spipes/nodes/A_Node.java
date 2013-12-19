@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ public abstract class A_Node
         this.internalStack = new LinkedList<>();
         this.transformsIN = new ArrayList<>();
         this.transformsOUT = new ArrayList<>();
+        this.properties = new Properties();
     }
 
     public String getNodeID()
@@ -76,29 +78,121 @@ public abstract class A_Node
     }
 
     /**
-     * Configurate the node.
+     * Set nodes's parameters.
      *
      * @param nodeID Node's identifier
-     * @param properties Node's properties (String->String)
      * @param dispatcher Main dispatcher
      */
-    public void config( final String nodeID ,
-                        final Properties properties ,
-                        final Dispatcher dispatcher )
+    public void setParameters( final String nodeID ,
+                               final Dispatcher dispatcher )
     {
         this.nodeID = nodeID;
-        this.properties = properties;
         this.dispatcher = dispatcher;
     }
 
-    public void addTransformIN( final A_Transform transform )
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
     {
-        transformsIN.add( transform );
+        Dispatcher.readProperties( properties ,
+                                   cNode );
+
+        // Load transforms IN
+        transformsIN.clear();
+        final List<HierarchicalConfiguration> cTransformsIN = cNode.configurationsAt( "in.transform" );
+        if ( cTransformsIN != null )
+        {
+            for ( final HierarchicalConfiguration cTransform : cTransformsIN )
+            {
+                final A_Transform transform = addTransformIN( cTransform.getString( "[@type]" ) );
+
+                transform.load( cTransform );
+            }
+        }
+
+        // Load transforms OUT
+        transformsOUT.clear();
+        final List<HierarchicalConfiguration> cTransformsOUT = cNode.configurationsAt( "out.transform" );
+        if ( cTransformsOUT != null )
+        {
+            for ( final HierarchicalConfiguration cTransform : cTransformsOUT )
+            {
+                final A_Transform transform = addTransformOUT( cTransform.getString( "[@type]" ) );
+
+                transform.load( cTransform );
+            }
+        }
     }
 
-    public void addTransformOUT( final A_Transform transform )
+    /**
+     * Add a transform to the node input.
+     *
+     * @param type Transform's type
+     * @return the transform
+     */
+    public A_Transform addTransformIN( final String type )
     {
-        transformsOUT.add( transform );
+        if ( type == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] addTransformIN : type=" + type );
+        }
+
+        try
+        {
+            final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
+            transform.setParent( this );
+
+            transformsIN.add( transform );
+
+            return transform;
+        }
+        catch( final ClassNotFoundException |
+                     IllegalAccessException |
+                     InstantiationException ex )
+        {
+            throw new RuntimeException( ex );
+        }
+    }
+
+    /**
+     * Add a transform to the node output.
+     *
+     * @param type Transform's type
+     * @return the transform
+     */
+    public A_Transform addTransformOUT( final String type )
+    {
+        if ( type == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] addTransformOUT : type=" + type );
+        }
+
+        try
+        {
+            final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
+            transform.setParent( this );
+
+            transformsOUT.add( transform );
+
+            return transform;
+        }
+        catch( final ClassNotFoundException |
+                     IllegalAccessException |
+                     InstantiationException ex )
+        {
+            throw new RuntimeException( ex );
+        }
     }
 
     public void prepare()
@@ -391,7 +485,7 @@ public abstract class A_Node
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
     private String nodeID;
-    private Properties properties;
+    private final Properties properties;
     private Dispatcher dispatcher;
     private final LinkedList<Message> internalStack;
     private volatile boolean activated;

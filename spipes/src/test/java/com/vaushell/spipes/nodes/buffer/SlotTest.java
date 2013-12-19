@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.nodes.buffer;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.TreeSet;
 import static org.testng.AssertJUnit.*;
@@ -37,30 +38,81 @@ public class SlotTest
     }
 
     /**
-     * Test of areWeInside method, of class Slot.
+     * Test of parse method, of class Slot.
+     *
+     * @throws java.text.ParseException
      */
     @Test
-    public void testAreWeInside()
+    public void testParse()
+        throws ParseException
     {
-        // TUE, SAT with 17:00-18:30
+        final Slot slot = Slot.parse( "TUE,SAT" ,
+                                      "17:00" ,
+                                      "18:30" );
+
         final TreeSet<Integer> days = new TreeSet<>();
         days.add( Calendar.TUESDAY );
         days.add( Calendar.SATURDAY );
+        assertArrayEquals( days.toArray() ,
+                           slot.getDays().toArray() );
 
-        Calendar minHour = Calendar.getInstance();
-        minHour.set( Calendar.HOUR_OF_DAY ,
-                     17 );
-        minHour.set( Calendar.MINUTE ,
-                     0 );
-        Calendar maxHour = Calendar.getInstance();
-        maxHour.set( Calendar.HOUR_OF_DAY ,
-                     18 );
-        maxHour.set( Calendar.MINUTE ,
-                     30 );
+        assertEquals( 17 ,
+                      slot.getMinHour().get( Calendar.HOUR_OF_DAY ) );
+        assertEquals( 0 ,
+                      slot.getMinHour().get( Calendar.MINUTE ) );
+        assertEquals( 18 ,
+                      slot.getMaxHour().get( Calendar.HOUR_OF_DAY ) );
+        assertEquals( 30 ,
+                      slot.getMaxHour().get( Calendar.MINUTE ) );
+    }
 
-        Slot slot = new Slot( days ,
-                              minHour ,
-                              maxHour );
+    /**
+     * Test of parse method, of class Slot.
+     *
+     * @throws java.text.ParseException
+     */
+    @Test( expectedExceptions =
+    {
+        ParseException.class
+    } )
+    public void testParse2()
+        throws ParseException
+    {
+        Slot.parse( "TUE,xvsrtzer" ,
+                    "17:00" ,
+                    "18:30" );
+    }
+
+    /**
+     * Test of parse method, of class Slot.
+     *
+     * @throws java.text.ParseException
+     */
+    @Test( expectedExceptions =
+    {
+        ParseException.class
+    } )
+    public void testParse3()
+        throws ParseException
+    {
+        Slot.parse( "TUE,SAT" ,
+                    "17:a00" ,
+                    "18:30" );
+    }
+
+    /**
+     * Test of areWeInside method, of class Slot.
+     *
+     * @throws java.text.ParseException
+     */
+    @Test
+    public void testAreWeInside()
+        throws ParseException
+    {
+        // TUE, SAT with 17:00-18:30
+        Slot slot = Slot.parse( "TUE,SAT" ,
+                                "17:00" ,
+                                "18:30" );
 
         // With TUE 16:59 => false
         Calendar cal = Calendar.getInstance();
@@ -129,23 +181,9 @@ public class SlotTest
                     slot.areWeInside( cal ) );
 
         // MON with 00:00-23:58
-        days.clear();
-        days.add( Calendar.MONDAY );
-
-        minHour = Calendar.getInstance();
-        minHour.set( Calendar.HOUR_OF_DAY ,
-                     0 );
-        minHour.set( Calendar.MINUTE ,
-                     0 );
-        maxHour = Calendar.getInstance();
-        maxHour.set( Calendar.HOUR_OF_DAY ,
-                     23 );
-        maxHour.set( Calendar.MINUTE ,
-                     58 );
-
-        slot = new Slot( days ,
-                         minHour ,
-                         maxHour );
+        slot = Slot.parse( "MON" ,
+                           "00:00" ,
+                           "23:58" );
 
         // With MON 00:00 => true
         cal = Calendar.getInstance();
@@ -183,29 +221,17 @@ public class SlotTest
 
     /**
      * Test of getSmallestDiffInMs method, of class Slot.
+     *
+     * @throws java.text.ParseException
      */
     @Test
     public void testGetSmallestDiffInMs()
+        throws ParseException
     {
         // TUE, SAT with 17:00-18:30
-        final TreeSet<Integer> days = new TreeSet<>();
-        days.add( Calendar.TUESDAY );
-        days.add( Calendar.SATURDAY );
-
-        final Calendar minHour = Calendar.getInstance();
-        minHour.set( Calendar.HOUR_OF_DAY ,
-                     17 );
-        minHour.set( Calendar.MINUTE ,
-                     0 );
-        final Calendar maxHour = Calendar.getInstance();
-        maxHour.set( Calendar.HOUR_OF_DAY ,
-                     18 );
-        maxHour.set( Calendar.MINUTE ,
-                     30 );
-
-        final Slot slot = new Slot( days ,
-                                    minHour ,
-                                    maxHour );
+        final Slot slot = Slot.parse( "TUE,SAT" ,
+                                      "17:00" ,
+                                      "18:30" );
 
         // with TUE, 16:00 => 3600000
         Calendar cal = Calendar.getInstance();

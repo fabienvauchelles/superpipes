@@ -51,6 +51,27 @@ public class N_Buffer
         this.lastWrite = null;
     }
 
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        slots.clear();
+        final List<HierarchicalConfiguration> sNodes = cNode.configurationsAt( "slots.slot" );
+        if ( sNodes != null )
+        {
+            for ( final HierarchicalConfiguration sNode : sNodes )
+            {
+                final Slot slot = Slot.parse( sNode.getString( "[@days]" ) ,
+                                              sNode.getString( "[@startat]" ) ,
+                                              sNode.getString( "[@endat]" ) );
+
+                slots.add( slot );
+            }
+        }
+    }
+
     // PROTECTED
     @Override
     protected void prepareImpl()

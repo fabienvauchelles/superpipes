@@ -19,9 +19,11 @@
 
 package com.vaushell.spipes.transforms;
 
+import com.vaushell.spipes.Dispatcher;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.util.Properties;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 
 /**
  *
@@ -33,7 +35,19 @@ public abstract class A_Transform
     public A_Transform()
     {
         this.node = null;
-        this.properties = null;
+        this.properties = new Properties();
+    }
+
+    public void setParent( final A_Node node )
+    {
+        this.node = node;
+    }
+
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        Dispatcher.readProperties( properties ,
+                                   cNode );
     }
 
     /**
@@ -54,13 +68,6 @@ public abstract class A_Transform
      */
     public abstract void terminate()
         throws Exception;
-
-    public void config( final A_Node node ,
-                        final Properties properties )
-    {
-        this.node = node;
-        this.properties = properties;
-    }
 
     // PROTECTED
     protected String getNodeID()
@@ -103,5 +110,5 @@ public abstract class A_Transform
 
     // PRIVATE
     private A_Node node;
-    private Properties properties;
+    private final Properties properties;
 }
