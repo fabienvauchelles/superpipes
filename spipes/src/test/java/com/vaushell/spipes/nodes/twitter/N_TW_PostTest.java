@@ -22,6 +22,7 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.Message;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.TreeSet;
 import static org.testng.AssertJUnit.*;
@@ -50,42 +51,39 @@ public class N_TW_PostTest
     public void testConvertNews()
         throws URISyntaxException
     {
-        final Message message = new Message();
-        message.setProperty( Message.KeyIndex.TITLE ,
-                             "Le titre de cette news n'est pas trop long" );
-        message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" );
-
         final String uriStr = "http://url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
-        message.setProperty( Message.KeyIndex.URI ,
-                             new URI( uriStr ) );
-        message.setProperty( Message.KeyIndex.URI_SOURCE ,
-                             new URI( uriStr ) );
-        message.setProperty( Message.KeyIndex.AUTHOR ,
-                             "John Kiki" );
-        message.setProperty( Message.KeyIndex.CONTENT ,
-                             "Le contenu, je m'en fous" );
 
-        final TreeSet<String> tags = new TreeSet<>();
-        tags.add( "ceci" );
-        tags.add( "est" );
-        tags.add( "un" );
-        tags.add( "tag" );
-        tags.add( "mais" );
-        tags.add( "je" );
-        tags.add( "vais" );
-        tags.add( "en" );
-        tags.add( "rajouter" );
-        tags.add( "pour" );
-        tags.add( "que" );
-        tags.add( "ca" );
-        tags.add( "soit" );
-        tags.add( "long" );
-        message.setProperty( Message.KeyIndex.TAGS ,
-                             tags );
-
-        message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                             new Date().getTime() );
+        final Message message = Message.create(
+            Message.KeyIndex.TITLE ,
+            "Le titre de cette news n'est pas trop long" ,
+            Message.KeyIndex.DESCRIPTION ,
+            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
+            Message.KeyIndex.URI ,
+            new URI( uriStr ) ,
+            Message.KeyIndex.URI_SOURCE ,
+            new URI( uriStr ) ,
+            Message.KeyIndex.AUTHOR ,
+            "John Kiki" ,
+            Message.KeyIndex.CONTENT ,
+            "Le contenu, je m'en fous" ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new Date().getTime() ,
+            Message.KeyIndex.TAGS ,
+            new TreeSet<>( Arrays.asList( "ceci" ,
+                                          "est" ,
+                                          "un" ,
+                                          "tag" ,
+                                          "mais" ,
+                                          "je" ,
+                                          "vais" ,
+                                          "en" ,
+                                          "rajouter" ,
+                                          "pour" ,
+                                          "que" ,
+                                          "ca" ,
+                                          "soit" ,
+                                          "long" ) )
+        );
 
         final String content = N_TW_Post.createContent( message );
 
@@ -106,27 +104,26 @@ public class N_TW_PostTest
     public void testURLlong()
         throws URISyntaxException
     {
-        final Message message = new Message();
-        message.setProperty( Message.KeyIndex.TITLE ,
-                             "Le titre de cette news n'est pas trop long" );
-        message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" );
-
         final String uriStr = "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
-        message.setProperty( Message.KeyIndex.URI ,
-                             new URI( uriStr ) );
-        message.setProperty( Message.KeyIndex.URI_SOURCE ,
-                             new URI( uriStr ) );
-        message.setProperty( Message.KeyIndex.AUTHOR ,
-                             "John Kiki" );
-        message.setProperty( Message.KeyIndex.CONTENT ,
-                             "Le contenu, je m'en fous" );
 
-        message.setProperty( Message.KeyIndex.TAGS ,
-                             new TreeSet<String>() );
-
-        message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                             new Date().getTime() );
+        final Message message = Message.create(
+            Message.KeyIndex.TITLE ,
+            "Le titre de cette news n'est pas trop long" ,
+            Message.KeyIndex.DESCRIPTION ,
+            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
+            Message.KeyIndex.URI ,
+            new URI( uriStr ) ,
+            Message.KeyIndex.URI_SOURCE ,
+            new URI( uriStr ) ,
+            Message.KeyIndex.AUTHOR ,
+            "John Kiki" ,
+            Message.KeyIndex.CONTENT ,
+            "Le contenu, je m'en fous" ,
+            Message.KeyIndex.TAGS ,
+            new TreeSet<String>() ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new Date().getTime()
+        );
 
         N_TW_Post.createContent( message );
     }
@@ -143,25 +140,23 @@ public class N_TW_PostTest
     public void testURLnull()
         throws URISyntaxException
     {
-        final Message message = new Message();
-        message.setProperty( Message.KeyIndex.TITLE ,
-                             "Le titre de cette news n'est pas trop long" );
-        message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" );
-
-        message.setProperty( Message.KeyIndex.URI_SOURCE ,
-                             new URI(
-            "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) );
-        message.setProperty( Message.KeyIndex.AUTHOR ,
-                             "John Kiki" );
-        message.setProperty( Message.KeyIndex.CONTENT ,
-                             "Le contenu, je m'en fous" );
-
-        message.setProperty( Message.KeyIndex.TAGS ,
-                             new TreeSet<String>() );
-
-        message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                             new Date().getTime() );
+        final Message message = Message.create(
+            Message.KeyIndex.TITLE ,
+            "Le titre de cette news n'est pas trop long" ,
+            Message.KeyIndex.DESCRIPTION ,
+            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
+            Message.KeyIndex.URI_SOURCE ,
+            new URI(
+            "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
+            Message.KeyIndex.AUTHOR ,
+            "John Kiki" ,
+            Message.KeyIndex.CONTENT ,
+            "Le contenu, je m'en fous" ,
+            Message.KeyIndex.TAGS ,
+            new TreeSet<String>() ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new Date().getTime()
+        );
 
         N_TW_Post.createContent( message );
     }
@@ -178,23 +173,21 @@ public class N_TW_PostTest
     public void testURLtitleNull()
         throws URISyntaxException
     {
-        final Message message = new Message();
-        message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" );
-
-        message.setProperty( Message.KeyIndex.URI_SOURCE ,
-                             new URI(
-            "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) );
-        message.setProperty( Message.KeyIndex.AUTHOR ,
-                             "John Kiki" );
-        message.setProperty( Message.KeyIndex.CONTENT ,
-                             "Le contenu, je m'en fous" );
-
-        message.setProperty( Message.KeyIndex.TAGS ,
-                             new TreeSet<String>() );
-
-        message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                             new Date().getTime() );
+        final Message message = Message.create(
+            Message.KeyIndex.DESCRIPTION ,
+            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
+            Message.KeyIndex.URI_SOURCE ,
+            new URI(
+            "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
+            Message.KeyIndex.AUTHOR ,
+            "John Kiki" ,
+            Message.KeyIndex.CONTENT ,
+            "Le contenu, je m'en fous" ,
+            Message.KeyIndex.TAGS ,
+            new TreeSet<String>() ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new Date().getTime()
+        );
 
         N_TW_Post.createContent( message );
     }

@@ -58,37 +58,32 @@ public class N_NewsGenerator
             LOGGER.trace( "[" + getNodeID() + "] generate post" );
         }
 
-        final Message message = new Message();
-
-        message.setProperty( Message.KeyIndex.TITLE ,
-                             ValuesGenerator.getRandomText( 10 ,
-                                                            20 ) );
-
-        message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                             ValuesGenerator.getRandomText( 20 ,
-                                                            30 ) );
-
         final String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
                                                                          20 );
-        message.setProperty( Message.KeyIndex.URI ,
-                             new URI( uriStr ) );
-        message.setProperty( Message.KeyIndex.URI_SOURCE ,
-                             new URI( uriStr ) );
 
-        message.setProperty( Message.KeyIndex.AUTHOR ,
-                             ValuesGenerator.getRandomText( 1 ,
-                                                            2 ) );
-
-        message.setProperty( Message.KeyIndex.CONTENT ,
-                             ValuesGenerator.getRandomText( 100 ,
-                                                            200 ) );
-
-        message.setProperty( Message.KeyIndex.TAGS ,
-                             ValuesGenerator.getRandomWordSet( 3 ,
-                                                               8 ) );
-
-        message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                             new Date().getTime() );
+        final Message message = Message.create(
+            Message.KeyIndex.TITLE ,
+            ValuesGenerator.getRandomText( 10 ,
+                                           20 ) ,
+            Message.KeyIndex.DESCRIPTION ,
+            ValuesGenerator.getRandomText( 20 ,
+                                           30 ) ,
+            Message.KeyIndex.URI ,
+            new URI( uriStr ) ,
+            Message.KeyIndex.URI_SOURCE ,
+            new URI( uriStr ) ,
+            Message.KeyIndex.AUTHOR ,
+            ValuesGenerator.getRandomText( 1 ,
+                                           2 ) ,
+            Message.KeyIndex.CONTENT ,
+            ValuesGenerator.getRandomText( 100 ,
+                                           200 ) ,
+            Message.KeyIndex.TAGS ,
+            ValuesGenerator.getRandomWordSet( 3 ,
+                                              8 ) ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new Date().getTime()
+        );
 
         sendMessage( message );
     }

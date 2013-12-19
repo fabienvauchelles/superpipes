@@ -76,13 +76,26 @@ public class N_RSS
         final List<SyndEntry> entries = feed.getEntries();
         for ( final SyndEntry entry : entries )
         {
-            final Message message = new Message();
-
             if ( entry.getUri() != null )
             {
-                // URI
-                message.setProperty( Message.KeyIndex.URI ,
-                                     new URI( entry.getUri() ) );
+                // Tags
+                final TreeSet<String> tags = new TreeSet<>();
+
+                final List<SyndCategory> categories = entry.getCategories();
+                if ( categories != null )
+                {
+                    for ( final SyndCategory category : categories )
+                    {
+                        tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
+                    }
+                }
+
+                final Message message = Message.create(
+                    Message.KeyIndex.URI ,
+                    new URI( entry.getUri() ) ,
+                    Message.KeyIndex.TAGS ,
+                    tags
+                );
 
                 // Title
                 if ( entry.getTitle() != null )
@@ -104,20 +117,6 @@ public class N_RSS
                     message.setProperty( Message.KeyIndex.AUTHOR ,
                                          entry.getAuthor() );
                 }
-
-                // Tags
-                final TreeSet<String> tags = new TreeSet<>();
-
-                final List<SyndCategory> categories = entry.getCategories();
-                if ( categories != null )
-                {
-                    for ( final SyndCategory category : categories )
-                    {
-                        tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
-                    }
-                }
-                message.setProperty( Message.KeyIndex.TAGS ,
-                                     tags );
 
                 // Published date
                 if ( entry.getPublishedDate() != null )

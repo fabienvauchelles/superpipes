@@ -103,13 +103,6 @@ public final class Message
         return m;
     }
 
-    public Message()
-    {
-        this.ID = null;
-        this.properties = new TreeMap<>();
-        this.hasToRebuildID = true;
-    }
-
     /**
      * Return the message ID. Generate lazy initialization.
      *
@@ -262,6 +255,13 @@ public final class Message
     private transient String ID;
     private TreeMap<String , Serializable> properties;
     private transient boolean hasToRebuildID;
+
+    private Message()
+    {
+        this.ID = null;
+        this.properties = new TreeMap<>();
+        this.hasToRebuildID = true;
+    }
 
     private void rebuildID()
     {

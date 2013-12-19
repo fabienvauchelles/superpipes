@@ -73,40 +73,29 @@ public class N_Shaarli
                  && sl.getTitle() != null
                  && ( sl.getID() != null || sl.getPermaID() != null ) )
             {
-                final Message message = new Message();
-
-                // URI
-                message.setProperty( Message.KeyIndex.URI ,
-                                     new URI( sl.getUrl() ) );
-
-                // Title
-                message.setProperty( Message.KeyIndex.TITLE ,
-                                     sl.getTitle() );
-
-                // Description
-                message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                                     sl.getDescription() );
-
-                // Shaarli ID
-                message.setProperty( "id-shaarli" ,
-                                     sl.getID() );
-
-                // Permanent ID
-                message.setProperty( "id-permanent" ,
-                                     sl.getPermaID() );
-
-                // Permanent URI
-                message.setProperty( "uri-permanent" ,
-                                     sl.getPermaURL( client.getEndpoint() ) );
-
                 // Tags
                 final TreeSet<String> tags = new TreeSet<>();
                 for ( final String tag : sl.getTags() )
                 {
                     tags.add( tag.toLowerCase( Locale.ENGLISH ) );
                 }
-                message.setProperty( Message.KeyIndex.TAGS ,
-                                     tags );
+
+                final Message message = Message.create(
+                    Message.KeyIndex.URI ,
+                    new URI( sl.getUrl() ) ,
+                    Message.KeyIndex.TITLE ,
+                    sl.getTitle() ,
+                    Message.KeyIndex.DESCRIPTION ,
+                    sl.getDescription() ,
+                    "id-shaarli" ,
+                    sl.getID() ,
+                    "id-permanent" ,
+                    sl.getPermaID() ,
+                    "uri-permanent" ,
+                    sl.getPermaURL( client.getEndpoint() ) ,
+                    Message.KeyIndex.TAGS ,
+                    tags
+                );
 
                 sendMessage( message );
             }
