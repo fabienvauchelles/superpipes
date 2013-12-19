@@ -100,7 +100,7 @@ public abstract class A_Node
             return value;
         }
 
-        for ( String commonPropertiesID : commonsPropertiesID )
+        for ( final String commonPropertiesID : commonsPropertiesID )
         {
             final Properties commonsProperties = dispatcher.getCommon( commonPropertiesID );
             if ( commonsProperties != null )

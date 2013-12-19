@@ -83,7 +83,7 @@ public abstract class A_Transform
             return value;
         }
 
-        for ( String commonPropertiesID : commonsPropertiesID )
+        for ( final String commonPropertiesID : commonsPropertiesID )
         {
             final Properties commonsProperties = node.getDispatcher().getCommon( commonPropertiesID );
             if ( commonsProperties != null )

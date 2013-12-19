@@ -46,6 +46,12 @@ public final class Dispatcher
         this.commonsProperties = new HashMap<>();
     }
 
+    /**
+     * Return common properties set.
+     *
+     * @param ID Common ID
+     * @return Common properties set
+     */
     public Properties getCommon( final String ID )
     {
         return commonsProperties.get( ID );
@@ -91,7 +97,7 @@ public final class Dispatcher
                            final String type ,
                            final String... commonsPropertiesID )
     {
-        if ( nodeID == null || type == null | commonsPropertiesID == null )
+        if ( nodeID == null || type == null || commonsPropertiesID == null )
         {
             throw new IllegalArgumentException();
         }

@@ -61,6 +61,12 @@ public final class Message
         }
     }
 
+    /**
+     * Create a message a full message.
+     *
+     * @param properties pair args are key (String or KeyIndex), impair args are value (Serializable)
+     * @return the Message
+     */
     public static Message create( final Object... properties )
     {
         if ( properties == null || properties.length % 2 == 1 )
