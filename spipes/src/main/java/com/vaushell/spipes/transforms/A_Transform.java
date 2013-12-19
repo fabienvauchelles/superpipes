@@ -44,6 +44,11 @@ public abstract class A_Transform
         this.node = node;
     }
 
+    public Properties getProperties()
+    {
+        return properties;
+    }
+
     /**
      * Load configuration for this transform.
      *

@@ -55,6 +55,11 @@ public abstract class A_Node
         return nodeID;
     }
 
+    public Properties getProperties()
+    {
+        return properties;
+    }
+
     /**
      * Retrieve node's parameter.
      *
@@ -132,6 +137,17 @@ public abstract class A_Node
     /**
      * Add a transform to the node input.
      *
+     * @param clazz Transform's type class
+     * @return the transform
+     */
+    public A_Transform addTransformIN( final Class<?> clazz )
+    {
+        return addTransformIN( clazz.getName() );
+    }
+
+    /**
+     * Add a transform to the node input.
+     *
      * @param type Transform's type
      * @return the transform
      */
@@ -163,6 +179,17 @@ public abstract class A_Node
         {
             throw new RuntimeException( ex );
         }
+    }
+
+    /**
+     * Add a transform to the node output.
+     *
+     * @param clazz Transform's type class
+     * @return the transform
+     */
+    public A_Transform addTransformOUT( final Class<?> clazz )
+    {
+        return addTransformOUT( clazz.getName() );
     }
 
     /**

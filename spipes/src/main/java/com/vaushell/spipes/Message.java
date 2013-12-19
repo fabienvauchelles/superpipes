@@ -61,6 +61,42 @@ public final class Message
         }
     }
 
+    public static Message create( final Object... properties )
+    {
+        if ( properties == null || properties.length % 2 == 1 )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        final Message m = new Message();
+
+        int i = 0;
+        while ( i < properties.length )
+        {
+            final Serializable value = (Serializable) properties[ i + 1];
+
+            final Object okey = properties[ i];
+            if ( okey instanceof String )
+            {
+                m.setProperty( (String) okey ,
+                               value );
+            }
+            else if ( okey instanceof KeyIndex )
+            {
+                m.setProperty( (KeyIndex) okey ,
+                               value );
+            }
+            else
+            {
+                throw new ClassCastException();
+            }
+
+            i += 2;
+        }
+
+        return m;
+    }
+
     public Message()
     {
         this.ID = null;

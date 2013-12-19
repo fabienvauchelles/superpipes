@@ -107,12 +107,13 @@ public final class Dispatcher
      *
      * @param nodeID Node's ID
      * @param clazz Node's type class
+     * @return the node
      */
-    public void addNode( final String nodeID ,
-                         final Class<?> clazz )
+    public A_Node addNode( final String nodeID ,
+                           final Class<?> clazz )
     {
-        addNode( nodeID ,
-                 clazz.getName() );
+        return addNode( nodeID ,
+                        clazz.getName() );
     }
 
     /**
