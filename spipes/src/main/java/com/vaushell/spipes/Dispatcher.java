@@ -170,6 +170,30 @@ public final class Dispatcher
     }
 
     /**
+     * Add common configuration.
+     *
+     * @param ID Common ID
+     * @param properties The properties
+     */
+    public void addCommon( final String ID ,
+                           final Properties properties )
+    {
+        if ( ID == null || properties == null || properties.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] addCommon : ID=" + ID + " / properties=" + properties );
+        }
+
+        commonsProperties.put( ID ,
+                               properties );
+    }
+
+    /**
      * Start the dispatcher.
      *
      * @throws Exception
@@ -302,8 +326,8 @@ public final class Dispatcher
                 readProperties( cProperties ,
                                 cCommon );
 
-                commonsProperties.put( cCommon.getString( "[@id]" ) ,
-                                       cProperties );
+                addCommon( cCommon.getString( "[@id]" ) ,
+                           properties );
             }
         }
 
