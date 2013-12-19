@@ -20,8 +20,12 @@
 package com.vaushell.spipes;
 
 import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.nodes.dummy.N_Dummy;
 import com.vaushell.spipes.nodes.stub.N_MessageLogger;
 import com.vaushell.spipes.nodes.stub.N_NewsGenerator;
+import com.vaushell.spipes.transforms.A_Transform;
+import com.vaushell.spipes.transforms.done.T_Done;
+import java.util.Properties;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -102,5 +106,82 @@ public class DispatcherTest
 
         dispatcher.addRoute( "generator" ,
                              "receptor" );
+    }
+
+    /**
+     * Test commons.
+     */
+    @Test
+    public void testCommons()
+    {
+        final Dispatcher dispatcher = new Dispatcher();
+
+        final Properties properties = new Properties();
+        properties.put( "test" ,
+                        "montest" );
+        dispatcher.addCommon( "conf1" ,
+                              properties );
+
+        final Properties properties2 = new Properties();
+        properties2.put( "check" ,
+                         "moncheck" );
+        dispatcher.addCommon( "conf2" ,
+                              properties2 );
+
+        // Node
+        final A_Node node = dispatcher.addNode( "dummy" ,
+                                                N_Dummy.class ,
+                                                "conf1" );
+        node.getProperties().setProperty( "test2" ,
+                                          "montest2" );
+
+        assertEquals( "test2 property should be found" ,
+                      "montest2" ,
+                      node.getConfig( "test2" ) );
+
+        assertNull( "check property is unknown" ,
+                    node.getConfig( "check" ) );
+
+        assertEquals( "test property should be found" ,
+                      "montest" ,
+                      node.getConfig( "test" ) );
+
+        node.getProperties().setProperty( "test" ,
+                                          "monautretest" );
+
+        assertEquals( "test property should be found" ,
+                      "monautretest" ,
+                      node.getConfig( "test" ) );
+
+        // Transform
+        final A_Transform transform = node.addTransformIN( T_Done.class ,
+                                                           "conf2" ,
+                                                           "conf1" );
+
+        assertEquals( "check property should be found" ,
+                      "moncheck" ,
+                      transform.getConfig( "check" ) );
+
+        assertEquals( "test property should be found" ,
+                      "montest" ,
+                      transform.getConfig( "test" ) );
+    }
+
+    /**
+     * Test unknown common conf.
+     */
+    @Test
+    public void testCommonsNull()
+    {
+        final Dispatcher dispatcher = new Dispatcher();
+
+        // Node
+        final A_Node node = dispatcher.addNode( "dummy" ,
+                                                N_Dummy.class ,
+                                                "confnull" );
+
+        assertNull( "confnull common is unknown" ,
+                    node.getConfig( "test2" ) );
+
     }
 }
