@@ -23,7 +23,6 @@ import com.vaushell.spipes.Message;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
-import java.util.Set;
 import java.util.TreeSet;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;

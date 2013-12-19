@@ -30,7 +30,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -88,12 +87,8 @@ public class N_Buffer
 
         try( final DirectoryStream<Path> stream = Files.newDirectoryStream( messagesPath ) )
         {
-            final Iterator<Path> it = stream.iterator();
-
-            while ( it.hasNext() )
+            for ( Path p : stream )
             {
-                final Path p = it.next();
-
                 messageIDs.add( p.getFileName().toString() );
             }
         }
