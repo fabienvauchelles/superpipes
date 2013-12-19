@@ -3,6 +3,18 @@
     <params>
         <param name="datas-directory" value="conf-local/datas" />
     </params>
+    <commons>
+        <common id="fbfabienkey">
+            <params>
+                <param name="key" value="KEY" />
+            </params>
+        </common>
+        <common id="fbfabiensecret">
+            <params>
+                <param name="secret" value="SECRET" />
+            </params>
+        </common>
+    </commons>
     <nodes>
         <node id="rss-vauchelles" type="com.vaushell.spipes.nodes.rss.N_RSS">
             <!-- RSS doesn't react to a message. It catchs news at regular interval -->
@@ -26,18 +38,8 @@
                 </transform>
             </out>
         </node>
-        <node id="fbpost" type="com.vaushell.spipes.nodes.fb.N_FB_Post">
-            <params>
-                <param name="key" value="KEY" />
-                <param name="secret" value="SECRET" />
-            </params>
-        </node>
-        <node id="fbpostlike" type="com.vaushell.spipes.nodes.fb.N_FB_PostLike">
-            <params>
-                <param name="key" value="KEY" />
-                <param name="secret" value="SECRET" />
-            </params>
-        </node>
+        <node id="fbpost" type="com.vaushell.spipes.nodes.fb.N_FB_Post" commons="fbfabienkey,fbfabiensecret" />
+        <node id="fbpostlike" type="com.vaushell.spipes.nodes.fb.N_FB_PostLike" commons="fbfabienkey,fbfabiensecret" />
         <node id="twpost" type="com.vaushell.spipes.nodes.twitter.N_TW_Post">
             <params>
                 <param name="key" value="KEY" />

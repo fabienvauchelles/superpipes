@@ -23,6 +23,7 @@ import com.vaushell.spipes.Dispatcher;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -48,6 +49,7 @@ public abstract class A_Node
         this.transformsIN = new ArrayList<>();
         this.transformsOUT = new ArrayList<>();
         this.properties = new Properties();
+        this.commonsPropertiesID = new ArrayList<>();
     }
 
     public String getNodeID()
@@ -60,6 +62,11 @@ public abstract class A_Node
         return properties;
     }
 
+    public Dispatcher getDispatcher()
+    {
+        return dispatcher;
+    }
+
     /**
      * Retrieve node's parameter.
      *
@@ -68,7 +75,26 @@ public abstract class A_Node
      */
     public String getConfig( final String key )
     {
-        return properties.getProperty( key );
+        String value = properties.getProperty( key );
+        if ( value != null )
+        {
+            return value;
+        }
+
+        for ( String commonPropertiesID : commonsPropertiesID )
+        {
+            final Properties commonsProperties = dispatcher.getCommon( commonPropertiesID );
+            if ( commonsProperties != null )
+            {
+                value = commonsProperties.getProperty( key );
+                if ( value != null )
+                {
+                    return value;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -83,16 +109,23 @@ public abstract class A_Node
     }
 
     /**
-     * Set nodes's parameters.
+     * Set node's parameters.
      *
      * @param nodeID Node's identifier
      * @param dispatcher Main dispatcher
+     * @param commonsPropertiesID commons properties set reference
      */
     public void setParameters( final String nodeID ,
-                               final Dispatcher dispatcher )
+                               final Dispatcher dispatcher ,
+                               final String... commonsPropertiesID )
     {
         this.nodeID = nodeID;
         this.dispatcher = dispatcher;
+
+        for ( final String cpID : commonsPropertiesID )
+        {
+            this.commonsPropertiesID.add( cpID );
+        }
     }
 
     /**
@@ -138,20 +171,25 @@ public abstract class A_Node
      * Add a transform to the node input.
      *
      * @param clazz Transform's type class
+     * @param commonsPropertiesID commons properties set reference
      * @return the transform
      */
-    public A_Transform addTransformIN( final Class<?> clazz )
+    public A_Transform addTransformIN( final Class<?> clazz ,
+                                       final String... commonsPropertiesID )
     {
-        return addTransformIN( clazz.getName() );
+        return addTransformIN( clazz.getName() ,
+                               commonsPropertiesID );
     }
 
     /**
      * Add a transform to the node input.
      *
      * @param type Transform's type
+     * @param commonsPropertiesID commons properties set reference
      * @return the transform
      */
-    public A_Transform addTransformIN( final String type )
+    public A_Transform addTransformIN( final String type ,
+                                       final String... commonsPropertiesID )
     {
         if ( type == null )
         {
@@ -167,7 +205,8 @@ public abstract class A_Node
         try
         {
             final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
-            transform.setParent( this );
+            transform.setParameters( this ,
+                                     commonsPropertiesID );
 
             transformsIN.add( transform );
 
@@ -185,20 +224,25 @@ public abstract class A_Node
      * Add a transform to the node output.
      *
      * @param clazz Transform's type class
+     * @param commonsPropertiesID commons properties set reference
      * @return the transform
      */
-    public A_Transform addTransformOUT( final Class<?> clazz )
+    public A_Transform addTransformOUT( final Class<?> clazz ,
+                                        final String... commonsPropertiesID )
     {
-        return addTransformOUT( clazz.getName() );
+        return addTransformOUT( clazz.getName() ,
+                                commonsPropertiesID );
     }
 
     /**
      * Add a transform to the node output.
      *
      * @param type Transform's type
+     * @param commonsPropertiesID commons properties set reference
      * @return the transform
      */
-    public A_Transform addTransformOUT( final String type )
+    public A_Transform addTransformOUT( final String type ,
+                                        final String... commonsPropertiesID )
     {
         if ( type == null )
         {
@@ -214,7 +258,8 @@ public abstract class A_Node
         try
         {
             final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
-            transform.setParent( this );
+            transform.setParameters( this ,
+                                     commonsPropertiesID );
 
             transformsOUT.add( transform );
 
@@ -543,6 +588,7 @@ public abstract class A_Node
     private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
     private String nodeID;
     private final Properties properties;
+    private final List<String> commonsPropertiesID;
     private Dispatcher dispatcher;
     private final LinkedList<Message> internalStack;
     private volatile boolean activated;

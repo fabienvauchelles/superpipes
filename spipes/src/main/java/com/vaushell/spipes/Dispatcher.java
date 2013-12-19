@@ -43,6 +43,12 @@ public final class Dispatcher
         this.nodes = new HashMap<>();
         this.routes = new HashMap<>();
         this.properties = new Properties();
+        this.commonsProperties = new HashMap<>();
+    }
+
+    public Properties getCommon( final String ID )
+    {
+        return commonsProperties.get( ID );
     }
 
     /**
@@ -60,13 +66,32 @@ public final class Dispatcher
      * Add a node to the flow.
      *
      * @param nodeID Node's ID
-     * @param type Node's type
+     * @param clazz Node's type class
+     * @param commonsPropertiesID commons properties set reference
      * @return the node
      */
     public A_Node addNode( final String nodeID ,
-                           final String type )
+                           final Class<?> clazz ,
+                           final String... commonsPropertiesID )
     {
-        if ( nodeID == null || type == null )
+        return addNode( nodeID ,
+                        clazz.getName() ,
+                        commonsPropertiesID );
+    }
+
+    /**
+     * Add a node to the flow.
+     *
+     * @param nodeID Node's ID
+     * @param type Node's type
+     * @param commonsPropertiesID commons properties set reference
+     * @return the node
+     */
+    public A_Node addNode( final String nodeID ,
+                           final String type ,
+                           final String... commonsPropertiesID )
+    {
+        if ( nodeID == null || type == null | commonsPropertiesID == null )
         {
             throw new IllegalArgumentException();
         }
@@ -87,7 +112,8 @@ public final class Dispatcher
         {
             final A_Node node = (A_Node) Class.forName( type ).newInstance();
             node.setParameters( nodeID ,
-                                this );
+                                this ,
+                                commonsPropertiesID );
 
             nodes.put( nodeID ,
                        node );
@@ -100,20 +126,6 @@ public final class Dispatcher
         {
             throw new RuntimeException( ex );
         }
-    }
-
-    /**
-     * Add a node to the flow.
-     *
-     * @param nodeID Node's ID
-     * @param clazz Node's type class
-     * @return the node
-     */
-    public A_Node addNode( final String nodeID ,
-                           final Class<?> clazz )
-    {
-        return addNode( nodeID ,
-                        clazz.getName() );
     }
 
     /**
@@ -279,6 +291,22 @@ public final class Dispatcher
         readProperties( properties ,
                         config );
 
+        // Load commons
+        commonsProperties.clear();
+        final List<HierarchicalConfiguration> cCommons = config.configurationsAt( "commons.common" );
+        if ( cCommons != null )
+        {
+            for ( final HierarchicalConfiguration cCommon : cCommons )
+            {
+                final Properties cProperties = new Properties();
+                readProperties( cProperties ,
+                                cCommon );
+
+                commonsProperties.put( cCommon.getString( "[@id]" ) ,
+                                       cProperties );
+            }
+        }
+
         // Load nodes
         nodes.clear();
         final List<HierarchicalConfiguration> cNodes = config.configurationsAt( "nodes.node" );
@@ -286,8 +314,23 @@ public final class Dispatcher
         {
             for ( final HierarchicalConfiguration cNode : cNodes )
             {
+                final String[] commons;
+
+                final String commonsStr = cNode.getString( "[@commons]" );
+                if ( commonsStr == null )
+                {
+                    commons = new String[]
+                    {
+                    };
+                }
+                else
+                {
+                    commons = commonsStr.split( "," );
+                }
+
                 final A_Node node = addNode( cNode.getString( "[@id]" ) ,
-                                             cNode.getString( "[@type]" ) );
+                                             cNode.getString( "[@type]" ) ,
+                                             commons );
 
                 node.load( cNode );
             }
@@ -347,4 +390,5 @@ public final class Dispatcher
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
     private final Properties properties;
+    private final HashMap<String , Properties> commonsProperties;
 }

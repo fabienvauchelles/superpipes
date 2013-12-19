@@ -22,6 +22,8 @@ package com.vaushell.spipes.transforms;
 import com.vaushell.spipes.Dispatcher;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
@@ -37,11 +39,24 @@ public abstract class A_Transform
     {
         this.node = null;
         this.properties = new Properties();
+        this.commonsPropertiesID = new ArrayList<>();
     }
 
-    public void setParent( final A_Node node )
+    /**
+     * Set transform's parameters.
+     *
+     * @param node Parent node
+     * @param commonsPropertiesID commons properties set reference
+     */
+    public void setParameters( final A_Node node ,
+                               final String... commonsPropertiesID )
     {
         this.node = node;
+
+        for ( final String cpID : commonsPropertiesID )
+        {
+            this.commonsPropertiesID.add( cpID );
+        }
     }
 
     public Properties getProperties()
@@ -102,7 +117,26 @@ public abstract class A_Transform
      */
     protected String getConfig( final String key )
     {
-        return properties.getProperty( key );
+        String value = properties.getProperty( key );
+        if ( value != null )
+        {
+            return value;
+        }
+
+        for ( String commonPropertiesID : commonsPropertiesID )
+        {
+            final Properties commonsProperties = node.getDispatcher().getCommon( commonPropertiesID );
+            if ( commonsProperties != null )
+            {
+                value = commonsProperties.getProperty( key );
+                if ( value != null )
+                {
+                    return value;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -130,4 +164,5 @@ public abstract class A_Transform
     // PRIVATE
     private A_Node node;
     private final Properties properties;
+    private final List<String> commonsPropertiesID;
 }
