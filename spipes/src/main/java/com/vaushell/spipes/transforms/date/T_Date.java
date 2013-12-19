@@ -23,7 +23,7 @@ import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,8 @@ public class T_Date
         {
             try
             {
-                minDate = df.parse( minDateStr );
+                minCal = Calendar.getInstance();
+                minCal.setTime( df.parse( minDateStr ) );
             }
             catch( final ParseException ex )
             {
@@ -67,7 +68,8 @@ public class T_Date
         {
             try
             {
-                maxDate = df.parse( maxDateStr );
+                maxCal = Calendar.getInstance();
+                maxCal.setTime( df.parse( maxDateStr ) );
             }
             catch( final ParseException ex )
             {
@@ -90,13 +92,14 @@ public class T_Date
             return null;
         }
 
-        final Date date = new Date( (Long) message.getProperty( Message.KeyIndex.PUBLISHED_DATE ) );
-        if ( minDate != null && minDate.after( date ) )
+        final Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis( (Long) message.getProperty( Message.KeyIndex.PUBLISHED_DATE ) );
+        if ( minCal != null && minCal.after( cal ) )
         {
             return null;
         }
 
-        if ( maxDate != null && maxDate.before( date ) )
+        if ( maxCal != null && maxCal.before( cal ) )
         {
             return null;
         }
@@ -113,7 +116,7 @@ public class T_Date
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( T_Date.class );
-    private Date minDate;
-    private Date maxDate;
+    private Calendar minCal;
+    private Calendar maxCal;
     private final SimpleDateFormat df;
 }
