@@ -23,7 +23,6 @@ import com.vaushell.spipes.Dispatcher;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -50,6 +49,26 @@ public abstract class A_Node
         this.transformsOUT = new ArrayList<>();
         this.properties = new Properties();
         this.commonsPropertiesID = new ArrayList<>();
+    }
+
+    /**
+     * Set node's parameters.
+     *
+     * @param nodeID Node's identifier
+     * @param dispatcher Main dispatcher
+     * @param commonsPropertiesID commons properties set reference
+     */
+    public void setParameters( final String nodeID ,
+                               final Dispatcher dispatcher ,
+                               final String[] commonsPropertiesID )
+    {
+        this.nodeID = nodeID;
+        this.dispatcher = dispatcher;
+
+        for ( final String cpID : commonsPropertiesID )
+        {
+            this.commonsPropertiesID.add( cpID );
+        }
     }
 
     public String getNodeID()
@@ -109,26 +128,6 @@ public abstract class A_Node
     }
 
     /**
-     * Set node's parameters.
-     *
-     * @param nodeID Node's identifier
-     * @param dispatcher Main dispatcher
-     * @param commonsPropertiesID commons properties set reference
-     */
-    public void setParameters( final String nodeID ,
-                               final Dispatcher dispatcher ,
-                               final String... commonsPropertiesID )
-    {
-        this.nodeID = nodeID;
-        this.dispatcher = dispatcher;
-
-        for ( final String cpID : commonsPropertiesID )
-        {
-            this.commonsPropertiesID.add( cpID );
-        }
-    }
-
-    /**
      * Load configuration for this node.
      *
      * @param cNode Configuration
@@ -147,7 +146,22 @@ public abstract class A_Node
         {
             for ( final HierarchicalConfiguration cTransform : cTransformsIN )
             {
-                final A_Transform transform = addTransformIN( cTransform.getString( "[@type]" ) );
+                final String[] commons;
+
+                final String commonsStr = cNode.getString( "[@commons]" );
+                if ( commonsStr == null )
+                {
+                    commons = new String[]
+                    {
+                    };
+                }
+                else
+                {
+                    commons = commonsStr.split( "," );
+                }
+
+                final A_Transform transform = addTransformIN( cTransform.getString( "[@type]" ) ,
+                                                              commons );
 
                 transform.load( cTransform );
             }
@@ -160,7 +174,22 @@ public abstract class A_Node
         {
             for ( final HierarchicalConfiguration cTransform : cTransformsOUT )
             {
-                final A_Transform transform = addTransformOUT( cTransform.getString( "[@type]" ) );
+                final String[] commons;
+
+                final String commonsStr = cNode.getString( "[@commons]" );
+                if ( commonsStr == null )
+                {
+                    commons = new String[]
+                    {
+                    };
+                }
+                else
+                {
+                    commons = commonsStr.split( "," );
+                }
+
+                final A_Transform transform = addTransformOUT( cTransform.getString( "[@type]" ) ,
+                                                               commons );
 
                 transform.load( cTransform );
             }

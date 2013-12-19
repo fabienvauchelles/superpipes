@@ -49,7 +49,7 @@ public abstract class A_Transform
      * @param commonsPropertiesID commons properties set reference
      */
     public void setParameters( final A_Node node ,
-                               final String... commonsPropertiesID )
+                               final String[] commonsPropertiesID )
     {
         this.node = node;
 
@@ -59,9 +59,66 @@ public abstract class A_Transform
         }
     }
 
+    public String getNodeID()
+    {
+        return node.getNodeID();
+    }
+
     public Properties getProperties()
     {
         return properties;
+    }
+
+    /**
+     * Retrieve node's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
+    public String getConfig( final String key )
+    {
+        String value = properties.getProperty( key );
+        if ( value != null )
+        {
+            return value;
+        }
+
+        for ( String commonPropertiesID : commonsPropertiesID )
+        {
+            final Properties commonsProperties = node.getDispatcher().getCommon( commonPropertiesID );
+            if ( commonsProperties != null )
+            {
+                value = commonsProperties.getProperty( key );
+                if ( value != null )
+                {
+                    return value;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Retrieve node's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
+    public String getNodeConfig( final String key )
+    {
+        return node.getConfig( key );
+    }
+
+    /**
+     * Retrieve main's parameter.
+     *
+     * @param key Key of parameter
+     * @return the value
+     */
+    public String getMainConfig( final String key )
+    {
+        return node.getMainConfig( key );
     }
 
     /**
@@ -102,64 +159,6 @@ public abstract class A_Transform
      */
     public abstract void terminate()
         throws Exception;
-
-    // PROTECTED
-    protected String getNodeID()
-    {
-        return node.getNodeID();
-    }
-
-    /**
-     * Retrieve node's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    protected String getConfig( final String key )
-    {
-        String value = properties.getProperty( key );
-        if ( value != null )
-        {
-            return value;
-        }
-
-        for ( String commonPropertiesID : commonsPropertiesID )
-        {
-            final Properties commonsProperties = node.getDispatcher().getCommon( commonPropertiesID );
-            if ( commonsProperties != null )
-            {
-                value = commonsProperties.getProperty( key );
-                if ( value != null )
-                {
-                    return value;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Retrieve node's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    protected String getNodeConfig( final String key )
-    {
-        return node.getConfig( key );
-    }
-
-    /**
-     * Retrieve main's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    protected String getMainConfig( final String key )
-    {
-        return node.getMainConfig( key );
-    }
 
     // PRIVATE
     private A_Node node;
