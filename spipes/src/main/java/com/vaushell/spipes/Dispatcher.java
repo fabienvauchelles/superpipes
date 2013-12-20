@@ -333,7 +333,7 @@ public final class Dispatcher
                                 cCommon );
 
                 addCommon( cCommon.getString( "[@id]" ) ,
-                           properties );
+                           cProperties );
             }
         }
 
