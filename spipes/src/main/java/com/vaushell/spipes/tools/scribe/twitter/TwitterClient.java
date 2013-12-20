@@ -52,14 +52,17 @@ public class TwitterClient
      * @param key OAuth key
      * @param secret OAuth secret
      * @param tokenPath Path to save the token
+     * @param vCodeMethod How to get the verification code
      * @param loginText Prefix message to request the token to the user
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
+                       final VCodeMethod vCodeMethod ,
                        final String loginText )
-        throws IOException
+        throws IOException , InterruptedException
     {
         loginImpl( TwitterApi.class ,
                    key ,
@@ -68,6 +71,7 @@ public class TwitterClient
                    null ,
                    true ,
                    tokenPath ,
+                   vCodeMethod ,
                    loginText );
     }
 

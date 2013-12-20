@@ -58,15 +58,18 @@ public class TumblrClient
      * @param key OAuth key
      * @param secret OAuth secret
      * @param tokenPath Path to save the token
+     * @param vCodeMethod How to get the verification code
      * @param loginText Prefix message to request the token to the user
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public void login( final String blogname ,
                        final String key ,
                        final String secret ,
                        final Path tokenPath ,
+                       final VCodeMethod vCodeMethod ,
                        final String loginText )
-        throws IOException
+        throws IOException , InterruptedException
     {
         if ( blogname == null )
         {
@@ -82,6 +85,7 @@ public class TumblrClient
                    "http://www.tumblr.com/connect/login_success.html" ,
                    true ,
                    tokenPath ,
+                   vCodeMethod ,
                    loginText );
     }
 

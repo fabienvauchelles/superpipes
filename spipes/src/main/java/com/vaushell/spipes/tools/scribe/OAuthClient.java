@@ -19,12 +19,14 @@
 
 package com.vaushell.spipes.tools.scribe;
 
+import com.vaushell.spipes.tools.FilesHelper;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.Api;
@@ -43,6 +45,16 @@ import org.slf4j.LoggerFactory;
  */
 public class OAuthClient
 {
+    // PUBLIC
+    /**
+     * Verification code method.
+     */
+    public enum VCodeMethod
+    {
+        SYSTEM_INPUT,
+        FILE
+    }
+
     // PROTECTED
     protected OAuthClient()
     {
@@ -59,8 +71,10 @@ public class OAuthClient
      * @param callback OAuth URL callback (or null)
      * @param useRequestToken OAuth use of request token ?
      * @param tokenPath Path to save the token
+     * @param vCodeMethod How to get the verification code
      * @param loginText Prefix message to request the token to the user
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     protected void loginImpl( final Class<? extends Api> api ,
                               final String key ,
@@ -69,10 +83,11 @@ public class OAuthClient
                               final String callback ,
                               final boolean useRequestToken ,
                               final Path tokenPath ,
+                              final VCodeMethod vCodeMethod ,
                               final String loginText )
-        throws IOException
+        throws IOException , InterruptedException
     {
-        if ( api == null || key == null || secret == null || tokenPath == null || loginText == null )
+        if ( api == null || key == null || secret == null || tokenPath == null || vCodeMethod == null || loginText == null )
         {
             throw new IllegalArgumentException();
         }
@@ -80,7 +95,7 @@ public class OAuthClient
         if ( LOGGER.isDebugEnabled() )
         {
             LOGGER.debug(
-                "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath + " / loginText=" + loginText );
+                "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath + " / vCodeMethod=" + vCodeMethod + " / loginText=" + loginText );
         }
 
         final ServiceBuilder builder = new ServiceBuilder()
@@ -111,11 +126,38 @@ public class OAuthClient
             System.out.println( loginText + " Use this URL :" );
             System.out.println( authUrl );
 
-            System.out.println( loginText + " Enter code :" );
+            final String code;
+            switch( vCodeMethod )
+            {
+                case SYSTEM_INPUT:
+                {
+                    System.out.println( loginText + " Enter code :" );
 
-            final Scanner sc = new Scanner( System.in ,
-                                            "UTF-8" );
-            final String code = sc.next();
+                    try( final Scanner sc = new Scanner( System.in ,
+                                                         "UTF-8" ) )
+                    {
+                        code = sc.next();
+                    }
+
+                    break;
+                }
+
+                case FILE:
+                {
+                    final Path p = Paths.get( tokenPath.toString() + ".code" );
+                    System.out.println( "Write token inside :'" + p.toString() + "'" );
+
+                    code = FilesHelper.fileContent( p );
+
+                    break;
+                }
+
+                default:
+                {
+                    throw new UnsupportedOperationException();
+                }
+            }
+
             System.out.println( loginText + " Read code is '" + code + "'" );
 
             // Get the access Token

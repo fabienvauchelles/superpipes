@@ -55,14 +55,17 @@ public class LinkedInClient
      * @param key OAuth keyd
      * @param secret OAuth secret
      * @param tokenPath Path to save the token
+     * @param vCodeMethod How to get the verification code
      * @param loginText Prefix message to request the token to the user
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
+                       final VCodeMethod vCodeMethod ,
                        final String loginText )
-        throws IOException
+        throws IOException , InterruptedException
     {
         loginImpl( LinkedInApi.class ,
                    key ,
@@ -71,6 +74,7 @@ public class LinkedInClient
                    "http://www.linkedin.com/connect/login_success.html" ,
                    true ,
                    tokenPath ,
+                   vCodeMethod ,
                    loginText );
     }
 

@@ -52,15 +52,18 @@ public class FacebookClient
      * @param secret Facebook secret
      * @param scope Facebook scope
      * @param tokenPath Path to save the token
+     * @param vCodeMethod How to get the verification code
      * @param loginText Prefix message to request the token to the user
      * @throws IOException
+     * @throws java.lang.InterruptedException
      */
     public void login( final String key ,
                        final String secret ,
                        final String scope ,
                        final Path tokenPath ,
+                       final VCodeMethod vCodeMethod ,
                        final String loginText )
-        throws IOException
+        throws IOException , InterruptedException
     {
         loginImpl( FacebookApi.class ,
                    key ,
@@ -69,6 +72,7 @@ public class FacebookClient
                    "http://www.facebook.com/connect/login_success.html" ,
                    false ,
                    tokenPath ,
+                   vCodeMethod ,
                    loginText );
     }
 
