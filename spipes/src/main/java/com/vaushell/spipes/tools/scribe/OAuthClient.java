@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.tools.scribe;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.vaushell.spipes.tools.FilesHelper;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -192,6 +193,18 @@ public class OAuthClient
                              request );
 
         return request.send();
+    }
+
+    protected static String convertNodeToString( final JsonNode node )
+    {
+        if ( node == null )
+        {
+            return null;
+        }
+        else
+        {
+            return node.asText();
+        }
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( OAuthClient.class );

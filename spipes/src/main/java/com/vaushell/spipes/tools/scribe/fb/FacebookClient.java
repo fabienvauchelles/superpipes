@@ -365,16 +365,4 @@ public class FacebookClient
                                          error.get( "message" ).asText() );
         }
     }
-
-    private static String convertNodeToString( final JsonNode node )
-    {
-        if ( node == null )
-        {
-            return null;
-        }
-        else
-        {
-            return node.asText();
-        }
-    }
 }
