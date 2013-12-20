@@ -47,7 +47,12 @@ public class OAuthClient
     // PROTECTED
     protected OAuthClient()
     {
-        // Nothing
+        this.key = null;
+    }
+
+    protected String getKey()
+    {
+        return key;
     }
 
     /**
@@ -85,9 +90,11 @@ public class OAuthClient
                 "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath );
         }
 
+        this.key = key;
+
         final ServiceBuilder builder = new ServiceBuilder()
             .provider( api )
-            .apiKey( key )
+            .apiKey( this.key )
             .apiSecret( secret );
 
         if ( scope != null )
@@ -147,6 +154,27 @@ public class OAuthClient
     }
 
     /**
+     * Send a unsigned request.
+     *
+     * @param request the request
+     * @return the response
+     */
+    protected Response sendUnsignedRequest( final OAuthRequest request )
+    {
+        if ( request == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] sendUnsignedRequest() : request=" + request );
+        }
+
+        return request.send();
+    }
+
+    /**
      * Convert a string node to a string.
      *
      * @param node the node
@@ -167,6 +195,7 @@ public class OAuthClient
     private static final Logger LOGGER = LoggerFactory.getLogger( OAuthClient.class );
     private OAuthService service;
     private Token accessToken;
+    private String key;
 
     private static Token loadToken( final Path path )
         throws IOException
