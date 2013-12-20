@@ -46,6 +46,7 @@ public final class FilesHelper
      * @throws IOException
      * @throws InterruptedException
      */
+    @SuppressWarnings( "unchecked" )
     public static String fileContent( final Path p )
         throws IOException , InterruptedException
     {
@@ -81,7 +82,7 @@ public final class FilesHelper
             {
                 final WatchKey key = watcher.take();
 
-                for ( WatchEvent<?> event : key.pollEvents() )
+                for ( final WatchEvent<?> event : key.pollEvents() )
                 {
                     final WatchEvent.Kind<?> kind = event.kind();
 
@@ -114,10 +115,12 @@ public final class FilesHelper
         try( BufferedReader bfr = Files.newBufferedReader( p ,
                                                            Charset.forName( "UTF-8" ) ) )
         {
-            String line;
-            while ( ( line = bfr.readLine() ) != null )
+            String line = bfr.readLine();
+            while ( line != null )
             {
                 sb.append( line );
+
+                line = bfr.readLine();
             }
         }
 

@@ -24,6 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import org.scribe.builder.api.FacebookApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -43,6 +46,9 @@ public class FacebookClient
     public FacebookClient()
     {
         super();
+
+        this.df = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ssZ" ,
+                                        Locale.ENGLISH );
     }
 
     /**
@@ -80,6 +86,45 @@ public class FacebookClient
      * Post a message to Facebook.
      *
      * @param message Message's content
+     * @return Post ID
+     * @throws FacebookException
+     * @throws IOException
+     */
+    public String postMessage( final String message )
+        throws FacebookException , IOException
+    {
+        if ( message == null || message.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://graph.facebook.com/me/feed" );
+
+        request.addBodyParameter( "message" ,
+                                  message );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.get( "id" ).asText();
+    }
+
+    /**
+     * Post a link to Facebook.
+     *
+     * @param message Message's content
      * @param uri Message's link
      * @param uriName Link's name
      * @param uriCaption Link's caption
@@ -88,14 +133,14 @@ public class FacebookClient
      * @throws FacebookException
      * @throws IOException
      */
-    public String post( final String message ,
-                        final String uri ,
-                        final String uriName ,
-                        final String uriCaption ,
-                        final String uriDescription )
+    public String postLink( final String message ,
+                            final String uri ,
+                            final String uriName ,
+                            final String uriCaption ,
+                            final String uriDescription )
         throws FacebookException , IOException
     {
-        if ( ( uri == null || uri.length() <= 0 ) && ( message == null || message.length() <= 0 ) )
+        if ( uri == null || uri.isEmpty() )
         {
             throw new IllegalArgumentException();
         }
@@ -103,7 +148,7 @@ public class FacebookClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] post() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription );
+                "[" + getClass().getSimpleName() + "] postLink() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -115,28 +160,25 @@ public class FacebookClient
                                       message );
         }
 
-        if ( uri != null && uri.length() > 0 )
+        request.addBodyParameter( "link" ,
+                                  uri );
+
+        if ( uriName != null && uriName.length() > 0 )
         {
-            request.addBodyParameter( "link" ,
-                                      uri );
+            request.addBodyParameter( "name" ,
+                                      uriName );
+        }
 
-            if ( uriName != null && uriName.length() > 0 )
-            {
-                request.addBodyParameter( "name" ,
-                                          uriName );
-            }
+        if ( uriCaption != null && uriCaption.length() > 0 )
+        {
+            request.addBodyParameter( "caption" ,
+                                      uriCaption );
+        }
 
-            if ( uriCaption != null && uriCaption.length() > 0 )
-            {
-                request.addBodyParameter( "caption" ,
-                                          uriCaption );
-            }
-
-            if ( uriDescription != null && uriDescription.length() > 0 )
-            {
-                request.addBodyParameter( "description" ,
-                                          uriDescription );
-            }
+        if ( uriDescription != null && uriDescription.length() > 0 )
+        {
+            request.addBodyParameter( "description" ,
+                                      uriDescription );
         }
 
         final Response response = sendSignedRequest( request );
@@ -151,23 +193,77 @@ public class FacebookClient
     }
 
     /**
-     * Like a Facebook Post.
+     * Read a Facebook Post.
      *
-     * @param postID Post ID
-     * @return True if successfull
+     * @param ID Post ID
+     * @return the Post
      * @throws IOException
      * @throws FacebookException
+     * @throws ParseException
      */
-    public boolean likePost( final String postID )
-        throws IOException , FacebookException
+    public FB_Post readPost( final String ID )
+        throws IOException , FacebookException , ParseException
     {
-        if ( postID == null || postID.length() <= 0 )
+        if ( ID == null || ID.isEmpty() )
         {
             throw new IllegalArgumentException();
         }
 
-        final OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                       "https://graph.facebook.com/" + postID + "/likes" );
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readPost() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "https://graph.facebook.com/" + ID );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final JsonNode nodeFrom = node.get( "from" );
+
+        return new FB_Post( node.get( "id" ).asText() ,
+                            convertNodeToString( node.get( "message" ) ) ,
+                            convertNodeToString( node.get( "link" ) ) ,
+                            convertNodeToString( node.get( "name" ) ) ,
+                            convertNodeToString( node.get( "caption" ) ) ,
+                            convertNodeToString( node.get( "description" ) ) ,
+                            new FB_User( nodeFrom.get( "id" ).asText() ,
+                                         nodeFrom.get( "name" ).asText() ) ,
+                            df.parse( node.get( "created_time" ).asText() ).getTime()
+        );
+    }
+
+    /**
+     * Delete a Facebook Post.
+     *
+     * @param ID Post ID
+     * @return True if successfull
+     * @throws IOException
+     * @throws FacebookException
+     */
+    public boolean deletePost( final String ID )
+        throws IOException , FacebookException
+    {
+        if ( ID == null || ID.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] deletePost() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.DELETE ,
+                                                       "https://graph.facebook.com/" + ID );
 
         final Response response = sendSignedRequest( request );
 
@@ -179,8 +275,82 @@ public class FacebookClient
 
         return node.asBoolean();
     }
+
+    /**
+     * Like a Facebook Post.
+     *
+     * @param ID Post ID
+     * @return True if successfull
+     * @throws IOException
+     * @throws FacebookException
+     */
+    public boolean likePost( final String ID )
+        throws IOException , FacebookException
+    {
+        if ( ID == null || ID.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] likePost() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://graph.facebook.com/" + ID + "/likes" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.asBoolean();
+    }
+
+    /**
+     * Unlike a Facebook Post.
+     *
+     * @param ID Post ID
+     * @return True if successfull
+     * @throws IOException
+     * @throws FacebookException
+     */
+    public boolean unlikePost( final String ID )
+        throws IOException , FacebookException
+    {
+        if ( ID == null || ID.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] unlikePost() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.DELETE ,
+                                                       "https://graph.facebook.com/" + ID + "/likes" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.asBoolean();
+    }
+
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
+    private final SimpleDateFormat df;
 
     private void checkErrors( final Response response ,
                               final JsonNode root )
@@ -193,6 +363,18 @@ public class FacebookClient
                                          error.get( "code" ).asInt() ,
                                          error.get( "type" ).asText() ,
                                          error.get( "message" ).asText() );
+        }
+    }
+
+    private static String convertNodeToString( final JsonNode node )
+    {
+        if ( node == null )
+        {
+            return null;
+        }
+        else
+        {
+            return node.asText();
         }
     }
 }

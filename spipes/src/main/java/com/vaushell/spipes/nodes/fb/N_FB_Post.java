@@ -101,7 +101,7 @@ public class N_FB_Post
             caption = null;
         }
 
-        final String ID = client.post( null ,
+        final String ID = client.postLink( null ,
                                        uriStr ,
                                        (String) message.getProperty( Message.KeyIndex.TITLE ) ,
                                        caption ,
