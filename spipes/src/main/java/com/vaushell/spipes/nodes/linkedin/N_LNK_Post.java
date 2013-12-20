@@ -91,7 +91,7 @@ public class N_LNK_Post
             uriStr = uri.toString();
         }
 
-        final String ID = client.updateStatus( null ,
+        final String ID = client.postLink( null ,
                                                uriStr ,
                                                (String) message.getProperty( Message.KeyIndex.TITLE ) ,
                                                null );

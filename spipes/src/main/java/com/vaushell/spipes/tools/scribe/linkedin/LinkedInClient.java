@@ -25,6 +25,7 @@ import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Path;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -37,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * LinkedIn client.
+ * LinkedIn client. Remark: Delete a share is not implemented in LinkedIn API
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -77,7 +78,7 @@ public class LinkedInClient
     }
 
     /**
-     * Update status.
+     * Post link.
      *
      * @param message Status's message
      * @param uri Status's link
@@ -87,13 +88,13 @@ public class LinkedInClient
      * @throws IOException
      * @throws OAuthException
      */
-    public String updateStatus( final String message ,
-                                final String uri ,
-                                final String uriName ,
-                                final String uriDescription )
+    public String postLink( final String message ,
+                            final String uri ,
+                            final String uriName ,
+                            final String uriDescription )
         throws IOException , OAuthException
     {
-        if ( ( uri == null || uri.length() <= 0 ) && ( message == null || message.length() <= 0 ) )
+        if ( uri == null || uri.isEmpty() )
         {
             throw new IllegalArgumentException();
         }
@@ -116,24 +117,21 @@ public class LinkedInClient
         }
 
         // Content
-        if ( uri != null && uri.length() > 0 )
+        final Element content = new Element( "content" );
+
+        if ( uriName != null && uriName.length() > 0 )
         {
-            final Element content = new Element( "content" );
-
-            if ( uriName != null && uriName.length() > 0 )
-            {
-                content.addContent( new Element( "title" ).setText( uriName ) );
-            }
-
-            if ( uriDescription != null && uriDescription.length() > 0 )
-            {
-                content.addContent( new Element( "description" ).setText( uriDescription ) );
-            }
-
-            content.addContent( new Element( "submitted-url" ).setText( uri ) );
-
-            share.addContent( content );
+            content.addContent( new Element( "title" ).setText( uriName ) );
         }
+
+        if ( uriDescription != null && uriDescription.length() > 0 )
+        {
+            content.addContent( new Element( "description" ).setText( uriDescription ) );
+        }
+
+        content.addContent( new Element( "submitted-url" ).setText( uri ) );
+
+        share.addContent( content );
 
         // Visiblity
         final Element visiblity = new Element( "visibility" );
@@ -156,6 +154,129 @@ public class LinkedInClient
 
         return node.get( "updateKey" ).asText();
     }
+
+    /**
+     * Post message.
+     *
+     * @param message Status's message
+     * @return Status ID
+     * @throws IOException
+     * @throws LinkedInException
+     */
+    public String postMessage( final String message )
+        throws IOException , LinkedInException
+    {
+        if ( message == null || message.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] updateStatus() : message=" + message );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "http://api.linkedin.com/v1/people/~/shares?format=json" );
+
+        final Element share = new Element( "share" );
+
+        // Message
+        share.addContent( new Element( "comment" ).setText( message ) );
+
+        // Visiblity
+        final Element visiblity = new Element( "visibility" );
+        visiblity.addContent( new Element( "code" ).setText( "anyone" ) );
+        share.addContent( visiblity );
+
+        final String xmlPayload = new XMLOutputter( Format.getPrettyFormat() ).outputString( share );
+
+        request.addHeader( "Content-Type" ,
+                           "application/xml" );
+        request.addPayload( xmlPayload );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.get( "updateKey" ).asText();
+    }
+
+    /**
+     * Read a LinkedIn status.
+     *
+     * @param ID Status's ID
+     * @return the Status
+     * @throws IOException
+     * @throws LinkedInException
+     * @throws URISyntaxException
+     */
+    public LNK_Status readStatus( final String ID )
+        throws IOException , LinkedInException , URISyntaxException
+    {
+        if ( ID == null || ID.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readStatus() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "http://api.linkedin.com/v1/people/~/network/updates/key=" + ID + "?type=SHAR&format=json" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final JsonNode nodeCurrent = node.get( "updateContent" ).get( "person" ).get( "currentShare" );
+        final JsonNode nodeAuthor = nodeCurrent.get( "author" );
+
+        final JsonNode nodeContent = nodeCurrent.get( "content" );
+        final String submittedUrl;
+        final String shortenedUrl;
+        final String title;
+        final String description;
+        if ( nodeContent == null )
+        {
+            submittedUrl = null;
+            shortenedUrl = null;
+            title = null;
+            description = null;
+        }
+        else
+        {
+            submittedUrl = convertNodeToString( nodeContent.get( "submittedUrl" ) );
+            shortenedUrl = convertNodeToString( nodeContent.get( "shortenedUrl" ) );
+            title = convertNodeToString( nodeContent.get( "title" ) );
+            description = convertNodeToString( nodeContent.get( "description" ) );
+        }
+
+        return new LNK_Status( node.get( "updateKey" ).asText() ,
+                               convertNodeToString( nodeCurrent.get( "comment" ) ) ,
+                               submittedUrl ,
+                               shortenedUrl ,
+                               title ,
+                               description ,
+                               new LNK_User( nodeAuthor.get( "id" ).asText() ,
+                                             convertNodeToString( nodeAuthor.get( "firstName" ) ) ,
+                                             convertNodeToString( nodeAuthor.get( "lastName" ) ) ,
+                                             convertNodeToString( nodeAuthor.get( "headline" ) ) ) ,
+                               nodeCurrent.get( "timestamp" ).asLong() );
+    }
+
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( LinkedInClient.class );
 
