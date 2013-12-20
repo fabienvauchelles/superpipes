@@ -21,10 +21,14 @@ package com.vaushell.spipes.tools.scribe.twitter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -44,6 +48,9 @@ public class TwitterClient
     public TwitterClient()
     {
         super();
+
+        this.df = new SimpleDateFormat( "EEE MMM dd HH:mm:ss Z yyyy" ,
+                                        Locale.ENGLISH );
     }
 
     /**
@@ -112,8 +119,115 @@ public class TwitterClient
 
         return node.get( "id" ).asLong();
     }
+
+    /**
+     * Read a tweet.
+     *
+     * @param ID Tweet ID
+     * @return the tweet
+     * @throws IOException
+     * @throws com.vaushell.spipes.tools.scribe.OAuthException
+     * @throws ParseException
+     */
+    public TW_Tweet readTweet( final long ID )
+        throws IOException , OAuthException , ParseException
+    {
+        if ( ID < 0 )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readTweet() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "https://api.twitter.com/1.1/statuses/show.json?id=" + Long.toString( ID ) );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        // Replace shorten URLs with expanded URLs
+        String text = node.get( "text" ).asText();
+
+        final JsonNode nodeEntities = node.get( "entities" );
+        if ( nodeEntities != null )
+        {
+            final JsonNode nodeUrls = nodeEntities.get( "urls" );
+            if ( nodeUrls != null )
+            {
+                for ( final JsonNode nodeUrl : nodeUrls )
+                {
+                    text = text.replace( nodeUrl.get( "url" ).asText() ,
+                                         nodeUrl.get( "expanded_url" ).asText() );
+                }
+            }
+        }
+
+        final JsonNode nodeUser = node.get( "user" );
+
+        return new TW_Tweet( node.get( "id" ).asLong() ,
+                             text ,
+                             new TW_User( nodeUser.get( "id" ).asLong() ,
+                                          nodeUser.get( "name" ).asText() ,
+                                          nodeUser.get( "screen_name" ).asText() ) ,
+                             df.parse( node.get( "created_at" ).asText() ).getTime()
+        );
+    }
+
+    /**
+     * Delete a tweet.
+     *
+     * @param ID Tweet ID
+     * @return True if successfull
+     * @throws IOException
+     * @throws com.vaushell.spipes.tools.scribe.OAuthException
+     */
+    public boolean deleteTweet( final long ID )
+        throws IOException , OAuthException
+    {
+        if ( ID < 0 )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] deleteTweet() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://api.twitter.com/1.1/statuses/destroy/" + ID + ".json" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final JsonNode nodeID = node.get( "id" );
+        if ( nodeID == null )
+        {
+            return false;
+        }
+        else
+        {
+            return ID == nodeID.asLong();
+        }
+    }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( TwitterClient.class );
+    private final SimpleDateFormat df;
 
     private void checkErrors( final Response response ,
                               final JsonNode root )
