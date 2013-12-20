@@ -22,6 +22,7 @@ package com.vaushell.spipes.nodes.fb;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
+import com.vaushell.spipes.tools.scribe.code.VC_SystemInput;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import java.net.URI;
 import java.nio.file.Path;
@@ -58,8 +59,7 @@ public class N_FB_Post
                       getConfig( "secret" ) ,
                       "publish_stream" ,
                       tokenPath ,
-                      OAuthClient.VCodeMethod.SYSTEM_INPUT ,
-                      "[" + getClass().getName() + " / " + getNodeID() + "]" );
+                      new VC_SystemInput( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
 
     @Override
@@ -102,10 +102,10 @@ public class N_FB_Post
         }
 
         final String ID = client.postLink( null ,
-                                       uriStr ,
-                                       (String) message.getProperty( Message.KeyIndex.TITLE ) ,
-                                       caption ,
-                                       (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) );
+                                           uriStr ,
+                                           (String) message.getProperty( Message.KeyIndex.TITLE ) ,
+                                           caption ,
+                                           (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) );
 
         if ( LOGGER.isTraceEnabled() )
         {

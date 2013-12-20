@@ -20,7 +20,7 @@
 package com.vaushell.spipes.tools.scribe.fb;
 
 import com.vaushell.spipes.Dispatcher;
-import com.vaushell.spipes.tools.scribe.OAuthClient;
+import com.vaushell.spipes.tools.scribe.code.VC_File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -84,8 +84,8 @@ public class FacebookClientTest
                       secret ,
                       "publish_stream" ,
                       tokenPath ,
-                      OAuthClient.VCodeMethod.FILE ,
-                      "[" + getClass().getName() + "]" );
+                      new VC_File( "[" + getClass().getName() + "] " ,
+                                   Paths.get( tokenPath.toString() + ".code" ) ) );
     }
 
     /**
@@ -98,7 +98,7 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir ce blog#" + new Date().getTime();
+        final String message = "Allez voir ce blog #" + new Date().getTime();
 
         final String ID = client.postLink( message ,
                                            "http://fabien.vauchelles.com/" ,

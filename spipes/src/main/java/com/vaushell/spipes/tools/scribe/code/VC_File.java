@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes.tools;
+package com.vaushell.spipes.tools.scribe.code;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,13 +31,47 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
 /**
- * Files helper.
+ * Ask to user to enter the code with keyboard.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public final class FilesHelper
+public class VC_File
+    implements I_ValidationCode
 {
     // PUBLIC
+    public VC_File( final String prefix ,
+                    final Path path )
+    {
+        this.prefix = prefix;
+        this.path = path;
+    }
+
+    @Override
+    public String getValidationCode( final String authURL )
+    {
+        try
+        {
+            System.out.println( prefix + " Use this URL :" );
+            System.out.println( authURL );
+
+            System.out.println( "Write token inside :'" + path.toString() + "'" );
+            final String code = fileContent( path );
+
+            System.out.println( prefix + " Read code is '" + code + "'" );
+
+            return code;
+        }
+        catch( final IOException |
+                     InterruptedException ex )
+        {
+            throw new RuntimeException( ex );
+        }
+    }
+
+    // PRIVATE
+    private final String prefix;
+    private final Path path;
+
     /**
      * Read a file content, or wait the file to be created. Delete the file after read.
      *
@@ -47,7 +81,7 @@ public final class FilesHelper
      * @throws InterruptedException
      */
     @SuppressWarnings( "unchecked" )
-    public static String fileContent( final Path p )
+    private static String fileContent( final Path p )
         throws IOException , InterruptedException
     {
         if ( p == null )
@@ -107,7 +141,7 @@ public final class FilesHelper
      * @return the content
      * @throws IOException
      */
-    public static String readAndDelete( final Path p )
+    private static String readAndDelete( final Path p )
         throws IOException
     {
         final StringBuilder sb = new StringBuilder();
@@ -129,9 +163,4 @@ public final class FilesHelper
         return sb.toString();
     }
 
-    // PRIVATE
-    private FilesHelper()
-    {
-        // Nothing
-    }
 }

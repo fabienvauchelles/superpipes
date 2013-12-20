@@ -22,6 +22,7 @@ package com.vaushell.spipes.tools.scribe.fb;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
+import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.text.ParseException;
@@ -58,8 +59,7 @@ public class FacebookClient
      * @param secret Facebook secret
      * @param scope Facebook scope
      * @param tokenPath Path to save the token
-     * @param vCodeMethod How to get the verification code
-     * @param loginText Prefix message to request the token to the user
+     * @param vCode How to get the verification code
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
@@ -67,8 +67,7 @@ public class FacebookClient
                        final String secret ,
                        final String scope ,
                        final Path tokenPath ,
-                       final VCodeMethod vCodeMethod ,
-                       final String loginText )
+                       final I_ValidationCode vCode )
         throws IOException , InterruptedException
     {
         loginImpl( FacebookApi.class ,
@@ -78,8 +77,7 @@ public class FacebookClient
                    "http://www.facebook.com/connect/login_success.html" ,
                    false ,
                    tokenPath ,
-                   vCodeMethod ,
-                   loginText );
+                   vCode );
     }
 
     /**

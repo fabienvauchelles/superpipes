@@ -22,6 +22,7 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
+import com.vaushell.spipes.tools.scribe.code.VC_SystemInput;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,8 +58,7 @@ public class N_TW_Post
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
                       tokenPath ,
-                      OAuthClient.VCodeMethod.SYSTEM_INPUT ,
-                      "[" + getClass().getName() + " / " + getNodeID() + "]" );
+                      new VC_SystemInput( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
 
     @Override

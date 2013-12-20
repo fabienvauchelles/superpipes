@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
+import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
 import java.io.IOException;
 import java.nio.file.Path;
 import org.jdom.Element;
@@ -55,16 +56,14 @@ public class LinkedInClient
      * @param key OAuth keyd
      * @param secret OAuth secret
      * @param tokenPath Path to save the token
-     * @param vCodeMethod How to get the verification code
-     * @param loginText Prefix message to request the token to the user
+     * @param vCode How to get the verification code
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
-                       final VCodeMethod vCodeMethod ,
-                       final String loginText )
+                       final I_ValidationCode vCode )
         throws IOException , InterruptedException
     {
         loginImpl( LinkedInApi.class ,
@@ -74,8 +73,7 @@ public class LinkedInClient
                    "http://www.linkedin.com/connect/login_success.html" ,
                    true ,
                    tokenPath ,
-                   vCodeMethod ,
-                   loginText );
+                   vCode );
     }
 
     /**

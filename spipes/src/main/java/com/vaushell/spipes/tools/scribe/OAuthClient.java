@@ -20,15 +20,13 @@
 package com.vaushell.spipes.tools.scribe;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.vaushell.spipes.tools.FilesHelper;
+import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Scanner;
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.builder.api.Api;
 import org.scribe.model.OAuthRequest;
@@ -46,16 +44,6 @@ import org.slf4j.LoggerFactory;
  */
 public class OAuthClient
 {
-    // PUBLIC
-    /**
-     * Verification code method.
-     */
-    public enum VCodeMethod
-    {
-        SYSTEM_INPUT,
-        FILE
-    }
-
     // PROTECTED
     protected OAuthClient()
     {
@@ -72,8 +60,7 @@ public class OAuthClient
      * @param callback OAuth URL callback (or null)
      * @param useRequestToken OAuth use of request token ?
      * @param tokenPath Path to save the token
-     * @param vCodeMethod How to get the verification code
-     * @param loginText Prefix message to request the token to the user
+     * @param vCode How to get the verification code
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
@@ -84,11 +71,10 @@ public class OAuthClient
                               final String callback ,
                               final boolean useRequestToken ,
                               final Path tokenPath ,
-                              final VCodeMethod vCodeMethod ,
-                              final String loginText )
+                              final I_ValidationCode vCode )
         throws IOException , InterruptedException
     {
-        if ( api == null || key == null || secret == null || tokenPath == null || vCodeMethod == null || loginText == null )
+        if ( api == null || key == null || secret == null || tokenPath == null || vCode == null )
         {
             throw new IllegalArgumentException();
         }
@@ -96,7 +82,7 @@ public class OAuthClient
         if ( LOGGER.isDebugEnabled() )
         {
             LOGGER.debug(
-                "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath + " / vCodeMethod=" + vCodeMethod + " / loginText=" + loginText );
+                "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath );
         }
 
         final ServiceBuilder builder = new ServiceBuilder()
@@ -124,42 +110,7 @@ public class OAuthClient
 
             // Making the user validate your request token
             final String authUrl = service.getAuthorizationUrl( requestToken );
-            System.out.println( loginText + " Use this URL :" );
-            System.out.println( authUrl );
-
-            final String code;
-            switch( vCodeMethod )
-            {
-                case SYSTEM_INPUT:
-                {
-                    System.out.println( loginText + " Enter code :" );
-
-                    try( final Scanner sc = new Scanner( System.in ,
-                                                         "UTF-8" ) )
-                    {
-                        code = sc.next();
-                    }
-
-                    break;
-                }
-
-                case FILE:
-                {
-                    final Path p = Paths.get( tokenPath.toString() + ".code" );
-                    System.out.println( "Write token inside :'" + p.toString() + "'" );
-
-                    code = FilesHelper.fileContent( p );
-
-                    break;
-                }
-
-                default:
-                {
-                    throw new UnsupportedOperationException();
-                }
-            }
-
-            System.out.println( loginText + " Read code is '" + code + "'" );
+            final String code = vCode.getValidationCode( authUrl );
 
             // Get the access Token
             final Verifier v = new Verifier( code );

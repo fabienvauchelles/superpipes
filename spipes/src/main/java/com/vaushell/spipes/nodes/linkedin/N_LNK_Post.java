@@ -23,6 +23,7 @@ import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.twitter.N_TW_Post;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
+import com.vaushell.spipes.tools.scribe.code.VC_SystemInput;
 import com.vaushell.spipes.tools.scribe.linkedin.LinkedInClient;
 import java.net.URI;
 import java.nio.file.Path;
@@ -58,8 +59,7 @@ public class N_LNK_Post
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
                       tokenPath ,
-                      OAuthClient.VCodeMethod.SYSTEM_INPUT ,
-                      "[" + getClass().getName() + " / " + getNodeID() + "]" );
+                      new VC_SystemInput( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
 
     @Override

@@ -20,8 +20,8 @@
 package com.vaushell.spipes.tools.scribe.twitter;
 
 import com.vaushell.spipes.Dispatcher;
-import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
+import com.vaushell.spipes.tools.scribe.code.VC_File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -84,8 +84,8 @@ public class TwitterClientTest
         client.login( key ,
                       secret ,
                       tokenPath ,
-                      OAuthClient.VCodeMethod.FILE ,
-                      "[" + getClass().getName() + "]" );
+                      new VC_File( "[" + getClass().getName() + "] " ,
+                                   Paths.get( tokenPath.toString() + ".code" ) ) );
     }
 
     /**
