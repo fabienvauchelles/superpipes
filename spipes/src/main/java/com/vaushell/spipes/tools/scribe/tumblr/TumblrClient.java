@@ -88,9 +88,8 @@ public class TumblrClient
     }
 
     /**
-     * Post link to tumblr.
+     * Post link to Tumblr.
      *
-     * @param message Message
      * @param uri Link
      * @param uriName Link's name
      * @param uriDescription Link's description
@@ -99,14 +98,13 @@ public class TumblrClient
      * @throws IOException
      * @throws TumblrException
      */
-    public long postLink( final String message ,
-                          final String uri ,
+    public long postLink( final String uri ,
                           final String uriName ,
                           final String uriDescription ,
                           final Set<String> tags )
         throws IOException , TumblrException
     {
-        if ( uri == null || uri.length() <= 0 )
+        if ( uri == null || uri.isEmpty() )
         {
             throw new IllegalArgumentException();
         }
@@ -114,7 +112,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] post() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags );
+                "[" + getClass().getSimpleName() + "] postLink() : uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -168,22 +166,211 @@ public class TumblrClient
         final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
         checkErrors( response ,
-                     node );
+                     node ,
+                     201 );
 
         final JsonNode nodeResponse = node.get( "response" );
 
         return nodeResponse.get( "id" ).asLong();
+    }
+
+    /**
+     * Post message to Tumblr.
+     *
+     * @param message Message
+     * @param tags Message's set of tags
+     * @return Post ID
+     * @throws IOException
+     * @throws TumblrException
+     */
+    public long postMessage( final String message ,
+                             final Set<String> tags )
+        throws IOException , TumblrException
+    {
+        if ( message == null || message.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message + " / tags=" + tags );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "http://api.tumblr.com/v2/blog/" + blogname + "/post" );
+
+        request.addBodyParameter( "type" ,
+                                  "text" );
+
+        request.addBodyParameter( "title" ,
+                                  message );
+
+        if ( tags != null && !tags.isEmpty() )
+        {
+            final TreeSet<String> correctedTags = new TreeSet<>();
+            for ( final String tag : tags )
+            {
+                final String correctedTag = tag.toLowerCase( Locale.ENGLISH );
+                correctedTags.add( correctedTag );
+            }
+
+            final StringBuilder sbTags = new StringBuilder();
+            for ( final String tag : correctedTags )
+            {
+                if ( sbTags.length() > 0 )
+                {
+                    sbTags.append( ',' );
+                }
+
+                sbTags.append( tag );
+            }
+
+            request.addBodyParameter( "tags" ,
+                                      sbTags.toString() );
+        }
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node ,
+                     201 );
+
+        final JsonNode nodeResponse = node.get( "response" );
+
+        return nodeResponse.get( "id" ).asLong();
+    }
+
+    /**
+     * Read a Tumblr Post.
+     *
+     * @param ID Post ID
+     * @return the Post
+     * @throws IOException
+     * @throws TumblrException
+     */
+    public TB_Post readPost( final long ID )
+        throws IOException , TumblrException
+    {
+        if ( ID < 0 )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readPost() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "http://api.tumblr.com/v2/blog/" + blogname + "/posts/?api_key=" + getKey() + "&filter=raw&id=" + Long.
+            toString( ID ) );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node ,
+                     200 );
+
+        final JsonNode nodeResponse = node.get( "response" );
+
+        final JsonNode nodePosts = nodeResponse.get( "posts" );
+        if ( nodePosts == null || nodePosts.size() <= 0 )
+        {
+            return null;
+        }
+        final JsonNode nodePost = nodePosts.get( 0 );
+
+        final Set<String> tags = new TreeSet<>();
+        final JsonNode nodeTags = nodePost.get( "tags" );
+        for ( final JsonNode nodeTag : nodeTags )
+        {
+            tags.add( nodeTag.asText() );
+        }
+
+        final String message;
+        final String urlName;
+        final String type = nodePost.get( "type" ).asText();
+        if ( "link".equalsIgnoreCase( type ) )
+        {
+            message = null;
+            urlName = convertNodeToString( nodePost.get( "title" ) );
+        }
+        else
+        {
+            message = convertNodeToString( nodePost.get( "title" ) );
+            urlName = null;
+        }
+
+        final JsonNode nodeBlog = nodeResponse.get( "blog" );
+
+        return new TB_Post( nodePost.get( "id" ).asLong() ,
+                            message ,
+
+                            convertNodeToString( nodePost.get( "url" ) ) ,
+                            urlName ,
+                            convertNodeToString( nodePost.get( "description" ) ) ,
+                            type ,
+                            nodePost.get( "slug" ).asText() ,
+                            nodePost.get( "timestamp" ).asLong() ,
+                            tags ,
+                            new TB_Blog( nodeBlog.get( "name" ).asText() ,
+                                         convertNodeToString( nodeBlog.get( "title" ) ) ,
+                                         convertNodeToString( nodeBlog.get( "description" ) ) ,
+                                         convertNodeToString( nodeBlog.get( "url" ) ) ) );
+    }
+
+    /**
+     * Delete a Tumblr Post.
+     *
+     * @param ID Post ID
+     * @return True if successfull
+     * @throws IOException
+     * @throws TumblrException
+     */
+    public boolean deletePost( final long ID )
+        throws IOException , TumblrException
+    {
+        if ( ID < 0 )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] deletePost() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "http://api.tumblr.com/v2/blog/" + blogname + "/post/delete" );
+
+        request.addBodyParameter( "id" ,
+                                  Long.toString( ID ) );
+
+        final Response response = sendSignedRequest( request );
+
+        return response.getCode() == 200;
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
     private String blogname;
 
     private void checkErrors( final Response response ,
-                              final JsonNode root )
+                              final JsonNode root ,
+                              final int validResponseCode )
         throws TumblrException
     {
         final JsonNode res = root.get( "response" );
-        if ( response.getCode() != 201 )
+        if ( response.getCode() != validResponseCode )
         {
             final JsonNode meta = root.get( "meta" );
 

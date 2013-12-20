@@ -92,8 +92,7 @@ public class N_TB_Post
             uriStr = uri.toString();
         }
 
-        final long ID = client.postLink( null ,
-                                         uriStr ,
+        final long ID = client.postLink( uriStr ,
                                          (String) message.getProperty( Message.KeyIndex.TITLE ) ,
                                          (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
                                          (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) );
