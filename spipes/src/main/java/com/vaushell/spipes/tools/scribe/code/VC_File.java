@@ -19,16 +19,9 @@
 
 package com.vaushell.spipes.tools.scribe.code;
 
-import java.io.BufferedReader;
+import com.vaushell.spipes.tools.FilesHelper;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 
 /**
  * Ask to user to enter the code with keyboard.
@@ -55,7 +48,7 @@ public class VC_File
             System.out.println( authURL );
 
             System.out.println( "Write token inside :'" + path.toString() + "'" );
-            final String code = fileContent( path );
+            final String code = FilesHelper.fileContent( path );
 
             System.out.println( prefix + " Read code is '" + code + "'" );
 
@@ -71,96 +64,4 @@ public class VC_File
     // PRIVATE
     private final String prefix;
     private final Path path;
-
-    /**
-     * Read a file content, or wait the file to be created. Delete the file after read.
-     *
-     * @param p the file path
-     * @return the content
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    @SuppressWarnings( "unchecked" )
-    private static String fileContent( final Path p )
-        throws IOException , InterruptedException
-    {
-        if ( p == null )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        if ( Files.exists( p ) )
-        {
-            return readAndDelete( p );
-        }
-
-        final Path parent = p.getParent();
-        if ( Files.notExists( parent ) )
-        {
-            Files.createDirectory( parent );
-        }
-        else
-        {
-            if ( !Files.isDirectory( parent ) )
-            {
-                throw new IllegalArgumentException( parent + " exists but is not a directory" );
-            }
-        }
-
-        try( final WatchService watcher = FileSystems.getDefault().newWatchService() )
-        {
-            parent.register( watcher ,
-                             StandardWatchEventKinds.ENTRY_CREATE );
-
-            while ( true )
-            {
-                final WatchKey key = watcher.take();
-
-                for ( final WatchEvent<?> event : key.pollEvents() )
-                {
-                    final WatchEvent.Kind<?> kind = event.kind();
-
-                    if ( kind == StandardWatchEventKinds.ENTRY_CREATE )
-                    {
-                        final WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                        final Path p2 = parent.resolve( ev.context() );
-                        if ( p.equals( p2 ) )
-                        {
-                            return readAndDelete( p );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Read and delete file and return the content.
-     *
-     * @param p the file path
-     * @return the content
-     * @throws IOException
-     */
-    private static String readAndDelete( final Path p )
-        throws IOException
-    {
-        final StringBuilder sb = new StringBuilder();
-
-        try( BufferedReader bfr = Files.newBufferedReader( p ,
-                                                           Charset.forName( "UTF-8" ) ) )
-        {
-            String line = bfr.readLine();
-            while ( line != null )
-            {
-                sb.append( line );
-
-                line = bfr.readLine();
-            }
-        }
-
-        Files.delete( p );
-
-        return sb.toString();
-    }
-
 }
