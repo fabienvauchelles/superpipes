@@ -19,9 +19,7 @@
 
 package com.vaushell.spipes.tools.scribe.twitter;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * A tweet.

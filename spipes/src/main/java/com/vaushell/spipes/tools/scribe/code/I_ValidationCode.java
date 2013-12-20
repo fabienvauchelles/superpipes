@@ -26,6 +26,7 @@ package com.vaushell.spipes.tools.scribe.code;
  */
 public interface I_ValidationCode
 {
+    // PUBLIC
     /**
      * Return the validation code.
      *

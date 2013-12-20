@@ -146,6 +146,12 @@ public class OAuthClient
         return request.send();
     }
 
+    /**
+     * Convert a string node to a string.
+     *
+     * @param node the node
+     * @return a string or null if node is null
+     */
     protected static String convertNodeToString( final JsonNode node )
     {
         if ( node == null )

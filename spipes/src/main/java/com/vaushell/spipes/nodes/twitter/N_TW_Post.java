@@ -21,7 +21,6 @@ package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.code.VC_SystemInput;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.nio.file.Path;
