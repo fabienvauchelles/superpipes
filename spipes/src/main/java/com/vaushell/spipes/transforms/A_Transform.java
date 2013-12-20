@@ -143,10 +143,10 @@ public abstract class A_Transform
         throws Exception;
 
     /**
-     * Transform's execution. Executed for each message.
+     * Transform's execution. Executed for each message. Transform the message itself.
      *
      * @param message the Message
-     * @return the transformed message
+     * @return the Message (or null)
      * @throws Exception
      */
     public abstract Message transform( final Message message )
