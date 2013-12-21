@@ -167,6 +167,7 @@ page at http://checkstyle.sourceforge.net/config.html
                                 </goals>
                                 <configuration>
                                     <verbose>true</verbose>
+                                    <signPackage>true</signPackage>
                                     <controlDir>${basedir}/src/deb/control</controlDir>
                                     <dataSet>
                                         <data>
