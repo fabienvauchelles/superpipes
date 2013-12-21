@@ -41,3 +41,7 @@
 }
 
 -keep class * extends com.vaushell.spipes.nodes.A_Node
+
+-keep class * extends com.vaushell.spipes.transforms.A_Transform
+
+-keep class * implements org.apache.commons.daemon.Daemon
