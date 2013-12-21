@@ -33,29 +33,12 @@ page at http://checkstyle.sourceforge.net/config.html
         </layout>
     </appender>
 
-    <appender name="filelog" class="org.apache.log4j.RollingFileAppender">
-        <param name="file" value="log/debug.log" />
-        <param name="append" value="true" />
-        <param name="maxBackupIndex" value="10" />
-        <param name="maxFileSize" value="1024KB" />
-        <param name="immediateFlush" value="true" />
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern"
-                   value="%d{ABSOLUTE} %5p %c{1} - %m%n" />
-        </layout>
-    </appender>
-
-    <appender class="org.apache.log4j.AsyncAppender" name="async">
-        <appender-ref ref="filelog" />
-        <appender-ref ref="stdout" />
-    </appender>
-
     <logger name="com.vaushell">
         <level value="debug" />
     </logger>
 
     <root>
         <level value="info" />
-        <appender-ref ref="async" />
+        <appender-ref ref="stdout" />
     </root>
 </log4j:configuration>
