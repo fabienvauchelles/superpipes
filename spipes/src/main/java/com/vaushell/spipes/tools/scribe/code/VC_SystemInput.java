@@ -42,12 +42,12 @@ public class VC_SystemInput
         System.out.println( authURL );
 
         System.out.println( prefix + " Enter code :" );
-        final String code;
-        try( final Scanner sc = new Scanner( System.in ,
-                                             "UTF-8" ) )
-        {
-            code = sc.next();
-        }
+
+        // Never include System.(in|out) in a try-catch-resources...
+        // You could use it only one time !
+        final Scanner sc = new Scanner( System.in ,
+                                        "UTF-8" );
+        final String code = sc.next();
 
         System.out.println( prefix + " Read code is '" + code + "'" );
 
