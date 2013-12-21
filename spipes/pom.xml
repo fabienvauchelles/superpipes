@@ -206,5 +206,10 @@ page at http://checkstyle.sourceforge.net/config.html
             <artifactId>shaarli-java-api</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>commons-daemon</groupId>
+            <artifactId>commons-daemon</artifactId>
+            <version>1.0.15</version>
+        </dependency>
     </dependencies>
 </project>
