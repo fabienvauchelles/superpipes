@@ -32,6 +32,7 @@ page at http://checkstyle.sourceforge.net/config.html
         <format>tar.gz</format>
         <format>tar.bz2</format>
         <format>zip</format>
+        <format>dir</format>
     </formats>
     <files>
         <file>

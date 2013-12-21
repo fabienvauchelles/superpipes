@@ -1,0 +1,9 @@
+Package: [[name]]
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: jsvc (>= 1.0.8-1)
+Maintainer: Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
+Description: [[description]]
+Distribution: development
