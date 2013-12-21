@@ -25,6 +25,7 @@ import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.dummy.N_Dummy;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import static org.testng.AssertJUnit.*;
@@ -62,8 +63,15 @@ public class T_ShortenExpandTest
             conf = "conf-local/configuration.xml";
         }
 
+        String datas = System.getProperty( "datas" );
+        if ( datas == null )
+        {
+            datas = "conf-local/datas";
+        }
+
         final XMLConfiguration config = new XMLConfiguration( conf );
-        dispatcher.load( config );
+        dispatcher.init( config ,
+                         Paths.get( datas ) );
 
         // Test if parameters are set.
         final Properties properties = dispatcher.getCommon( "bitly" );

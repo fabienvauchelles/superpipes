@@ -84,7 +84,7 @@ public class T_Date
     {
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
+            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
         if ( !message.contains( Message.KeyIndex.PUBLISHED_DATE ) )

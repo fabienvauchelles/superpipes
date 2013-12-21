@@ -117,17 +117,6 @@ public abstract class A_Node
     }
 
     /**
-     * Retrieve main's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    public String getMainConfig( final String key )
-    {
-        return dispatcher.getConfig( key );
-    }
-
-    /**
      * Load configuration for this node.
      *
      * @param cNode Configuration

@@ -84,8 +84,7 @@ public class N_Buffer
 
         flowLimit = Long.parseLong( getConfig( "flow-limit" ) );
 
-        messagesPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                  getNodeID() );
+        messagesPath = getDispatcher().getDatas().resolve( getNodeID() );
 
         Files.createDirectories( messagesPath );
 

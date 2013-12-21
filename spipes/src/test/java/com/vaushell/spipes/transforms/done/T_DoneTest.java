@@ -49,7 +49,7 @@ public class T_DoneTest
     /**
      * Initialize the test.
      *
-     * @throws ConfigurationException
+     * @throws java.lang.Exception
      */
     @BeforeClass
     public void setUp()
@@ -62,8 +62,15 @@ public class T_DoneTest
             conf = "conf-local/configuration.xml";
         }
 
+        String datas = System.getProperty( "datas" );
+        if ( datas == null )
+        {
+            datas = "conf-local/datas";
+        }
+
         final XMLConfiguration config = new XMLConfiguration( conf );
-        dispatcher.load( config );
+        dispatcher.init( config ,
+                         Paths.get( datas ) );
     }
 
     /**
@@ -79,9 +86,8 @@ public class T_DoneTest
                                              N_Dummy.class );
         final A_Transform t = n.addTransformIN( T_Done.class );
 
-        final Path p = Paths.get( n.getMainConfig( "datas-directory" ) ,
-                                  n.getNodeID() ,
-                                  "done.dat" );
+        final Path p = dispatcher.getDatas().resolve( Paths.get( n.getNodeID() ,
+                                                                 "done.dat" ) );
 
         Files.deleteIfExists( p );
 

@@ -65,8 +65,15 @@ public class TumblrClientTest
             conf = "conf-local/configuration.xml";
         }
 
+        String datas = System.getProperty( "datas" );
+        if ( datas == null )
+        {
+            datas = "conf-local/datas";
+        }
+
         final XMLConfiguration config = new XMLConfiguration( conf );
-        dispatcher.load( config );
+        dispatcher.init( config ,
+                         Paths.get( datas ) );
 
         // Test if parameters are set
         final Properties properties = dispatcher.getCommon( "tumblr" );
@@ -83,9 +90,7 @@ public class TumblrClientTest
         assertNotNull( "Parameter 'secret' should exist" ,
                        secret );
 
-        final Path tokenPath = Paths.get( dispatcher.getConfig( "datas-directory" ) ,
-                                          "test-tokens" ,
-                                          "tumblr.token" );
+        final Path tokenPath = dispatcher.getDatas().resolve( "test-tokens/tumblr.token" );
 
         // Create tokens & login
         client.login( blogname ,

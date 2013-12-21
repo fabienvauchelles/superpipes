@@ -51,9 +51,8 @@ public class N_FB_PostLike
     protected void prepareImpl()
         throws Exception
     {
-        final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                          getNodeID() ,
-                                          "token" );
+        final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
+                                                                              "token" ) );
 
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,

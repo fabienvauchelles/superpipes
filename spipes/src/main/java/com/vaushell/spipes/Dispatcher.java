@@ -20,6 +20,8 @@
 package com.vaushell.spipes;
 
 import com.vaushell.spipes.nodes.A_Node;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,6 +46,12 @@ public final class Dispatcher
         this.routes = new HashMap<>();
         this.properties = new Properties();
         this.commonsProperties = new HashMap<>();
+        this.datas = null;
+    }
+
+    public Path getDatas()
+    {
+        return datas;
     }
 
     /**
@@ -55,17 +63,6 @@ public final class Dispatcher
     public Properties getCommon( final String ID )
     {
         return commonsProperties.get( ID );
-    }
-
-    /**
-     * Retrieve main's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    public String getConfig( final String key )
-    {
-        return properties.getProperty( key );
     }
 
     /**
@@ -299,23 +296,39 @@ public final class Dispatcher
     }
 
     /**
-     * Load configuration.
+     * Init configuration.
      *
      * @param config Configuration
+     * @param datas Path to store datas
      * @throws java.lang.Exception
      */
-    public void load( final XMLConfiguration config )
+    public void init( final XMLConfiguration config ,
+                      final Path datas )
         throws Exception
     {
-        if ( config == null )
+        if ( config == null || datas == null )
         {
             throw new IllegalArgumentException();
         }
 
         if ( LOGGER.isDebugEnabled() )
         {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] load" );
+            LOGGER.debug( "[" + getClass().getSimpleName() + "] load() : datas=" + datas );
         }
+
+        if ( Files.notExists( datas ) )
+        {
+            Files.createDirectory( datas );
+        }
+        else
+        {
+            if ( !Files.isDirectory( datas ) )
+            {
+                throw new IllegalArgumentException( "Path '" + datas.toString() + "' should be a directory" );
+            }
+        }
+
+        this.datas = datas;
 
         // Load general configuration
         readProperties( properties ,
@@ -421,4 +434,5 @@ public final class Dispatcher
     private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
     private final Properties properties;
     private final HashMap<String , Properties> commonsProperties;
+    private Path datas;
 }

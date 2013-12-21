@@ -59,9 +59,9 @@ public abstract class A_Transform
         }
     }
 
-    public String getNodeID()
+    public A_Node getNode()
     {
-        return node.getNodeID();
+        return node;
     }
 
     public Properties getProperties()
@@ -97,28 +97,6 @@ public abstract class A_Transform
         }
 
         return null;
-    }
-
-    /**
-     * Retrieve node's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    public String getNodeConfig( final String key )
-    {
-        return node.getConfig( key );
-    }
-
-    /**
-     * Retrieve main's parameter.
-     *
-     * @param key Key of parameter
-     * @return the value
-     */
-    public String getMainConfig( final String key )
-    {
-        return node.getMainConfig( key );
     }
 
     /**

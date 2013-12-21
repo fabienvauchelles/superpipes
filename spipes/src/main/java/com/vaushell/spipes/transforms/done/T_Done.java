@@ -54,9 +54,8 @@ public class T_Done
         throws IOException
     {
         // Config
-        path = Paths.get( getMainConfig( "datas-directory" ) ,
-                          getNodeID() ,
-                          "done.dat" );
+        path = getNode().getDispatcher().getDatas().resolve( Paths.get( getNode().getNodeID() ,
+                                                                        "done.dat" ) );
 
         Files.createDirectories( path.getParent() );
 
@@ -83,7 +82,7 @@ public class T_Done
     {
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
+            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
         if ( ids.contains( message.getID() ) )

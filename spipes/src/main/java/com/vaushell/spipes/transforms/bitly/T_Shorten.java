@@ -58,7 +58,7 @@ public class T_Shorten
         // Receive
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
+            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
         }
 
         if ( message.contains( Message.KeyIndex.URI ) )

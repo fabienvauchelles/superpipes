@@ -50,9 +50,8 @@ public class N_TW_Post
     protected void prepareImpl()
         throws Exception
     {
-        final Path tokenPath = Paths.get( getMainConfig( "datas-directory" ) ,
-                                          getNodeID() ,
-                                          "token" );
+        final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
+                                                                              "token" ) );
 
         client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,

@@ -19,10 +19,12 @@
 
 package com.vaushell.spipes;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.configuration.XMLConfiguration;
 
 /**
- * Main class.
+ * Main class. For development purpose.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
@@ -42,17 +44,50 @@ public final class App
         final XMLConfiguration config = new XMLConfiguration();
         config.setDelimiterParsingDisabled( true );
 
-        if ( args.length > 0 )
+        final long delay;
+        final Path datas;
+        switch( args.length )
         {
-            config.load( args[ 0] );
-        }
-        else
-        {
-            config.load( "conf/configuration.xml" );
+            case 1:
+            {
+                config.load( args[ 0] );
+                datas = Paths.get( "datas" );
+                delay = 10000L;
+
+                break;
+            }
+
+            case 2:
+            {
+                config.load( args[ 0] );
+                datas = Paths.get( args[ 1] );
+                delay = 10000L;
+
+                break;
+            }
+
+            case 3:
+            {
+                config.load( args[ 0] );
+                datas = Paths.get( args[ 1] );
+                delay = Long.parseLong( args[2] );
+
+                break;
+            }
+
+            default:
+            {
+                config.load( "conf/configuration.xml" );
+                datas = Paths.get( "datas" );
+                delay = 10000L;
+
+                break;
+            }
         }
 
         final Dispatcher dispatcher = new Dispatcher();
-        dispatcher.load( config );
+        dispatcher.init( config ,
+                         datas );
 
         // Run
         dispatcher.start();
@@ -60,7 +95,7 @@ public final class App
         // Wait
         try
         {
-            Thread.sleep( 1000 * 10 );
+            Thread.sleep( delay );
         }
         catch( final InterruptedException ex )
         {

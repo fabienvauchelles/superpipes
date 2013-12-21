@@ -61,8 +61,15 @@ public class FacebookClientTest
             conf = "conf-local/configuration.xml";
         }
 
+        String datas = System.getProperty( "datas" );
+        if ( datas == null )
+        {
+            datas = "conf-local/datas";
+        }
+
         final XMLConfiguration config = new XMLConfiguration( conf );
-        dispatcher.load( config );
+        dispatcher.init( config ,
+                         Paths.get( datas ) );
 
         // Test if parameters are set
         final Properties properties = dispatcher.getCommon( "facebook" );
@@ -75,9 +82,7 @@ public class FacebookClientTest
         assertNotNull( "Parameter 'secret' should exist" ,
                        secret );
 
-        final Path tokenPath = Paths.get( dispatcher.getConfig( "datas-directory" ) ,
-                                          "test-tokens" ,
-                                          "facebook.token" );
+        final Path tokenPath = dispatcher.getDatas().resolve( "test-tokens/facebook.token" );
 
         // Create tokens & login
         client.login( key ,
