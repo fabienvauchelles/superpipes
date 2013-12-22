@@ -61,8 +61,8 @@ LOG_ERR="/var/log/$NAME.err"
 
 jsvc_exec()
 {
-    cd $FILE_PATH
-    $EXEC -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $1 $CLASS $ARGS
+    cd "$FILE_PATH"
+    $EXEC -cp "$CLASS_PATH" -user "$USER" -outfile "$LOG_OUT" -errfile "$LOG_ERR" -pidfile "$PID" $1 "$CLASS" "$ARGS"
 }
 
 case "$1" in
