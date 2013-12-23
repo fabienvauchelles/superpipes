@@ -352,6 +352,7 @@ public abstract class A_Node
                 {
                     LOGGER.error( "Error" ,
                                   ex );
+                    getDispatcher().postError( ex );
                 }
 
                 final String delayStr = getConfig( "delay" );
@@ -372,6 +373,7 @@ public abstract class A_Node
         {
             LOGGER.error( "Error" ,
                           th );
+            getDispatcher().postError( th );
         }
 
         if ( LOGGER.isDebugEnabled() )

@@ -48,6 +48,7 @@ public final class Dispatcher
         this.commonsProperties = new HashMap<>();
         this.datas = null;
         this.vCodeFactory = null;
+        this.eMailer = new ErrorMailer();
     }
 
     public Path getDatas()
@@ -202,6 +203,16 @@ public final class Dispatcher
     }
 
     /**
+     * Post an error.
+     *
+     * @param th the error
+     */
+    public void postError( final Throwable th )
+    {
+        eMailer.receiveError( th );
+    }
+
+    /**
      * Start the dispatcher.
      *
      * @throws Exception
@@ -220,6 +231,9 @@ public final class Dispatcher
         {
             node.prepare();
         }
+
+        // Start error mailer
+        eMailer.start();
 
         // Start nodes
         for ( final A_Node node : nodes.values() )
@@ -258,6 +272,10 @@ public final class Dispatcher
                 // Ignore
             }
         }
+
+        // Error mailer
+        eMailer.stopMe();
+        eMailer.join();
 
         for ( final A_Node node : nodes.values() )
         {
@@ -337,6 +355,9 @@ public final class Dispatcher
 
         this.datas = datas;
         this.vCodeFactory = vCodeFactory;
+
+        // Load mailer
+        eMailer.load( config.configurationAt( "mailer" ) );
 
         // Load commons
         commonsProperties.clear();
@@ -433,6 +454,7 @@ public final class Dispatcher
     // DEFAULT
     final HashMap<String , A_Node> nodes;
     final HashMap<String , Set<String>> routes;
+    final ErrorMailer eMailer;
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
