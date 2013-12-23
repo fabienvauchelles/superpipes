@@ -54,15 +54,15 @@ USER="spipes"
 PID="/var/run/$NAME.pid"
 
 # System.out writes to this file...
-LOG_OUT="/var/log/$NAME.out"
+LOG_OUT="/var/log/$NAME/info"
 
 # System.err writes to this file...
-LOG_ERR="/var/log/$NAME.err"
+LOG_ERR="/var/log/$NAME/error"
 
 jsvc_exec()
 {
     cd "$FILE_PATH"
-    $EXEC -cp "$CLASS_PATH" -user "$USER" -outfile "$LOG_OUT" -errfile "$LOG_ERR" -pidfile "$PID" $1 "$CLASS" "$ARGS"
+    $EXEC -cp "$CLASS_PATH" -user "$USER" -outfile "$LOG_OUT" -errfile "$LOG_ERR" -pidfile "$PID" $1 "$CLASS" $ARGS
 }
 
 case "$1" in

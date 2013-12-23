@@ -23,13 +23,9 @@ case "$1" in
     /usr/sbin/groupadd -r spipes || true
     /usr/sbin/useradd -d /var/spipes -g spipes -m -r -s /bin/sh spipes || true
 
-    /usr/bin/touch /var/log/spipes.out || true
-    /bin/chown spipes:spipes /var/log/spipes.out || true
-    /bin/chmod 644 /var/log/spipes.out || true
-
-     /usr/bin/touch /var/log/spipes.err || true
-    /bin/chown spipes:spipes /var/log/spipes.err || true
-    /bin/chmod 644 /var/log/spipes.err || true
+    /bin/mkdir /var/log/spipes || true
+    /bin/chown spipes:spipes /var/log/spipes || true
+    /bin/chmod 755 /var/log/spipes -Rf || true
 
     /usr/bin/touch /var/run/spipes.pid || true
     /bin/chown spipes:spipes /var/run/spipes.pid || true
