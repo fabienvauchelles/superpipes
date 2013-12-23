@@ -21,7 +21,6 @@ package com.vaushell.spipes.nodes.tumblr;
 
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.tools.scribe.code.VC_SystemInput;
 import com.vaushell.spipes.tools.scribe.tumblr.TumblrClient;
 import java.net.URI;
 import java.nio.file.Path;
@@ -58,7 +57,7 @@ public class N_TB_Post
                       getConfig( "key" ) ,
                       getConfig( "secret" ) ,
                       tokenPath ,
-                      new VC_SystemInput( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+                      getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
 
     @SuppressWarnings( "unchecked" )

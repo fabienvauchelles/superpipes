@@ -22,7 +22,7 @@ package com.vaushell.spipes.tools.scribe.tumblr;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
-import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
+import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -67,7 +67,7 @@ public class TumblrClient
                        final String key ,
                        final String secret ,
                        final Path tokenPath ,
-                       final I_ValidationCode vCode )
+                       final A_ValidatorCode vCode )
         throws IOException , InterruptedException
     {
         if ( blogname == null )

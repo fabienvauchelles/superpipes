@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
-import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
+import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -64,7 +64,7 @@ public class LinkedInClient
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
-                       final I_ValidationCode vCode )
+                       final A_ValidatorCode vCode )
         throws IOException , InterruptedException
     {
         loginImpl( LinkedInApi.class ,

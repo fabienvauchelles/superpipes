@@ -129,6 +129,30 @@ public final class FilesHelper
         return sb.toString();
     }
 
+    /**
+     * Create a non existent filename.
+     *
+     * @param parent Parent directory
+     * @param prefix File's prefix
+     * @param suffix File's suffix
+     * @return Path
+     */
+    public static Path createIncrNonExistentFilename( final Path parent ,
+                                                      final String prefix ,
+                                                      final String suffix )
+    {
+        int i = 1;
+        Path result;
+        do
+        {
+            result = parent.resolve( prefix + i + suffix );
+            ++i;
+        }
+        while ( Files.exists( result ) );
+
+        return result;
+    }
+
     // PRIVATE
     private FilesHelper()
     {

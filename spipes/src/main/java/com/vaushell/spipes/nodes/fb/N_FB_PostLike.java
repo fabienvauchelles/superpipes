@@ -21,7 +21,6 @@ package com.vaushell.spipes.nodes.fb;
 
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.tools.scribe.code.VC_SystemInput;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import com.vaushell.spipes.tools.scribe.fb.FacebookException;
 import java.io.IOException;
@@ -58,7 +57,7 @@ public class N_FB_PostLike
                       getConfig( "secret" ) ,
                       "publish_stream" ,
                       tokenPath ,
-                      new VC_SystemInput( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+                      getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
 
     @Override

@@ -23,8 +23,10 @@ import com.vaushell.spipes.Dispatcher;
 import com.vaushell.spipes.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.dummy.N_Dummy;
+import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -70,8 +72,11 @@ public class T_ShortenExpandTest
         }
 
         final XMLConfiguration config = new XMLConfiguration( conf );
+
+        final Path pDatas = Paths.get( datas );
         dispatcher.init( config ,
-                         Paths.get( datas ) );
+                         pDatas ,
+                         new VC_FileFactory( pDatas ) );
 
         // Test if parameters are set.
         final Properties properties = dispatcher.getCommon( "bitly" );

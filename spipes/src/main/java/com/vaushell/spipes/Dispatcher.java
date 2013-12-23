@@ -20,6 +20,7 @@
 package com.vaushell.spipes;
 
 import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -47,11 +48,17 @@ public final class Dispatcher
         this.properties = new Properties();
         this.commonsProperties = new HashMap<>();
         this.datas = null;
+        this.vCodeFactory = null;
     }
 
     public Path getDatas()
     {
         return datas;
+    }
+
+    public A_ValidatorCode.I_Factory getVCodeFactory()
+    {
+        return vCodeFactory;
     }
 
     /**
@@ -300,10 +307,12 @@ public final class Dispatcher
      *
      * @param config Configuration
      * @param datas Path to store datas
+     * @param vCodeFactory Valication code factory
      * @throws java.lang.Exception
      */
     public void init( final XMLConfiguration config ,
-                      final Path datas )
+                      final Path datas ,
+                      final A_ValidatorCode.I_Factory vCodeFactory )
         throws Exception
     {
         if ( config == null || datas == null )
@@ -329,6 +338,7 @@ public final class Dispatcher
         }
 
         this.datas = datas;
+        this.vCodeFactory = vCodeFactory;
 
         // Load general configuration
         readProperties( properties ,
@@ -435,4 +445,5 @@ public final class Dispatcher
     private final Properties properties;
     private final HashMap<String , Properties> commonsProperties;
     private Path datas;
+    private A_ValidatorCode.I_Factory vCodeFactory;
 }

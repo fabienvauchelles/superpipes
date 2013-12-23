@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes;
 
+import com.vaushell.spipes.tools.scribe.code.VC_SystemInputFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -87,7 +88,8 @@ public final class App
 
         final Dispatcher dispatcher = new Dispatcher();
         dispatcher.init( config ,
-                         datas );
+                         datas ,
+                         new VC_SystemInputFactory() );
 
         // Run
         dispatcher.start();

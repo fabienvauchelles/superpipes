@@ -20,7 +20,7 @@
 package com.vaushell.spipes.tools.scribe.linkedin;
 
 import com.vaushell.spipes.Dispatcher;
-import com.vaushell.spipes.tools.scribe.code.VC_File;
+import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -68,8 +68,11 @@ public class LinkedInClientTest
         }
 
         final XMLConfiguration config = new XMLConfiguration( conf );
+
+        final Path pDatas = Paths.get( datas );
         dispatcher.init( config ,
-                         Paths.get( datas ) );
+                         pDatas ,
+                         new VC_FileFactory( pDatas ) );
 
         // Test if parameters are set
         final Properties properties = dispatcher.getCommon( "linkedin" );
@@ -82,14 +85,11 @@ public class LinkedInClientTest
         assertNotNull( "Parameter 'secret' should exist" ,
                        secret );
 
-        final Path tokenPath = dispatcher.getDatas().resolve( "test-tokens/linkedin.token" );
-
         // Create tokens & login
         client.login( key ,
                       secret ,
-                      tokenPath ,
-                      new VC_File( "[" + getClass().getName() + "] " ,
-                                   Paths.get( tokenPath.toString() + ".code" ) ) );
+                      dispatcher.getDatas().resolve( "test-tokens/linkedin.token" ) ,
+                      dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }
 
     /**

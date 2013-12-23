@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes;
 
+import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -82,7 +83,8 @@ public class DaemonApp
         }
 
         dispatcher.init( config ,
-                         datas );
+                         datas ,
+                         new VC_FileFactory( datas ) );
     }
 
     @Override

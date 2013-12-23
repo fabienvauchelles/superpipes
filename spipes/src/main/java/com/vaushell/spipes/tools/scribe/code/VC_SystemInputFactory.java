@@ -19,49 +19,55 @@
 
 package com.vaushell.spipes.tools.scribe.code;
 
-import com.vaushell.spipes.tools.FilesHelper;
-import java.io.IOException;
-import java.nio.file.Path;
+import java.util.Scanner;
 
 /**
  * Ask to user to enter the code with keyboard.
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class VC_File
-    implements I_ValidationCode
+public class VC_SystemInputFactory
+    implements A_ValidatorCode.I_Factory
 {
     // PUBLIC
-    public VC_File( final String prefix ,
-                    final Path path )
+    public VC_SystemInputFactory()
     {
-        this.prefix = prefix;
-        this.path = path;
+        // Nothing
     }
 
     @Override
-    public String getValidationCode( final String authURL )
+    public A_ValidatorCode create( final String prefix )
     {
-        try
-        {
-            System.out.println( prefix + " Use this URL :" );
-            System.out.println( authURL );
-
-            System.out.println( "Write token inside :'" + path.toString() + "'" );
-            final String code = FilesHelper.fileContent( path );
-
-            System.out.println( prefix + " Read code is '" + code + "'" );
-
-            return code;
-        }
-        catch( final IOException |
-                     InterruptedException ex )
-        {
-            throw new RuntimeException( ex );
-        }
+        return new VC_SystemInput( prefix );
     }
 
     // PRIVATE
-    private final String prefix;
-    private final Path path;
+    private static class VC_SystemInput
+        extends A_ValidatorCode
+    {
+        // PUBLIC
+        public VC_SystemInput( final String prefix )
+        {
+            super( prefix );
+        }
+
+        @Override
+        public String getValidationCode( final String authURL )
+        {
+            System.out.println( getPrefix() + " Use this URL :" );
+            System.out.println( authURL );
+
+            System.out.println( getPrefix() + " Enter code :" );
+
+            // Never include System.(in|out) in a try-catch-resources...
+            // You could use it only one time !
+            final Scanner sc = new Scanner( System.in ,
+                                            "UTF-8" );
+            final String code = sc.next();
+
+            System.out.println( getPrefix() + " Read code is '" + code + "'" );
+
+            return code;
+        }
+    }
 }

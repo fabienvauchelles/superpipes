@@ -20,7 +20,7 @@
 package com.vaushell.spipes.tools.scribe;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.vaushell.spipes.tools.scribe.code.I_ValidationCode;
+import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class OAuthClient
                               final String callback ,
                               final boolean useRequestToken ,
                               final Path tokenPath ,
-                              final I_ValidationCode vCode )
+                              final A_ValidatorCode vCode )
         throws IOException , InterruptedException
     {
         if ( api == null || key == null || secret == null || tokenPath == null || vCode == null )

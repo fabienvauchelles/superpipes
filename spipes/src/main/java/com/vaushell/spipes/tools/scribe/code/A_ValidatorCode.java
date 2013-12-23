@@ -24,14 +24,45 @@ package com.vaushell.spipes.tools.scribe.code;
  *
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public interface I_ValidationCode
+public abstract class A_ValidatorCode
 {
     // PUBLIC
+    public A_ValidatorCode( final String prefix )
+    {
+        this.prefix = prefix;
+    }
+
     /**
      * Return the validation code.
      *
      * @param authURL The auth URL to connect with a browser
      * @return the validation code
      */
-    String getValidationCode( String authURL );
+    public abstract String getValidationCode( String authURL );
+
+    /**
+     * OAuth validation code retrieve process.
+     *
+     * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
+     */
+    public interface I_Factory
+    {
+        // PUBLIC
+        /**
+         * Create a code validator.
+         *
+         * @param prefix Prefix identifier
+         * @return the code validator
+         */
+        A_ValidatorCode create( String prefix );
+    }
+
+    // PROTECTED
+    protected String getPrefix()
+    {
+        return prefix;
+    }
+
+    // PRIVATE
+    private final String prefix;
 }
