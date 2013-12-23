@@ -35,7 +35,8 @@ public class N_MessageLogger
     // PUBLIC
     public N_MessageLogger()
     {
-        super();
+        super( 0L ,
+               0L );
     }
 
     // PROTECTED

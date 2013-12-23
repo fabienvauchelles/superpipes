@@ -40,7 +40,8 @@ public class N_FB_PostLike
     // PUBLIC
     public N_FB_PostLike()
     {
-        super();
+        super( 0L ,
+               DEFAULT_ANTIBURST_IN_MS );
 
         this.client = new FacebookClient();
     }

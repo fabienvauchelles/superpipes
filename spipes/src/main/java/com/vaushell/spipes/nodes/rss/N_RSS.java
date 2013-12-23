@@ -47,7 +47,9 @@ public class N_RSS
     // PUBLIC
     public N_RSS()
     {
-        super();
+        // Read every 10 minutes
+        super( 600000L ,
+               0L );
     }
 
     // PROTECTED

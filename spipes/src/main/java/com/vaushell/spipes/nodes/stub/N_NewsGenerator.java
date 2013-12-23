@@ -38,7 +38,8 @@ public class N_NewsGenerator
     // PUBLIC
     public N_NewsGenerator()
     {
-        super();
+        super( DEFAULT_DELAY_IN_MS ,
+               0L );
     }
 
     // PROTECTED

@@ -51,7 +51,7 @@ public class ErrorMailer
         this.activated = true;
         this.internalStack = new ArrayList<>();
         this.properties = new Properties();
-        this.antiBurstInMs = 0L;
+        this.antiBurstInMs = 1000L;
     }
 
     /**

@@ -41,7 +41,9 @@ public class N_Shaarli
     // PUBLIC
     public N_Shaarli()
     {
-        super();
+        // Read every 10 minutes
+        super( 600000L ,
+               0L );
     }
 
     // PROTECTED

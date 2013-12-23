@@ -47,7 +47,8 @@ public class N_Buffer
     // PUBLIC
     public N_Buffer()
     {
-        super();
+        super( 0L ,
+               0L );
 
         this.slots = new ArrayList<>();
         this.messageIDs = new TreeSet<>();

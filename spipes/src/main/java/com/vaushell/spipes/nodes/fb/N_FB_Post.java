@@ -39,7 +39,8 @@ public class N_FB_Post
     // PUBLIC
     public N_FB_Post()
     {
-        super();
+        super( 0L ,
+               DEFAULT_ANTIBURST_IN_MS );
 
         this.client = new FacebookClient();
     }

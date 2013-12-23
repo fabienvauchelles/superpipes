@@ -83,10 +83,6 @@ public class ErrorMailerTest
     public void testPostError()
         throws InterruptedException
     {
-        assertEquals( "Property 'anti-burst' should be '1000'" ,
-                      "1000" ,
-                      dispatcher.eMailer.properties.getProperty( "anti-burst" ) );
-
         final SimpleSmtpServer server = SimpleSmtpServer.start( 33325 );
 
         dispatcher.eMailer.start();

@@ -39,7 +39,11 @@ public abstract class A_Node
     extends Thread
 {
     // PUBLIC
-    public A_Node()
+    public static final long DEFAULT_DELAY_IN_MS = 1000L;
+    public static final long DEFAULT_ANTIBURST_IN_MS = 2000L;
+
+    public A_Node( final long defaultDelay ,
+                   final long defaultAntiBurstInMs )
     {
         super();
 
@@ -50,8 +54,8 @@ public abstract class A_Node
         this.properties = new Properties();
         this.commonsPropertiesID = new ArrayList<>();
         this.lastPop = null;
-        this.antiBurstInMs = 0L;
-        this.delay = 0L;
+        this.antiBurstInMs = defaultAntiBurstInMs;
+        this.delay = defaultDelay;
     }
 
     /**
