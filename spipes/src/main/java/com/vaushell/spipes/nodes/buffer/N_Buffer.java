@@ -73,6 +73,8 @@ public class N_Buffer
                 slots.add( slot );
             }
         }
+
+        flowLimit = Long.parseLong( getConfig( "flow-limit" ) );
     }
 
     // PROTECTED
@@ -80,10 +82,7 @@ public class N_Buffer
     protected void prepareImpl()
         throws Exception
     {
-        // Load slots
-
-        flowLimit = Long.parseLong( getConfig( "flow-limit" ) );
-
+        // Load messages IDs
         messagesPath = getDispatcher().getDatas().resolve( getNodeID() );
 
         Files.createDirectories( messagesPath );
