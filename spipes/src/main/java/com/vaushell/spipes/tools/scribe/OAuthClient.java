@@ -130,6 +130,27 @@ public class OAuthClient
     }
 
     /**
+     * Change access token.
+     *
+     * @param newToken the new token
+     */
+    protected void changeAccessToken( final Token newToken )
+    {
+        if ( newToken == null || newToken.getToken() == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isDebugEnabled() )
+        {
+            LOGGER.debug(
+                "[" + getClass().getSimpleName() + "] changeAccessToken() : newToken=" + newToken );
+        }
+
+        this.accessToken = newToken;
+    }
+
+    /**
      * Send a signed request.
      *
      * @param request the request

@@ -36,10 +36,10 @@ import org.testng.annotations.Test;
  * @see FacebookClient
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
-public class FacebookClientTest
+public class FacebookClientPageTest
 {
     // PUBLIC
-    public FacebookClientTest()
+    public FacebookClientPageTest()
     {
         this.dispatcher = new Dispatcher();
         this.client = new FacebookClient();
@@ -75,7 +75,7 @@ public class FacebookClientTest
                          new VC_FileFactory( pDatas ) );
 
         // Test if parameters are set
-        final Properties properties = dispatcher.getCommon( "facebook" );
+        final Properties properties = dispatcher.getCommon( "facebookpage" );
 
         final String key = properties.getProperty( "key" );
         assertNotNull( "Parameter 'key' should exist" ,
@@ -85,10 +85,15 @@ public class FacebookClientTest
         assertNotNull( "Parameter 'secret' should exist" ,
                        secret );
 
+        final String pageName = properties.getProperty( "pagename" );
+        assertNotNull( "Parameter 'pagename' should exist" ,
+                       pageName );
+
         // Create tokens & login
-        client.login( key ,
+        client.login( pageName ,
+                      key ,
                       secret ,
-                      dispatcher.getDatas().resolve( "test-tokens/facebook.token" ) ,
+                      dispatcher.getDatas().resolve( "test-tokens/facebookpage.token" ) ,
                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }
 

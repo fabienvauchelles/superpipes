@@ -31,6 +31,7 @@ import java.util.Locale;
 import org.scribe.builder.api.FacebookApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
+import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,8 @@ public class FacebookClient
 
         this.df = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ssZ" ,
                                         Locale.ENGLISH );
+
+        this.target = null;
     }
 
     /**
@@ -57,15 +60,13 @@ public class FacebookClient
      *
      * @param key Facebook key
      * @param secret Facebook secret
-     * @param scope Facebook scope
      * @param tokenPath Path to save the token
      * @param vCode How to get the verification code
      * @throws IOException
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException
      */
     public void login( final String key ,
                        final String secret ,
-                       final String scope ,
                        final Path tokenPath ,
                        final A_ValidatorCode vCode )
         throws IOException , InterruptedException
@@ -73,11 +74,44 @@ public class FacebookClient
         loginImpl( FacebookApi.class ,
                    key ,
                    secret ,
-                   scope ,
+                   "publish_stream" ,
                    "http://www.facebook.com/connect/login_success.html" ,
                    false ,
                    tokenPath ,
                    vCode );
+
+        target = "me";
+    }
+
+    /**
+     * Log in.
+     *
+     * @param pageName Page name (not the ID)
+     * @param key Facebook key
+     * @param secret Facebook secret
+     * @param tokenPath Path to save the token
+     * @param vCode How to get the verification code
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws FacebookException
+     */
+    public void login( final String pageName ,
+                       final String key ,
+                       final String secret ,
+                       final Path tokenPath ,
+                       final A_ValidatorCode vCode )
+        throws IOException , InterruptedException , FacebookException
+    {
+        loginImpl( FacebookApi.class ,
+                   key ,
+                   secret ,
+                   "publish_stream,manage_pages" ,
+                   "http://www.facebook.com/connect/login_success.html" ,
+                   false ,
+                   tokenPath ,
+                   vCode );
+
+        updateTarget( pageName );
     }
 
     /**
@@ -103,7 +137,7 @@ public class FacebookClient
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                       "https://graph.facebook.com/me/feed" );
+                                                       "https://graph.facebook.com/" + target + "/feed" );
 
         request.addBodyParameter( "message" ,
                                   message );
@@ -150,7 +184,7 @@ public class FacebookClient
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                       "https://graph.facebook.com/me/feed" );
+                                                       "https://graph.facebook.com/" + target + "/feed" );
 
         if ( message != null && message.length() > 0 )
         {
@@ -349,6 +383,7 @@ public class FacebookClient
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
     private final SimpleDateFormat df;
+    private String target;
 
     private void checkErrors( final Response response ,
                               final JsonNode root )
@@ -362,5 +397,51 @@ public class FacebookClient
                                          error.get( "type" ).asText() ,
                                          error.get( "message" ).asText() );
         }
+    }
+
+    private void updateTarget( final String pageName )
+        throws IOException , FacebookException
+    {
+        if ( pageName == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] updateTarget() : pageName=" + pageName );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "https://graph.facebook.com/me/accounts" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final JsonNode datas = node.get( "data" );
+        if ( datas != null )
+        {
+            for ( final JsonNode data : datas )
+            {
+                final String name = data.get( "name" ).asText();
+                if ( pageName.equalsIgnoreCase( name ) )
+                {
+                    target = data.get( "id" ).asText();
+
+                    changeAccessToken( new Token( data.get( "access_token" ).asText() ,
+                                                  "" ) );
+
+                    return;
+                }
+            }
+        }
+
+        throw new IllegalArgumentException( "Page '" + pageName + "' is not accessible" );
     }
 }

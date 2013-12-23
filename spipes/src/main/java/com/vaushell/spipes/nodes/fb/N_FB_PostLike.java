@@ -54,11 +54,22 @@ public class N_FB_PostLike
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "key" ) ,
-                      getConfig( "secret" ) ,
-                      "publish_stream" ,
-                      tokenPath ,
-                      getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+        final String pageName = getConfig( "pagename" );
+        if ( pageName == null )
+        {
+            client.login( getConfig( "key" ) ,
+                          getConfig( "secret" ) ,
+                          tokenPath ,
+                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+        }
+        else
+        {
+            client.login( pageName ,
+                          getConfig( "key" ) ,
+                          getConfig( "secret" ) ,
+                          tokenPath ,
+                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+        }
     }
 
     @Override
