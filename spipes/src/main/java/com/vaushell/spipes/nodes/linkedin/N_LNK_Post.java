@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.nodes.linkedin;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.twitter.N_TW_Post;
 import com.vaushell.spipes.tools.scribe.linkedin.LinkedInClient;

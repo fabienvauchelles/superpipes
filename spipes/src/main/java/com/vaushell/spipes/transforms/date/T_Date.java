@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.transforms.date;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

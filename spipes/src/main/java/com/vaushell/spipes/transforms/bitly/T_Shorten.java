@@ -22,7 +22,7 @@ package com.vaushell.spipes.transforms.bitly;
 import com.rosaloves.bitlyj.Bitly;
 import com.rosaloves.bitlyj.Bitly.Provider;
 import com.rosaloves.bitlyj.Url;
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.net.URI;
 import org.slf4j.Logger;

@@ -19,8 +19,8 @@
 
 package com.vaushell.spipes.transforms;
 
-import com.vaushell.spipes.Dispatcher;
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Dispatcher;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.util.ArrayList;
 import java.util.List;

@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.nodes.twitter;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;

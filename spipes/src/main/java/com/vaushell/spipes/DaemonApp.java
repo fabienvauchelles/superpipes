@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes;
 
+import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;

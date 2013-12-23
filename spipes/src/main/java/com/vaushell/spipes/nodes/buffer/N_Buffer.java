@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.nodes.buffer;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.io.IOException;
 import java.io.ObjectInputStream;

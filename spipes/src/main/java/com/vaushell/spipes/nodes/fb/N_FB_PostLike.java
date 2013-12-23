@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.nodes.fb;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import com.vaushell.spipes.tools.scribe.fb.FacebookException;

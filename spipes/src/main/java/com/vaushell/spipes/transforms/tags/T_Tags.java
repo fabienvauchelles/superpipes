@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.transforms.tags;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.util.Set;
 import org.slf4j.Logger;

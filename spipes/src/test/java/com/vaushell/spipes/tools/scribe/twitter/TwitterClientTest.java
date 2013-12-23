@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.tools.scribe.twitter;
 
-import com.vaushell.spipes.Dispatcher;
+import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;

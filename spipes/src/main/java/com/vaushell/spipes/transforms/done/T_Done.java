@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.transforms.done;
 
-import com.vaushell.spipes.Message;
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

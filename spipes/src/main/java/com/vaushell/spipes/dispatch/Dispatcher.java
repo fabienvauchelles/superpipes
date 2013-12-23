@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes;
+package com.vaushell.spipes.dispatch;
 
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;

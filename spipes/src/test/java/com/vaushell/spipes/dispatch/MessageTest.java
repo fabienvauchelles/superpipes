@@ -17,8 +17,9 @@
  * MA 02110-1301  USA
  */
 
-package com.vaushell.spipes;
+package com.vaushell.spipes.dispatch;
 
+import com.vaushell.spipes.dispatch.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
