@@ -19,7 +19,6 @@
 
 package com.vaushell.spipes.dispatch;
 
-import com.vaushell.spipes.dispatch.Message;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

@@ -32,7 +32,7 @@ import org.testng.annotations.Test;
 /**
  * Unit test.
  *
- * @see Dispatcher cs
+ * @see Dispatcher
  * @author Fabien Vauchelles (fabien_AT_vauchelles_DOT_com)
  */
 public class DispatcherTest
