@@ -24,7 +24,7 @@ DESC="$NAME service"
 EXEC=`which jsvc`
 
 # The path to the folder containing the jar
-FILE_PATH="/usr/share/$NAME"
+FILE_PATH="/usr/local/$NAME"
 
 # Our classpath including our jar file and the Apache Commons Daemon library
 CLASS_PATH="$FILE_PATH/lib/*.jar:$FILE_PATH/$NAME.jar"
@@ -47,7 +47,7 @@ jsvc_exec()
 }
 
 if [ ! -d "$HOME/.$NAME" ]; then
-	mkdir "$HOME/.$NAME" 
+	mkdir "$HOME/.$NAME"
 fi
 
 case "$1" in

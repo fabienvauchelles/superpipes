@@ -21,15 +21,19 @@ case "$1" in
 
   configure)
     /usr/sbin/groupadd -r spipes || true
-    /usr/sbin/useradd -d /var/spipes -g spipes -m -r -s /bin/sh spipes || true
+    /usr/sbin/useradd -d /usr/local/spipes -g spipes -M -r -s /bin/sh spipes || true
 
-    /bin/mkdir /var/log/spipes || true
-    /bin/chown spipes:spipes /var/log/spipes || true
-    /bin/chmod 755 /var/log/spipes -Rf || true
+    /bin/mkdir /usr/local/spipes/log || true
+    /bin/chmod 755 /usr/local/spipes/log || true
+    /usr/bin/touch /usr/local/spipes/log/info || true
+    /usr/bin/touch /usr/local/spipes/log/error || true
 
-    /usr/bin/touch /var/run/spipes.pid || true
-    /bin/chown spipes:spipes /var/run/spipes.pid || true
-    /bin/chmod 644 /var/run/spipes.pid || true
+    /usr/bin/touch /usr/local/spipes/spipes.pid || true
+
+    /bin/mkdir /usr/local/spipes/datas || true
+    /bin/chmod 755 /usr/local/spipes/datas || true
+
+    /bin/chown spipes:spipes /usr/local/spipes -Rf || true
 
     /usr/sbin/update-rc.d spipes defaults || true
   ;;

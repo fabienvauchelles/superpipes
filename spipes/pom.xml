@@ -175,15 +175,7 @@ page at http://checkstyle.sourceforge.net/config.html
                                             <type>directory</type>
                                             <mapper>
                                                 <type>perm</type>
-                                                <prefix>/usr/share/${project.artifactId}</prefix>
-                                            </mapper>
-                                        </data>
-                                        <data>
-                                            <src>${project.basedir}/conf</src>
-                                            <type>directory</type>
-                                            <mapper>
-                                                <type>perm</type>
-                                                <prefix>/etc/${project.artifactId}</prefix>
+                                                <prefix>/usr/local/${project.artifactId}</prefix>
                                             </mapper>
                                         </data>
                                         <data>
@@ -200,7 +192,7 @@ page at http://checkstyle.sourceforge.net/config.html
                                             <type>directory</type>
                                             <mapper>
                                                 <type>perm</type>
-                                                <prefix>/usr/share/${project.artifactId}</prefix>
+                                                <prefix>/usr/local/${project.artifactId}</prefix>
                                                 <filemode>755</filemode>
                                             </mapper>
                                         </data>

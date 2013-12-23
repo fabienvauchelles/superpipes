@@ -21,7 +21,7 @@ case "$1" in
     /etc/init.d/spipes stop || true
     /usr/sbin/update-rc.d spipes disable || true
 
-    /bin/rm /var/run/spipes.pid || true
+    /bin/rm /usr/local/spipes/spipes.pid || true
   ;;
 
   failed-upgrade)
