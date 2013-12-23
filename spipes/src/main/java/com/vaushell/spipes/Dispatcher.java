@@ -45,7 +45,6 @@ public final class Dispatcher
     {
         this.nodes = new HashMap<>();
         this.routes = new HashMap<>();
-        this.properties = new Properties();
         this.commonsProperties = new HashMap<>();
         this.datas = null;
         this.vCodeFactory = null;
@@ -114,8 +113,7 @@ public final class Dispatcher
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / properties.size=" + properties.
-                size() );
+                "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / commonsPropertiesID.length=" + commonsPropertiesID.length );
         }
 
         try
@@ -340,10 +338,6 @@ public final class Dispatcher
         this.datas = datas;
         this.vCodeFactory = vCodeFactory;
 
-        // Load general configuration
-        readProperties( properties ,
-                        config );
-
         // Load commons
         commonsProperties.clear();
         final List<HierarchicalConfiguration> cCommons = config.configurationsAt( "commons.common" );
@@ -442,7 +436,6 @@ public final class Dispatcher
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
-    private final Properties properties;
     private final HashMap<String , Properties> commonsProperties;
     private Path datas;
     private A_ValidatorCode.I_Factory vCodeFactory;
