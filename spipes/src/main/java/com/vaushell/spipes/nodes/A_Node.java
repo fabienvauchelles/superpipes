@@ -137,7 +137,7 @@ public abstract class A_Node
             {
                 final String[] commons;
 
-                final String commonsStr = cNode.getString( "[@commons]" );
+                final String commonsStr = cTransform.getString( "[@commons]" );
                 if ( commonsStr == null )
                 {
                     commons = new String[]
@@ -165,7 +165,7 @@ public abstract class A_Node
             {
                 final String[] commons;
 
-                final String commonsStr = cNode.getString( "[@commons]" );
+                final String commonsStr = cTransform.getString( "[@commons]" );
                 if ( commonsStr == null )
                 {
                     commons = new String[]
