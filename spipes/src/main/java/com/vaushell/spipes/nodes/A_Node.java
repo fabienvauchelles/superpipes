@@ -49,6 +49,9 @@ public abstract class A_Node
         this.transformsOUT = new ArrayList<>();
         this.properties = new Properties();
         this.commonsPropertiesID = new ArrayList<>();
+        this.lastPop = null;
+        this.antiBurstInMs = 0L;
+        this.delay = 0L;
     }
 
     /**
@@ -127,6 +130,15 @@ public abstract class A_Node
     {
         Dispatcher.readProperties( properties ,
                                    cNode );
+
+        if ( properties.containsKey( "anti-burst" ) )
+        {
+            antiBurstInMs = Long.parseLong( properties.getProperty( "anti-burst" ) );
+        }
+        if ( properties.containsKey( "delay" ) )
+        {
+            delay = Long.parseLong( properties.getProperty( "delay" ) );
+        }
 
         // Load transforms IN
         transformsIN.clear();
@@ -355,12 +367,11 @@ public abstract class A_Node
                     getDispatcher().postError( ex );
                 }
 
-                final String delayStr = getConfig( "delay" );
-                if ( delayStr != null )
+                if ( delay > 0L )
                 {
                     try
                     {
-                        Thread.sleep( Long.parseLong( delayStr ) );
+                        Thread.sleep( delay );
                     }
                     catch( final InterruptedException ex )
                     {
@@ -555,6 +566,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait" );
         }
 
+        final Message m;
         synchronized( internalStack )
         {
             while ( internalStack.isEmpty() )
@@ -562,14 +574,29 @@ public abstract class A_Node
                 internalStack.wait();
             }
 
-            return internalStack.pollLast();
+            m = internalStack.pollLast();
         }
+
+        if ( lastPop != null && antiBurstInMs > 0 )
+        {
+            final long elapsed = System.currentTimeMillis() - lastPop;
+            final long remaining = antiBurstInMs - elapsed;
+
+            if ( remaining > 0L )
+            {
+                Thread.sleep( remaining );
+            }
+        }
+
+        lastPop = System.currentTimeMillis();
+
+        return m;
     }
 
     /**
      * Pop the last message.
      *
-     * @param timeout max time to wait (in ms)
+     * @param timeout max time to wait (in ms). If timeout is smaller than antiburst, use antiburst.
      * @return the message (or null if empty)
      * @throws InterruptedException
      */
@@ -586,6 +613,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait() : timeout=" + timeout );
         }
 
+        final Message m;
         synchronized( internalStack )
         {
             long start = System.currentTimeMillis();
@@ -601,8 +629,26 @@ public abstract class A_Node
                 start = actual;
             }
 
-            return internalStack.pollLast();
+            m = internalStack.pollLast();
         }
+
+        if ( m != null )
+        {
+            if ( lastPop != null && antiBurstInMs > 0 )
+            {
+                final long elapsed = System.currentTimeMillis() - lastPop;
+                final long remaining = antiBurstInMs - elapsed;
+
+                if ( remaining > 0L )
+                {
+                    Thread.sleep( remaining );
+                }
+            }
+
+            lastPop = System.currentTimeMillis();
+        }
+
+        return m;
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
@@ -614,4 +660,7 @@ public abstract class A_Node
     private volatile boolean activated;
     private final List<A_Transform> transformsIN;
     private final List<A_Transform> transformsOUT;
+    private Long lastPop;
+    private long antiBurstInMs;
+    private long delay;
 }
