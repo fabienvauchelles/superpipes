@@ -52,6 +52,9 @@ public class TwitterClient
     extends OAuthClient
 {
     // PUBLIC
+    public static final int TWEET_SIZE = 140;
+    public static final int MEDIA_RESERVED = 23;
+
     public TwitterClient()
     {
         super();

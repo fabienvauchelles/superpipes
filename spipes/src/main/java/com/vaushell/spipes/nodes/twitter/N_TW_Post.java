@@ -22,9 +22,19 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
+import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
+import org.apache.http.HttpEntity;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +53,7 @@ public class N_TW_Post
                DEFAULT_ANTIBURST_IN_MS );
 
         this.client = new TwitterClient();
+        this.httpClient = null;
     }
 
     // PROTECTED
@@ -57,6 +68,12 @@ public class N_TW_Post
                       getConfig( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+
+        httpClient = HttpClientBuilder
+            .create()
+            .setDefaultCookieStore( new BasicCookieStore() )
+            .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
+            .build();
     }
 
     @Override
@@ -72,9 +89,51 @@ public class N_TW_Post
         }
 
         // Send to Twitter
-        final String content = createContent( message );
+        final long ID;
+        if ( message.contains( Message.KeyIndex.URI_PICTURE ) )
+        {
+            final URI picture = (URI) message.getProperty( Message.KeyIndex.URI_PICTURE );
 
-        final long ID = client.tweet( content );
+            HttpEntity responseEntity = null;
+            try
+            {
+                // Exec request
+                final HttpGet get = new HttpGet( picture );
+
+                try( final CloseableHttpResponse response = httpClient.execute( get ) )
+                {
+                    final StatusLine sl = response.getStatusLine();
+                    if ( sl.getStatusCode() == 200 )
+                    {
+                        responseEntity = response.getEntity();
+
+                        try( final InputStream is = responseEntity.getContent() )
+                        {
+                            ID = client.tweetPicture( createContent( message ,
+                                                                     TwitterClient.TWEET_SIZE - TwitterClient.MEDIA_RESERVED ) ,
+                                                      is );
+                        }
+                    }
+                    else
+                    {
+                        ID = client.tweet( createContent( message ,
+                                                          TwitterClient.TWEET_SIZE ) );
+                    }
+                }
+            }
+            finally
+            {
+                if ( responseEntity != null )
+                {
+                    EntityUtils.consume( responseEntity );
+                }
+            }
+        }
+        else
+        {
+            ID = client.tweet( createContent( message ,
+                                              TwitterClient.TWEET_SIZE ) );
+        }
 
         if ( LOGGER.isTraceEnabled() )
         {
@@ -91,19 +150,23 @@ public class N_TW_Post
     protected void terminateImpl()
         throws Exception
     {
-        // Nothing
+        if ( httpClient != null )
+        {
+            httpClient.close();
+        }
     }
     // DEFAULT
-    static final int TWEET_SIZE = 140;
 
     /**
      * Convert a message to a tweet correctly sized.
      *
      * @param message the Message
+     * @param size message maximum size in characters
      * @return the Tweet content
      */
     @SuppressWarnings( "unchecked" )
-    static String createContent( final Message message )
+    static String createContent( final Message message ,
+                                 final int size )
     {
         if ( message == null || !message.contains( Message.KeyIndex.URI ) )
         {
@@ -111,13 +174,13 @@ public class N_TW_Post
         }
 
         final String uri = message.getProperty( Message.KeyIndex.URI ).toString();
-        if ( uri.length() > TWEET_SIZE )
+        if ( uri.length() > size )
         {
             throw new IllegalArgumentException( "URL is too long" );
         }
 
         final StringBuilder sb = new StringBuilder();
-        if ( uri.length() > TWEET_SIZE - 15 )
+        if ( uri.length() > size - 15 )
         {
             sb.append( uri );
         }
@@ -128,11 +191,11 @@ public class N_TW_Post
                 final String title = (String) message.getProperty( Message.KeyIndex.TITLE );
 
                 sb.append( " (" ).append( uri ).append( ')' );
-                if ( title.length() + sb.length() > TWEET_SIZE )
+                if ( title.length() + sb.length() > size )
                 {
                     sb.insert( 0 ,
                                title.substring( 0 ,
-                                                TWEET_SIZE - sb.length() ) );
+                                                size - sb.length() ) );
                 }
                 else
                 {
@@ -148,7 +211,7 @@ public class N_TW_Post
                 {
                     final String ct = " #" + tag;
 
-                    if ( sb.length() + ct.length() <= TWEET_SIZE )
+                    if ( sb.length() + ct.length() <= size )
                     {
                         sb.append( ct );
                     }
@@ -161,4 +224,5 @@ public class N_TW_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
     private final TwitterClient client;
+    private CloseableHttpClient httpClient;
 }

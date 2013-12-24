@@ -20,6 +20,7 @@
 package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
@@ -82,11 +83,12 @@ public class N_TW_PostTest
                                           "long" ) )
         );
 
-        final String content = N_TW_Post.createContent( message );
+        final String content = N_TW_Post.createContent( message ,
+                                                        TwitterClient.TWEET_SIZE );
 
         assertEquals( "(" + content.length() + ") " + content ,
                       content.length() ,
-                      N_TW_Post.TWEET_SIZE );
+                      TwitterClient.TWEET_SIZE );
     }
 
     /**
@@ -120,7 +122,8 @@ public class N_TW_PostTest
             new Date().getTime()
         );
 
-        N_TW_Post.createContent( message );
+        N_TW_Post.createContent( message ,
+                                 TwitterClient.TWEET_SIZE );
     }
 
     /**
@@ -151,7 +154,8 @@ public class N_TW_PostTest
             new Date().getTime()
         );
 
-        N_TW_Post.createContent( message );
+        N_TW_Post.createContent( message ,
+                                 TwitterClient.TWEET_SIZE );
     }
 
     /**
@@ -180,6 +184,7 @@ public class N_TW_PostTest
             new Date().getTime()
         );
 
-        N_TW_Post.createContent( message );
+        N_TW_Post.createContent( message ,
+                                 TwitterClient.TWEET_SIZE );
     }
 }

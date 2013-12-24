@@ -47,6 +47,7 @@ public final class Message
         DESCRIPTION( "description" ),
         URI( "uri" ),
         URI_SOURCE( "uri-source" ),
+        URI_PICTURE( "uri-picture" ),
         AUTHOR( "author" ),
         TAGS( "tags" ),
         PUBLISHED_DATE( "published-date" ),
