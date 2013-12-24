@@ -21,7 +21,6 @@ package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.dispatch.Message;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TreeSet;
@@ -45,11 +44,9 @@ public class N_TW_PostTest
     /**
      * Check tweet content length.
      *
-     * @throws URISyntaxException
      */
     @Test
     public void testConvertNews()
-        throws URISyntaxException
     {
         final String uriStr = "http://url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
 
@@ -59,9 +56,9 @@ public class N_TW_PostTest
             Message.KeyIndex.DESCRIPTION ,
             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
             Message.KeyIndex.URI ,
-            new URI( uriStr ) ,
+            URI.create( uriStr ) ,
             Message.KeyIndex.URI_SOURCE ,
-            new URI( uriStr ) ,
+            URI.create( uriStr ) ,
             Message.KeyIndex.AUTHOR ,
             "John Kiki" ,
             Message.KeyIndex.CONTENT ,
@@ -95,14 +92,12 @@ public class N_TW_PostTest
     /**
      * Check tweet content length (2).
      *
-     * @throws URISyntaxException
      */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class
     } )
     public void testURLlong()
-        throws URISyntaxException
     {
         final String uriStr = "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
 
@@ -112,9 +107,9 @@ public class N_TW_PostTest
             Message.KeyIndex.DESCRIPTION ,
             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
             Message.KeyIndex.URI ,
-            new URI( uriStr ) ,
+            URI.create( uriStr ) ,
             Message.KeyIndex.URI_SOURCE ,
-            new URI( uriStr ) ,
+            URI.create( uriStr ) ,
             Message.KeyIndex.AUTHOR ,
             "John Kiki" ,
             Message.KeyIndex.CONTENT ,
@@ -131,14 +126,12 @@ public class N_TW_PostTest
     /**
      * Check tweet URL null.
      *
-     * @throws URISyntaxException
      */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class
     } )
     public void testURLnull()
-        throws URISyntaxException
     {
         final Message message = Message.create(
             Message.KeyIndex.TITLE ,
@@ -146,7 +139,7 @@ public class N_TW_PostTest
             Message.KeyIndex.DESCRIPTION ,
             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
             Message.KeyIndex.URI_SOURCE ,
-            new URI(
+            URI.create(
             "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
             Message.KeyIndex.AUTHOR ,
             "John Kiki" ,
@@ -164,20 +157,18 @@ public class N_TW_PostTest
     /**
      * Check tweet title null.
      *
-     * @throws URISyntaxException
      */
     @Test( expectedExceptions =
     {
         IllegalArgumentException.class
     } )
     public void testURLtitleNull()
-        throws URISyntaxException
     {
         final Message message = Message.create(
             Message.KeyIndex.DESCRIPTION ,
             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
             Message.KeyIndex.URI_SOURCE ,
-            new URI(
+            URI.create(
             "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
             Message.KeyIndex.AUTHOR ,
             "John Kiki" ,

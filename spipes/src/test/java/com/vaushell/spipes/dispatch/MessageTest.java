@@ -24,7 +24,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -50,13 +49,12 @@ public class MessageTest
     /**
      * Test of message serialization.
      *
-     * @throws URISyntaxException
      * @throws IOException
      * @throws ClassNotFoundException
      */
     @Test
     public void testSerialization()
-        throws URISyntaxException , IOException , ClassNotFoundException
+        throws IOException , ClassNotFoundException
     {
         final String uriStr = "http://url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
 
@@ -66,9 +64,9 @@ public class MessageTest
             Message.KeyIndex.DESCRIPTION ,
             "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
             Message.KeyIndex.URI ,
-            new URI( uriStr ) ,
+            URI.create( uriStr ) ,
             Message.KeyIndex.URI_SOURCE ,
-            new URI( uriStr ) ,
+            URI.create( uriStr ) ,
             Message.KeyIndex.AUTHOR ,
             "John Kiki" ,
             Message.KeyIndex.CONTENT ,

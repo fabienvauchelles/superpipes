@@ -21,7 +21,6 @@ package com.vaushell.spipes.tools;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -117,12 +116,11 @@ public final class HTTPhelper
      * @param builder Http client builder
      * @param message the message
      * @return the message with expanded URLs
-     * @throws URISyntaxException
      * @throws IOException
      */
     public static String expandShortenURLinMessage( final HttpClientBuilder builder ,
                                                     final String message )
-        throws URISyntaxException , IOException
+        throws IOException
     {
         final Pattern p = Pattern.compile( "http\\://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?" );
         final Matcher m = p.matcher( message );
@@ -130,7 +128,7 @@ public final class HTTPhelper
         String result = message;
         while ( m.find() )
         {
-            final URI shorten = new URI( m.group() );
+            final URI shorten = URI.create( m.group() );
 
             final List<URI> redirects = HTTPhelper.getRedirected( shorten );
             if ( !redirects.isEmpty() )
@@ -150,11 +148,10 @@ public final class HTTPhelper
      *
      * @param message the message
      * @return the message with expanded URLs
-     * @throws URISyntaxException
      * @throws IOException
      */
     public static String expandShortenURLinMessage( final String message )
-        throws URISyntaxException , IOException
+        throws IOException
     {
         final HttpClientBuilder builder = HttpClientBuilder
             .create()

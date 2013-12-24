@@ -25,7 +25,6 @@ import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Path;
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -214,10 +213,9 @@ public class LinkedInClient
      * @return the Status
      * @throws IOException
      * @throws LinkedInException
-     * @throws URISyntaxException
      */
     public LNK_Status readStatus( final String ID )
-        throws IOException , LinkedInException , URISyntaxException
+        throws IOException , LinkedInException
     {
         if ( ID == null || ID.isEmpty() )
         {
