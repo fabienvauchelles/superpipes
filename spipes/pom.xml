@@ -268,5 +268,10 @@ page at http://checkstyle.sourceforge.net/config.html
             <version>1.6</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.3.1</version>
+        </dependency>
     </dependencies>
 </project>

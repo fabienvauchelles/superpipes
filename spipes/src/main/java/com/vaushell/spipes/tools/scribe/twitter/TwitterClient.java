@@ -24,11 +24,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -105,6 +112,101 @@ public class TwitterClient
                                                        "https://api.twitter.com/1.1/statuses/update.json" );
         request.addBodyParameter( "status" ,
                                   message );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.get( "id" ).asLong();
+    }
+
+    /**
+     * Tweet picture.
+     *
+     * @param message Tweet's content
+     * @param picturePath Path of the picture
+     * @return Tweet's ID
+     * @throws IOException
+     * @throws OAuthException
+     */
+    public long tweetPicture( final String message ,
+                              final Path picturePath )
+        throws IOException , OAuthException
+    {
+        if ( picturePath == null || Files.notExists( picturePath ) )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        // Don't use a try-with-resources
+        // Because of a findbug bug on : RCN_REDUNDANT_NULLCHECK_OF_NULL_VALUE
+        // double check in the finally
+        InputStream is = null;
+        try
+        {
+            is = Files.newInputStream( picturePath );
+
+            return tweetPicture( message ,
+                                 is );
+        }
+        finally
+        {
+            if ( null != is )
+            {
+                is.close();
+            }
+        }
+    }
+
+    /**
+     * Tweet picture.
+     *
+     * @param message Tweet's content
+     * @param is InputStream of the picture
+     * @return Tweet's ID
+     * @throws IOException
+     * @throws OAuthException
+     */
+    public long tweetPicture( final String message ,
+                              final InputStream is )
+        throws IOException , OAuthException
+    {
+        if ( message == null || is == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] tweetPicture() : message=" + message );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://api.twitter.com/1.1/statuses/update_with_media.json" );
+        final HttpEntity entity = MultipartEntityBuilder
+            .create()
+            .addTextBody( "status" ,
+                          message )
+            .addBinaryBody( "media[]" ,
+                            is ,
+                            ContentType.APPLICATION_OCTET_STREAM ,
+                            "media" )
+            .build();
+
+        final Header contentType = entity.getContentType();
+        request.addHeader( contentType.getName() ,
+                           contentType.getValue() );
+
+        try( final ByteArrayOutputStream bos = new ByteArrayOutputStream() )
+        {
+            entity.writeTo( bos );
+            request.addPayload( bos.toByteArray() );
+        }
 
         final Response response = sendSignedRequest( request );
 

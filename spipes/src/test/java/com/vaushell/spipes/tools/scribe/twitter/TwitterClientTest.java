@@ -22,6 +22,7 @@ package com.vaushell.spipes.tools.scribe.twitter;
 import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
@@ -151,6 +152,44 @@ public class TwitterClientTest
         // Read
         client.readTweet( ID );
     }
+
+    /**
+     * Test tweetPicture.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testTweetPicture()
+        throws Exception
+    {
+        // Post
+        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new Date().
+            getTime();
+
+        final long ID;
+        try( InputStream is = getClass().getResourceAsStream( "/media.png" ) )
+        {
+            ID = client.tweetPicture( message ,
+                                      is );
+
+            assertTrue( "ID should be return" ,
+                        ID >= 0 );
+        }
+
+        // Read
+        final TW_Tweet tweet = client.readTweet( ID );
+
+        assertEquals( "ID should be the same" ,
+                      ID ,
+                      tweet.getID() );
+        assertTrue( "message should be the same (except the image link which is end added)" ,
+                    tweet.getMessage().startsWith( message ) );
+
+        // Delete
+        assertTrue( "Delete should work" ,
+                    client.deleteTweet( ID ) );
+    }
+
     // PRIVATE
     private final Dispatcher dispatcher;
     private final TwitterClient client;
