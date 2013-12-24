@@ -273,5 +273,10 @@ page at http://checkstyle.sourceforge.net/config.html
             <artifactId>httpmime</artifactId>
             <version>4.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.7.3</version>
+        </dependency>
     </dependencies>
 </project>
