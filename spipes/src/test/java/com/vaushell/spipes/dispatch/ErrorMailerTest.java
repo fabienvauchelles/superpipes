@@ -80,6 +80,7 @@ public class ErrorMailerTest
      * @throws java.lang.InterruptedException
      */
     @Test
+    @SuppressWarnings( "unchecked" )
     public void testPostError()
         throws InterruptedException
     {
