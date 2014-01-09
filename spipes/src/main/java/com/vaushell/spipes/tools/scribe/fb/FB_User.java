@@ -29,20 +29,10 @@ import java.util.Objects;
 public class FB_User
 {
     // PUBLIC
-    public FB_User( final String name ,
-                    final String ID )
+    public FB_User( final String ID ,
+                    final String name )
     {
-        this.name = name;
         this.ID = ID;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName( final String name )
-    {
         this.name = name;
     }
 
@@ -56,13 +46,23 @@ public class FB_User
         this.ID = ID;
     }
 
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName( final String name )
+    {
+        this.name = name;
+    }
+
     @Override
     public int hashCode()
     {
         int hash = 5;
 
-        hash = 23 * hash + Objects.hashCode( this.name );
         hash = 23 * hash + Objects.hashCode( this.ID );
+        hash = 23 * hash + Objects.hashCode( this.name );
 
         return hash;
     }
@@ -81,14 +81,15 @@ public class FB_User
         }
 
         final FB_User other = (FB_User) obj;
-        if ( !Objects.equals( this.name ,
-                              other.name ) )
+
+        if ( !Objects.equals( this.ID ,
+                              other.ID ) )
         {
             return false;
         }
 
-        if ( !Objects.equals( this.ID ,
-                              other.ID ) )
+        if ( !Objects.equals( this.name ,
+                              other.name ) )
         {
             return false;
         }
@@ -99,10 +100,10 @@ public class FB_User
     @Override
     public String toString()
     {
-        return "FB_User{" + "name=" + name + ", ID=" + ID + '}';
+        return "FB_User{" + "ID=" + ID + ", name=" + name + '}';
     }
 
     // PRIVATE
-    private String name;
     private String ID;
+    private String name;
 }
