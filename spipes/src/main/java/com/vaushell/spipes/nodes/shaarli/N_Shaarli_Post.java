@@ -20,10 +20,13 @@
 package com.vaushell.spipes.nodes.shaarli;
 
 import com.vaushell.shaarlijavaapi.ShaarliClient;
+import com.vaushell.shaarlijavaapi.ShaarliTemplates;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.net.URI;
+import java.util.List;
 import java.util.Set;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +43,27 @@ public class N_Shaarli_Post
     {
         super( 0L ,
                DEFAULT_ANTIBURST_IN_MS );
+
+        this.templates = new ShaarliTemplates();
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        final List<HierarchicalConfiguration> cTemplates = cNode.configurationsAt( "templates.template" );
+        if ( cTemplates != null )
+        {
+            for ( final HierarchicalConfiguration cTemplate : cTemplates )
+            {
+                templates.add( cTemplate.getString( "[@key]" ) ,
+                               cTemplate.getString( "[@csspath]" ) ,
+                               cTemplate.getString( "[@attribut]" ) ,
+                               cTemplate.getString( "[@regex]" ) );
+            }
+        }
     }
 
     // PROTECTED
@@ -47,7 +71,8 @@ public class N_Shaarli_Post
     protected void prepareImpl()
         throws Exception
     {
-        this.client = new ShaarliClient( getConfig( "url" ) );
+        this.client = new ShaarliClient( templates ,
+                                         getConfig( "url" ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -115,4 +140,5 @@ public class N_Shaarli_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Shaarli_Post.class );
     private ShaarliClient client;
+    private final ShaarliTemplates templates;
 }

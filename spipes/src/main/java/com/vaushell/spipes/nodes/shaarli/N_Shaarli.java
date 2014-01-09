@@ -21,12 +21,15 @@ package com.vaushell.spipes.nodes.shaarli;
 
 import com.vaushell.shaarlijavaapi.ShaarliClient;
 import com.vaushell.shaarlijavaapi.ShaarliLink;
+import com.vaushell.shaarlijavaapi.ShaarliTemplates;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +47,27 @@ public class N_Shaarli
         // Read every 10 minutes
         super( 600000L ,
                0L );
+
+        this.templates = new ShaarliTemplates();
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        final List<HierarchicalConfiguration> cTemplates = cNode.configurationsAt( "templates.template" );
+        if ( cTemplates != null )
+        {
+            for ( final HierarchicalConfiguration cTemplate : cTemplates )
+            {
+                templates.add( cTemplate.getString( "[@key]" ) ,
+                               cTemplate.getString( "[@csspath]" ) ,
+                               cTemplate.getString( "[@attribut]" ) ,
+                               cTemplate.getString( "[@regex]" ) );
+            }
+        }
     }
 
     // PROTECTED
@@ -51,7 +75,8 @@ public class N_Shaarli
     protected void prepareImpl()
         throws Exception
     {
-        this.client = new ShaarliClient( getConfig( "url" ) );
+        this.client = new ShaarliClient( templates ,
+                                         getConfig( "url" ) );
     }
 
     @Override
@@ -115,4 +140,5 @@ public class N_Shaarli
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Shaarli.class );
     private ShaarliClient client;
+    private final ShaarliTemplates templates;
 }
