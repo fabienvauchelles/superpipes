@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import org.scribe.builder.api.FacebookApi;
@@ -266,49 +267,99 @@ public class FacebookClient
     /**
      * Read a Facebook Feed.
      *
-     * @param userID User ID. 'me' for authenficated user.
      * @return the list of Post
      * @throws IOException
      * @throws FacebookException
      * @throws ParseException
      */
-    public List<FB_Post> readFeed( final String userID )
+    public List<FB_Post> readFeed()
         throws IOException , FacebookException , ParseException
     {
-        if ( userID == null || userID.isEmpty() )
-        {
-            throw new IllegalArgumentException();
-        }
-
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] readFeed() : userID=" + userID );
+                "[" + getClass().getSimpleName() + "] readFeed()" );
         }
 
-        final OAuthRequest request = new OAuthRequest( Verb.GET ,
-                                                       "https://graph.facebook.com/" + userID + "/feed" );
+        return readFeedImpl( "https://graph.facebook.com/" + target + "/feed" );
+    }
 
-        final Response response = sendSignedRequest( request );
-
-        final ObjectMapper mapper = new ObjectMapper();
-        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
-
-        checkErrors( response ,
-                     node );
-
-        final List<FB_Post> posts = new ArrayList<>();
-
-        final JsonNode nDatas = node.get( "data" );
-        if ( nDatas != null )
+    /**
+     * Iterator a Facebook Feed.
+     *
+     * @param limit Maximum number of results by call
+     * @return An iterator
+     */
+    public Iterator<FB_Post> iteratorFeed( final int limit )
+    {
+        return new Iterator<FB_Post>()
         {
-            for ( final JsonNode nData : nDatas )
+            @Override
+            public boolean hasNext()
             {
-                posts.add( convertJsonToPost( nData ) );
-            }
-        }
+                try
+                {
+                    if ( bufferCursor < buffer.size() )
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        buffer.clear();
+                        bufferCursor = 0;
 
-        return posts;
+                        final List<FB_Post> links;
+                        if ( lastTimestamp == null )
+                        {
+                            links = readFeedImpl( "https://graph.facebook.com/" + target
+                                                  + "/feed?limit=" + Integer.toString( limit ) );
+                        }
+                        else
+                        {
+                            links = readFeedImpl( "https://graph.facebook.com/" + target
+                                                  + "/feed?limit=" + Integer.toString( limit )
+                                                  + "&until=" + Long.toString( lastTimestamp / 1000L - 1L ) );
+                        }
+
+                        if ( links.isEmpty() )
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            lastTimestamp = links.get( links.size() - 1 ).getCreatedTime();
+
+                            buffer.addAll( links );
+
+                            return true;
+                        }
+                    }
+                }
+                catch( final FacebookException |
+                             IOException |
+                             ParseException ex )
+                {
+                    throw new RuntimeException( ex );
+                }
+            }
+
+            @Override
+            public FB_Post next()
+            {
+                return buffer.get( bufferCursor++ );
+            }
+
+            @Override
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+
+            // PRIVATE
+            private final List<FB_Post> buffer = new ArrayList<>();
+            private int bufferCursor;
+            private Long lastTimestamp;
+        };
     }
 
     /**
@@ -482,6 +533,38 @@ public class FacebookClient
         }
 
         throw new IllegalArgumentException( "Page '" + pageName + "' is not accessible" );
+    }
+
+    private List<FB_Post> readFeedImpl( final String url )
+        throws IOException , FacebookException , ParseException
+    {
+        if ( url == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       url );
+
+        final Response response = sendSignedRequest( request );
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final List<FB_Post> posts = new ArrayList<>();
+
+        final JsonNode nDatas = node.get( "data" );
+        if ( nDatas != null )
+        {
+            for ( final JsonNode nData : nDatas )
+            {
+                posts.add( convertJsonToPost( nData ) );
+            }
+        }
+
+        return posts;
     }
 
     private FB_Post convertJsonToPost( final JsonNode node )

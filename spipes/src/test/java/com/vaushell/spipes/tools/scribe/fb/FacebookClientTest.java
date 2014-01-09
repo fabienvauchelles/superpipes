@@ -24,6 +24,7 @@ import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -93,116 +94,117 @@ public class FacebookClientTest
                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }
 
-//    /**
-//     * Test postLink.
-//     *
-//     * @throws java.lang.Exception
-//     */
-//    @Test
-//    public void testPostLink()
-//        throws Exception
-//    {
-//        // Post
-//        final String message = "Allez voir ce blog #" + new Date().getTime();
-//
-//        final String ID = client.postLink( message ,
-//                                           "http://fabien.vauchelles.com/" ,
-//                                           "Blog de Fabien Vauchelles" ,
-//                                           "JAVA ou JAVAPA?" ,
-//                                           "Du JAVA, du big data, et de l'entreprenariat" );
-//
-//        assertTrue( "ID should be return" ,
-//                    ID != null && !ID.isEmpty() );
-//
-//        // Read
-//        final FB_Post post = client.readPost( ID );
-//
-//        assertEquals( "ID should be the same" ,
-//                      ID ,
-//                      post.getID() );
-//        assertEquals( "message should be the same" ,
-//                      message ,
-//                      post.getMessage() );
-//        assertEquals( "URL should be the same" ,
-//                      "http://fabien.vauchelles.com/" ,
-//                      post.getURL() );
-//        assertEquals( "URLname should be the same" ,
-//                      "Blog de Fabien Vauchelles" ,
-//                      post.getURLname() );
-//        assertEquals( "URLcaption should be the same" ,
-//                      "JAVA ou JAVAPA?" ,
-//                      post.getURLcaption() );
-//        assertEquals( "URLdescription should be the same" ,
-//                      "Du JAVA, du big data, et de l'entreprenariat" ,
-//                      post.getURLdescription() );
-//
-//        // Like/Unlike
-//        assertTrue( "Like should work" ,
-//                    client.likePost( ID ) );
-//        assertTrue( "Unlike should work" ,
-//                    client.unlikePost( ID ) );
-//
-//        // Delete
-//        assertTrue( "Delete should work" ,
-//                    client.deletePost( ID ) );
-//    }
-//
-//    /**
-//     * Test postMessage.
-//     *
-//     * @throws java.lang.Exception
-//     */
-//    @Test
-//    public void testPostMessage()
-//        throws Exception
-//    {
-//        // Post
-//        final String message = "Allez voir mon blog #" + new Date().getTime();
-//        final String ID = client.postMessage( message );
-//
-//        assertTrue( "ID should be return" ,
-//                    ID != null && !ID.isEmpty() );
-//
-//        // Read
-//        final FB_Post post = client.readPost( ID );
-//
-//        assertEquals( "ID should be the same" ,
-//                      ID ,
-//                      post.getID() );
-//        assertEquals( "message should be the same" ,
-//                      message ,
-//                      post.getMessage() );
-//
-//        // Delete
-//        assertTrue( "Delete should work" ,
-//                    client.deletePost( ID ) );
-//    }
-//
-//    /**
-//     * Test deletePost.
-//     *
-//     * @throws java.lang.Exception
-//     */
-//    @Test( expectedExceptions =
-//    {
-//        FacebookException.class
-//    } )
-//    public void testDeletePost()
-//        throws Exception
-//    {
-//        // Post
-//        final String ID = client.postMessage( "Allez voir mon blog #" + new Date().getTime() );
-//
-//        assertTrue( "ID should be return" ,
-//                    ID != null && !ID.isEmpty() );
-//
-//        // Delete
-//        assertTrue( "Delete should work" ,
-//                    client.deletePost( ID ) );
-//
-//        // Read error
-//        client.readPost( ID );
-//    }
+    /**
+     * Test postLink.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testPostLink()
+        throws Exception
+    {
+        // Post
+        final String message = "Allez voir ce blog #" + new Date().getTime();
+
+        final String ID = client.postLink( message ,
+                                           "http://fabien.vauchelles.com/" ,
+                                           "Blog de Fabien Vauchelles" ,
+                                           "JAVA ou JAVAPA?" ,
+                                           "Du JAVA, du big data, et de l'entreprenariat" );
+
+        assertTrue( "ID should be return" ,
+                    ID != null && !ID.isEmpty() );
+
+        // Read
+        final FB_Post post = client.readPost( ID );
+
+        assertEquals( "ID should be the same" ,
+                      ID ,
+                      post.getID() );
+        assertEquals( "message should be the same" ,
+                      message ,
+                      post.getMessage() );
+        assertEquals( "URL should be the same" ,
+                      "http://fabien.vauchelles.com/" ,
+                      post.getURL() );
+        assertEquals( "URLname should be the same" ,
+                      "Blog de Fabien Vauchelles" ,
+                      post.getURLname() );
+        assertEquals( "URLcaption should be the same" ,
+                      "JAVA ou JAVAPA?" ,
+                      post.getURLcaption() );
+        assertEquals( "URLdescription should be the same" ,
+                      "Du JAVA, du big data, et de l'entreprenariat" ,
+                      post.getURLdescription() );
+
+        // Like/Unlike
+        assertTrue( "Like should work" ,
+                    client.likePost( ID ) );
+        assertTrue( "Unlike should work" ,
+                    client.unlikePost( ID ) );
+
+        // Delete
+        assertTrue( "Delete should work" ,
+                    client.deletePost( ID ) );
+    }
+
+    /**
+     * Test postMessage.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testPostMessage()
+        throws Exception
+    {
+        // Post
+        final String message = "Allez voir mon blog #" + new Date().getTime();
+        final String ID = client.postMessage( message );
+
+        assertTrue( "ID should be return" ,
+                    ID != null && !ID.isEmpty() );
+
+        // Read
+        final FB_Post post = client.readPost( ID );
+
+        assertEquals( "ID should be the same" ,
+                      ID ,
+                      post.getID() );
+        assertEquals( "message should be the same" ,
+                      message ,
+                      post.getMessage() );
+
+        // Delete
+        assertTrue( "Delete should work" ,
+                    client.deletePost( ID ) );
+    }
+
+    /**
+     * Test deletePost.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test( expectedExceptions =
+    {
+        FacebookException.class
+    } )
+    public void testDeletePost()
+        throws Exception
+    {
+        // Post
+        final String ID = client.postMessage( "Allez voir mon blog #" + new Date().getTime() );
+
+        assertTrue( "ID should be return" ,
+                    ID != null && !ID.isEmpty() );
+
+        // Delete
+        assertTrue( "Delete should work" ,
+                    client.deletePost( ID ) );
+
+        // Read error
+        client.readPost( ID );
+    }
+
     /**
      * Test testReadFeed.
      *
@@ -242,7 +244,7 @@ public class FacebookClientTest
                     ID3 != null && !ID3.isEmpty() );
 
         // Retrieve post
-        final List<FB_Post> posts = client.readFeed( "me" );
+        final List<FB_Post> posts = client.readFeed();
         assertTrue( "We should have minimum 3 posts" ,
                     posts.size() >= 3 );
 
@@ -284,6 +286,25 @@ public class FacebookClientTest
         assertEquals( "Messages should be the same" ,
                       message1 ,
                       post1.getMessage() );
+
+        final Iterator<FB_Post> it = client.iteratorFeed( 1 );
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      it.next().getID() );
 
         // Delete Post 3
         assertTrue( "Delete should work" ,
