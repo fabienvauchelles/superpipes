@@ -59,18 +59,32 @@ public class N_FB
         final String pageName = getConfig( "pagename" );
         if ( pageName == null )
         {
-            client.login( getConfig( "key" ) ,
-                          getConfig( "secret" ) ,
-                          tokenPath ,
-                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+            final String userID = getConfig( "userid" );
+            if ( userID == null )
+            {
+                client.login( getConfig( "key" ) ,
+                              getConfig( "secret" ) ,
+                              tokenPath ,
+                              getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+            }
+            else
+            {
+                client.loginAsOtherUser( userID ,
+                                         getConfig( "key" ) ,
+                                         getConfig( "secret" ) ,
+                                         tokenPath ,
+                                         getDispatcher().getVCodeFactory().create(
+                    "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+            }
         }
         else
         {
-            client.login( pageName ,
-                          getConfig( "key" ) ,
-                          getConfig( "secret" ) ,
-                          tokenPath ,
-                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+            client.loginAsPage( pageName ,
+                                getConfig( "key" ) ,
+                                getConfig( "secret" ) ,
+                                tokenPath ,
+                                getDispatcher().getVCodeFactory().
+                create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
         }
     }
 

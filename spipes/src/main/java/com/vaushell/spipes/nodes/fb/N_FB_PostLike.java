@@ -64,11 +64,12 @@ public class N_FB_PostLike
         }
         else
         {
-            client.login( pageName ,
-                          getConfig( "key" ) ,
-                          getConfig( "secret" ) ,
-                          tokenPath ,
-                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+            client.loginAsPage( pageName ,
+                                getConfig( "key" ) ,
+                                getConfig( "secret" ) ,
+                                tokenPath ,
+                                getDispatcher().getVCodeFactory().
+                create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
         }
     }
 

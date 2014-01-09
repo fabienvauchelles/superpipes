@@ -77,7 +77,7 @@ public class FacebookClient
         loginImpl( FacebookApi.class ,
                    key ,
                    secret ,
-                   "publish_stream" ,
+                   "read_stream,publish_actions" ,
                    "http://www.facebook.com/connect/login_success.html" ,
                    false ,
                    tokenPath ,
@@ -87,7 +87,37 @@ public class FacebookClient
     }
 
     /**
-     * Log in.
+     * Log in as an other user.
+     *
+     * @param userID Force user ID
+     * @param key Facebook key
+     * @param secret Facebook secret
+     * @param tokenPath Path to save the token
+     * @param vCode How to get the verification code
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void loginAsOtherUser( final String userID ,
+                                  final String key ,
+                                  final String secret ,
+                                  final Path tokenPath ,
+                                  final A_ValidatorCode vCode )
+        throws IOException , InterruptedException
+    {
+        loginImpl( FacebookApi.class ,
+                   key ,
+                   secret ,
+                   "read_stream,publish_actions" ,
+                   "http://www.facebook.com/connect/login_success.html" ,
+                   false ,
+                   tokenPath ,
+                   vCode );
+
+        target = userID;
+    }
+
+    /**
+     * Log in as a page.
      *
      * @param pageName Page name (not the ID)
      * @param key Facebook key
@@ -98,17 +128,17 @@ public class FacebookClient
      * @throws InterruptedException
      * @throws FacebookException
      */
-    public void login( final String pageName ,
-                       final String key ,
-                       final String secret ,
-                       final Path tokenPath ,
-                       final A_ValidatorCode vCode )
+    public void loginAsPage( final String pageName ,
+                             final String key ,
+                             final String secret ,
+                             final Path tokenPath ,
+                             final A_ValidatorCode vCode )
         throws IOException , InterruptedException , FacebookException
     {
         loginImpl( FacebookApi.class ,
                    key ,
                    secret ,
-                   "publish_stream,manage_pages" ,
+                   "read_stream,publish_actions,manage_pages" ,
                    "http://www.facebook.com/connect/login_success.html" ,
                    false ,
                    tokenPath ,

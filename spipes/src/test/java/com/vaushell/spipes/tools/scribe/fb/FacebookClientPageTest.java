@@ -90,11 +90,11 @@ public class FacebookClientPageTest
                        pageName );
 
         // Create tokens & login
-        client.login( pageName ,
-                      key ,
-                      secret ,
-                      dispatcher.getDatas().resolve( "test-tokens/facebookpage.token" ) ,
-                      dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
+        client.loginAsPage( pageName ,
+                            key ,
+                            secret ,
+                            dispatcher.getDatas().resolve( "test-tokens/facebookpage.token" ) ,
+                            dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }
 
     /**
