@@ -22,19 +22,13 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
-import java.io.InputStream;
-import java.net.URI;
+import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,43 +84,15 @@ public class N_TW_Post
 
         // Send to Twitter
         final long ID;
-        if ( message.contains( Message.KeyIndex.URI_PICTURE ) )
+        if ( message.contains( Message.KeyIndex.PICTURE ) )
         {
-            final URI picture = (URI) message.getProperty( Message.KeyIndex.URI_PICTURE );
+            final byte[] picture = (byte[]) message.getProperty( Message.KeyIndex.PICTURE );
 
-            HttpEntity responseEntity = null;
-            try
+            try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
             {
-                // Exec request
-                final HttpGet get = new HttpGet( picture );
-
-                try( final CloseableHttpResponse response = httpClient.execute( get ) )
-                {
-                    final StatusLine sl = response.getStatusLine();
-                    if ( sl.getStatusCode() == 200 )
-                    {
-                        responseEntity = response.getEntity();
-
-                        try( final InputStream is = responseEntity.getContent() )
-                        {
-                            ID = client.tweetPicture( createContent( message ,
-                                                                     TwitterClient.TWEET_SIZE - TwitterClient.MEDIA_RESERVED ) ,
-                                                      is );
-                        }
-                    }
-                    else
-                    {
-                        ID = client.tweet( createContent( message ,
-                                                          TwitterClient.TWEET_SIZE ) );
-                    }
-                }
-            }
-            finally
-            {
-                if ( responseEntity != null )
-                {
-                    EntityUtils.consume( responseEntity );
-                }
+                ID = client.tweetPicture( createContent( message ,
+                                                         TwitterClient.TWEET_SIZE - TwitterClient.MEDIA_RESERVED ) ,
+                                          bis );
             }
         }
         else

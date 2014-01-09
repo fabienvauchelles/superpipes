@@ -19,7 +19,6 @@
 
 package com.vaushell.spipes.tools.http;
 
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,11 +57,11 @@ public class ImageExtractor
     /**
      * Return the biggest image URI of this webpage.
      *
-     * @param uri Webpage URI
-     * @return Biggest image URI
+     * @param rootURI Webpage URI
+     * @return Biggest image
      * @throws IOException
      */
-    public URI extractBiggestPicture( final URI uri )
+    public BufferedImage extractBiggest( final URI rootURI )
         throws IOException
     {
         final List<URI> imagesURIs = new ArrayList<>();
@@ -70,7 +69,7 @@ public class ImageExtractor
         try
         {
             // Exec request
-            final HttpGet get = new HttpGet( uri );
+            final HttpGet get = new HttpGet( rootURI );
 
             try( final CloseableHttpResponse response = client.execute( get ) )
             {
@@ -86,7 +85,7 @@ public class ImageExtractor
                 {
                     final Document doc = Jsoup.parse( is ,
                                                       "UTF-8" ,
-                                                      uri.toString() );
+                                                      rootURI.toString() );
 
                     final Elements elts = doc.select( "img" );
                     if ( elts != null )
@@ -96,7 +95,7 @@ public class ImageExtractor
                             final String src = elt.attr( "src" );
                             if ( src != null && !src.isEmpty() )
                             {
-                                imagesURIs.add( uri.resolve( src ) );
+                                imagesURIs.add( rootURI.resolve( src ) );
                             }
                         }
                     }
@@ -111,7 +110,7 @@ public class ImageExtractor
             }
         }
 
-        final Dimension[] dimensions = new Dimension[ imagesURIs.size() ];
+        final BufferedImage[] images = new BufferedImage[ imagesURIs.size() ];
         final ExecutorService service = Executors.newCachedThreadPool();
         for ( int i = 0 ; i < imagesURIs.size() ; ++i )
         {
@@ -124,11 +123,11 @@ public class ImageExtractor
                 {
                     try
                     {
-                        dimensions[ num] = extractPictureSize( imagesURIs.get( num ) );
+                        images[ num] = loadPicture( imagesURIs.get( num ) );
                     }
                     catch( final IOException ex )
                     {
-                        dimensions[ num] = null;
+                        images[ num] = null;
                     }
                 }
             } );
@@ -146,16 +145,17 @@ public class ImageExtractor
             // Ignore
         }
 
-        URI biggest = null;
+        BufferedImage biggest = null;
         int biggestSize = Integer.MIN_VALUE;
         for ( int i = 0 ; i < imagesURIs.size() ; ++i )
         {
-            if ( dimensions[i] != null )
+            if ( images[i] != null )
             {
-                final int actualSize = dimensions[ i].width * dimensions[i].height;
+                final int actualSize = images[ i].getWidth() * images[i].getHeight();
                 if ( actualSize > biggestSize )
                 {
-                    biggest = imagesURIs.get( i );
+                    biggest = images[ i];
+
                     biggestSize = actualSize;
                 }
             }
@@ -167,7 +167,7 @@ public class ImageExtractor
     // PRIVATE
     private final CloseableHttpClient client;
 
-    private Dimension extractPictureSize( final URI uri )
+    private BufferedImage loadPicture( final URI uri )
         throws IOException
     {
         HttpEntity responseEntity = null;
@@ -205,14 +205,7 @@ public class ImageExtractor
 
                 try( final InputStream is = responseEntity.getContent() )
                 {
-                    final BufferedImage image = ImageIO.read( is );
-                    if ( image == null )
-                    {
-                        return null;
-                    }
-
-                    return new Dimension( image.getWidth() ,
-                                          image.getHeight() );
+                    return ImageIO.read( is );
                 }
             }
         }

@@ -22,8 +22,11 @@ package com.vaushell.spipes.transforms.image;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.tools.http.ImageExtractor;
 import com.vaushell.spipes.transforms.A_Transform;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
+import javax.imageio.ImageIO;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -74,9 +77,18 @@ public class T_FindBiggest
         {
             final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
 
-            final URI biggest = extractor.extractBiggestPicture( uri );
-            message.setProperty( Message.KeyIndex.URI_PICTURE ,
-                                 biggest );
+            final BufferedImage biggest = extractor.extractBiggest( uri );
+
+            try( ByteArrayOutputStream bos = new ByteArrayOutputStream() )
+            {
+                // PNG is lossless
+                ImageIO.write( biggest ,
+                               "png" ,
+                               bos );
+
+                message.setProperty( Message.KeyIndex.PICTURE ,
+                                     bos.toByteArray() );
+            }
         }
 
         return message;
