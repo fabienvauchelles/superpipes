@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import org.scribe.builder.api.FacebookApi;
 import org.scribe.model.OAuthRequest;
@@ -258,18 +260,55 @@ public class FacebookClient
         checkErrors( response ,
                      node );
 
-        final JsonNode nodeFrom = node.get( "from" );
+        return convertJsonToPost( node );
+    }
 
-        return new FB_Post( node.get( "id" ).asText() ,
-                            convertNodeToString( node.get( "message" ) ) ,
-                            convertNodeToString( node.get( "link" ) ) ,
-                            convertNodeToString( node.get( "name" ) ) ,
-                            convertNodeToString( node.get( "caption" ) ) ,
-                            convertNodeToString( node.get( "description" ) ) ,
-                            new FB_User( nodeFrom.get( "id" ).asText() ,
-                                         nodeFrom.get( "name" ).asText() ) ,
-                            df.parse( node.get( "created_time" ).asText() ).getTime()
-        );
+    /**
+     * Read a Facebook Feed.
+     *
+     * @param userID User ID. 'me' for authenficated user.
+     * @return the list of Post
+     * @throws IOException
+     * @throws FacebookException
+     * @throws ParseException
+     */
+    public List<FB_Post> readFeed( final String userID )
+        throws IOException , FacebookException , ParseException
+    {
+        if ( userID == null || userID.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readFeed() : userID=" + userID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "https://graph.facebook.com/" + userID + "/feed" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final List<FB_Post> posts = new ArrayList<>();
+
+        final JsonNode nDatas = node.get( "data" );
+        if ( nDatas != null )
+        {
+            for ( final JsonNode nData : nDatas )
+            {
+                posts.add( convertJsonToPost( nData ) );
+            }
+        }
+
+        return posts;
     }
 
     /**
@@ -443,5 +482,21 @@ public class FacebookClient
         }
 
         throw new IllegalArgumentException( "Page '" + pageName + "' is not accessible" );
+    }
+
+    private FB_Post convertJsonToPost( final JsonNode node )
+        throws ParseException
+    {
+        final JsonNode nodeFrom = node.get( "from" );
+
+        return new FB_Post( node.get( "id" ).asText() ,
+                            convertNodeToString( node.get( "message" ) ) ,
+                            convertNodeToString( node.get( "link" ) ) ,
+                            convertNodeToString( node.get( "name" ) ) ,
+                            convertNodeToString( node.get( "caption" ) ) ,
+                            convertNodeToString( node.get( "description" ) ) ,
+                            new FB_User( nodeFrom.get( "id" ).asText() ,
+                                         nodeFrom.get( "name" ).asText() ) ,
+                            df.parse( node.get( "created_time" ).asText() ).getTime() );
     }
 }
