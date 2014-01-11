@@ -21,6 +21,7 @@ package com.vaushell.spipes.tools.scribe.fb;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.io.IOException;
@@ -175,6 +176,9 @@ public class FacebookClient
         request.addBodyParameter( "message" ,
                                   message );
 
+        request.addBodyParameter( "privacy" ,
+                                  "{'value':'EVERYONE'}" );
+
         final Response response = sendSignedRequest( request );
 
         final ObjectMapper mapper = new ObjectMapper();
@@ -218,6 +222,9 @@ public class FacebookClient
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
                                                        "https://graph.facebook.com/" + target + "/feed" );
+
+        request.addBodyParameter( "privacy" ,
+                                  "{'value':'EVERYONE'}" );
 
         if ( message != null && message.length() > 0 )
         {
