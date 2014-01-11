@@ -27,10 +27,10 @@ import java.io.ObjectOutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import java.util.TreeSet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.slf4j.Logger;
@@ -53,6 +53,7 @@ public class N_Buffer
         this.slots = new ArrayList<>();
         this.messageIDs = new TreeSet<>();
         this.lastWrite = null;
+        this.rnd = new Random();
     }
 
     @Override
@@ -75,7 +76,28 @@ public class N_Buffer
             }
         }
 
-        flowLimit = Long.parseLong( getConfig( "flow-limit" ) );
+        final String flowLimitStr = getConfig( "flow-limit" );
+        if ( flowLimitStr == null )
+        {
+            flowLimit = null;
+        }
+        else
+        {
+            flowLimit = Long.parseLong( flowLimitStr );
+        }
+
+        final String waitMinStr = getConfig( "wait-min" );
+        final String waitMaxStr = getConfig( "wait-max" );
+        if ( waitMinStr == null || waitMaxStr == null )
+        {
+            waitMin = null;
+            waitMax = null;
+        }
+        else
+        {
+            waitMin = Integer.parseInt( waitMinStr );
+            waitMax = Integer.parseInt( waitMaxStr );
+        }
     }
 
     // PROTECTED
@@ -92,7 +114,8 @@ public class N_Buffer
         {
             for ( final Path p : stream )
             {
-                messageIDs.add( p.getFileName().toString() );
+                final long ID = Long.parseLong( p.getFileName().toString() );
+                messageIDs.add( ID );
             }
         }
     }
@@ -118,6 +141,8 @@ public class N_Buffer
             {
                 pushMessage( message );
             }
+
+            // And loop again.
         }
         else
         {
@@ -164,11 +189,14 @@ public class N_Buffer
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Buffer.class );
-    private long flowLimit;
+    private Long flowLimit;
     private final List<Slot> slots;
-    private final TreeSet<String> messageIDs;
+    private final TreeSet<Long> messageIDs;
+    private Integer waitMin;
+    private Integer waitMax;
     private Long lastWrite;
     private Path messagesPath;
+    private final Random rnd;
 
     private Message popMessage()
         throws IOException , ClassNotFoundException
@@ -178,10 +206,9 @@ public class N_Buffer
             return null;
         }
 
-        final String ID = messageIDs.pollFirst();
+        final Long ID = messageIDs.pollFirst();
 
-        final Path p = Paths.get( messagesPath.toString() ,
-                                  ID );
+        final Path p = messagesPath.resolve( Long.toString( ID ) );
 
         final Message m = readMessage( p );
 
@@ -193,18 +220,52 @@ public class N_Buffer
     private void pushMessage( final Message message )
         throws IOException
     {
-        final String ID = Long.toString( Calendar.getInstance().getTimeInMillis() );
+        final long now = Calendar.getInstance().getTimeInMillis();
 
-        Path p = Paths.get( messagesPath.toString() ,
-                            ID );
-
-        int i = 2;
-        while ( Files.exists( p ) )
+        final long delta;
+        if ( waitMin == null || waitMax == null )
         {
-            p = Paths.get( messagesPath.toString() ,
-                           ID + i );
+            delta = 0L;
+        }
+        else
+        {
+            if ( waitMin.equals( waitMax ) )
+            {
+                delta = waitMin;
+            }
+            else
+            {
+                delta = (long) ( rnd.nextInt( waitMax - waitMin ) + waitMin );
+            }
+        }
 
-            ++i;
+        final long ID;
+        if ( messageIDs.isEmpty() )
+        {
+            ID = now + delta;
+        }
+        else
+        {
+            final long askedID = now + delta;
+
+            final long lastTime = messageIDs.last();
+            if ( askedID < lastTime )
+            {
+                ID = lastTime + 1L;
+            }
+            else
+            {
+                ID = askedID;
+            }
+        }
+
+        final Path p = messagesPath.resolve( Long.toString( ID ) );
+
+        if ( LOGGER.isDebugEnabled() )
+        {
+            LOGGER.debug(
+                "[" + getNodeID() + "] write message with ID=" + ID
+            );
         }
 
         writeMessage( p ,
@@ -240,7 +301,7 @@ public class N_Buffer
         }
 
         // Anti burst
-        if ( lastWrite != null )
+        if ( flowLimit != null && lastWrite != null )
         {
             final long diff = calendar.getTimeInMillis() - lastWrite;
             if ( diff < flowLimit )
@@ -250,6 +311,20 @@ public class N_Buffer
             }
         }
 
+        // First message
+        if ( messageIDs.size() > 0 )
+        {
+            final long firstDate = messageIDs.first();
+            final long now = calendar.getTimeInMillis();
+
+            if ( firstDate > now )
+            {
+                minTime = Math.max( minTime ,
+                                    firstDate - now );
+            }
+        }
+
+        // Result
         return minTime;
     }
 
