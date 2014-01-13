@@ -28,8 +28,10 @@ import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -95,6 +97,22 @@ public class FacebookClientTest
     }
 
     /**
+     * Remove all links before each test.
+     *
+     * @throws java.lang.Exception
+     */
+    @BeforeMethod
+    public void cleanAndCheck()
+        throws Exception
+    {
+        client.deleteAllPosts();
+
+        final Iterator<FB_Post> itControl = client.iteratorFeed( 1 );
+        assertFalse( "Delete all should remove all links" ,
+                     itControl.hasNext() );
+    }
+
+    /**
      * Test postLink.
      *
      * @throws java.lang.Exception
@@ -106,11 +124,15 @@ public class FacebookClientTest
         // Post
         final String message = "Allez voir ce blog #" + new DateTime().getMillis();
 
+        // Force post to be post one month ago, but it won't work.
+        final DateTime dt = new DateTime().minusMonths( 1 );
+
         final String ID = client.postLink( message ,
                                            "http://fabien.vauchelles.com/" ,
                                            "Blog de Fabien Vauchelles" ,
                                            "JAVA ou JAVAPA?" ,
-                                           "Du JAVA, du big data, et de l'entreprenariat" );
+                                           "Du JAVA, du big data, et de l'entreprenariat" ,
+                                           dt );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
@@ -136,6 +158,9 @@ public class FacebookClientTest
         assertEquals( "URLdescription should be the same" ,
                       "Du JAVA, du big data, et de l'entreprenariat" ,
                       post.getURLdescription() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( post.getCreatedTime() ,
+                                  null ).getMillis() < 60000L );
 
         // Like/Unlike
         assertTrue( "Like should work" ,
@@ -158,8 +183,13 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir mon blog #" + new DateTime().getMillis();
-        final String ID = client.postMessage( message );
+        final String message = "Allez voir ce blog #" + new DateTime().getMillis();
+
+        // Force post to be post one month ago, but it won't work.
+        final DateTime dt = new DateTime().minusMonths( 1 );
+
+        final String ID = client.postMessage( message ,
+                                              dt );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
@@ -173,6 +203,9 @@ public class FacebookClientTest
         assertEquals( "message should be the same" ,
                       message ,
                       post.getMessage() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( post.getCreatedTime() ,
+                                  null ).getMillis() < 60000L );
 
         // Delete
         assertTrue( "Delete should work" ,
@@ -192,7 +225,8 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() );
+        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
+                                              null );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
@@ -216,7 +250,8 @@ public class FacebookClientTest
     {
         // Post 1
         final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
-        final String ID1 = client.postMessage( message1 );
+        final String ID1 = client.postMessage( message1 ,
+                                               null );
 
         assertTrue( "ID1 should be return" ,
                     ID1 != null && !ID1.isEmpty() );
@@ -231,14 +266,16 @@ public class FacebookClientTest
                                             url2 ,
                                             urlName2 ,
                                             urlCaption2 ,
-                                            urlDescription2 );
+                                            urlDescription2 ,
+                                            null );
 
         assertTrue( "ID2 should be return" ,
                     ID2 != null && !ID2.isEmpty() );
 
         // Post 3
         final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
-        final String ID3 = client.postMessage( message3 );
+        final String ID3 = client.postMessage( message3 ,
+                                               null );
 
         assertTrue( "ID3 should be return" ,
                     ID3 != null && !ID3.isEmpty() );

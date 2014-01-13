@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.scribe.builder.api.FacebookApi;
@@ -53,10 +52,14 @@ public class FacebookClient
     {
         super();
 
-        this.fmtPST = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ssZ" )
-            .withZone( DateTimeZone.forID( "America/Los_Angeles" ) );
+        this.fmtPSTread = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ssZ" );
+
+        // To manage backdating problem : http://stackoverflow.com/questions/20649571/backdating-posts-with-facebook-graph-api
+        // We force our date, with a PST TimeZone (-0800)
+        this.fmtPSTwrite = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ss-0800" );
 
         this.target = null;
+        this.targetType = null;
     }
 
     /**
@@ -85,6 +88,7 @@ public class FacebookClient
                    vCode );
 
         target = "me";
+        targetType = TargetType.ME;
     }
 
     /**
@@ -115,6 +119,7 @@ public class FacebookClient
                    vCode );
 
         target = userID;
+        targetType = TargetType.OTHER;
     }
 
     /**
@@ -146,17 +151,20 @@ public class FacebookClient
                    vCode );
 
         updateTarget( pageName );
+        targetType = TargetType.PAGE;
     }
 
     /**
      * Post a message to Facebook.
      *
      * @param message Message's content
+     * @param date Force message's date
      * @return Post ID
      * @throws FacebookException
      * @throws IOException
      */
-    public String postMessage( final String message )
+    public String postMessage( final String message ,
+                               final DateTime date )
         throws FacebookException , IOException
     {
         if ( message == null || message.isEmpty() )
@@ -167,20 +175,51 @@ public class FacebookClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message );
+                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message + " / date=" + date );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
                                                        "https://graph.facebook.com/" + target + "/feed" );
 
+        switch( targetType )
+        {
+            case ME:
+            {
+                request.addBodyParameter( "privacy" ,
+                                          "{'value':'EVERYONE'}" );
+
+                break;
+            }
+
+            case PAGE:
+            {
+                if ( date != null )
+                {
+                    final DateTime now = new DateTime();
+
+                    if ( date.isBefore( now ) )
+                    {
+                        request.addBodyParameter( "backdated_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
+                    else if ( date.isAfter( now ) )
+                    {
+                        request.addBodyParameter( "scheduled_publish_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
+                }
+
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+
         request.addBodyParameter( "message" ,
                                   message );
-
-        if ( "me".equals( target ) )
-        {
-            request.addBodyParameter( "privacy" ,
-                                      "{'value':'EVERYONE'}" );
-        }
 
         final Response response = sendSignedRequest( request );
 
@@ -201,6 +240,7 @@ public class FacebookClient
      * @param uriName Link's name
      * @param uriCaption Link's caption
      * @param uriDescription Link's description
+     * @param date Force message's date
      * @return Post ID
      * @throws FacebookException
      * @throws IOException
@@ -209,7 +249,8 @@ public class FacebookClient
                             final String uri ,
                             final String uriName ,
                             final String uriCaption ,
-                            final String uriDescription )
+                            final String uriDescription ,
+                            final DateTime date )
         throws FacebookException , IOException
     {
         if ( uri == null || uri.isEmpty() )
@@ -220,16 +261,47 @@ public class FacebookClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postLink() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription );
+                "[" + getClass().getSimpleName() + "] postLink() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription + " / date=" + date );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
                                                        "https://graph.facebook.com/" + target + "/feed" );
 
-        if ( "me".equals( target ) )
+        switch( targetType )
         {
-            request.addBodyParameter( "privacy" ,
-                                      "{'value':'EVERYONE'}" );
+            case ME:
+            {
+                request.addBodyParameter( "privacy" ,
+                                          "{'value':'EVERYONE'}" );
+
+                break;
+            }
+
+            case PAGE:
+            {
+                if ( date != null )
+                {
+                    final DateTime now = new DateTime();
+
+                    if ( date.isBefore( now ) )
+                    {
+                        request.addBodyParameter( "backdated_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
+                    else if ( date.isAfter( now ) )
+                    {
+                        request.addBodyParameter( "scheduled_publish_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
+                }
+
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
         }
 
         if ( message != null && message.length() > 0 )
@@ -439,6 +511,27 @@ public class FacebookClient
     }
 
     /**
+     * Delete all posts. Warning! Could crash because you haven't the rights.
+     *
+     * @throws IOException
+     * @throws FacebookException
+     */
+    public void deleteAllPosts()
+        throws IOException , FacebookException
+    {
+        List<FB_Post> posts = readFeed();
+        while ( !posts.isEmpty() )
+        {
+            for ( final FB_Post post : posts )
+            {
+                deletePost( post.getID() );
+            }
+
+            posts = readFeed();
+        }
+    }
+
+    /**
      * Like a Facebook Post.
      *
      * @param ID Post ID
@@ -512,8 +605,17 @@ public class FacebookClient
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
-    private final DateTimeFormatter fmtPST;
+    private final DateTimeFormatter fmtPSTread;
+    private final DateTimeFormatter fmtPSTwrite;
     private String target;
+    private TargetType targetType;
+
+    private enum TargetType
+    {
+        ME,
+        OTHER,
+        PAGE
+    }
 
     private void checkErrors( final Response response ,
                               final JsonNode root )
@@ -619,6 +721,6 @@ public class FacebookClient
                             convertNodeToString( node.get( "description" ) ) ,
                             new FB_User( nodeFrom.get( "id" ).asText() ,
                                          nodeFrom.get( "name" ).asText() ) ,
-                            fmtPST.parseDateTime( node.get( "created_time" ).asText() ) );
+                            fmtPSTread.parseDateTime( node.get( "created_time" ).asText() ) );
     }
 }

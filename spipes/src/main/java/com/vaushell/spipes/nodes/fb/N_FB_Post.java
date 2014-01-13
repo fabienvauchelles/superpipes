@@ -25,6 +25,7 @@ import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,11 +125,22 @@ public class N_FB_Post
             caption = null;
         }
 
+        final DateTime date;
+        if ( "true".equals( getConfig( "backdating" ) ) )
+        {
+            date = (DateTime) message.getProperty( Message.KeyIndex.PUBLISHED_DATE );
+        }
+        else
+        {
+            date = null;
+        }
+
         final String ID = client.postLink( null ,
                                            uriStr ,
                                            (String) message.getProperty( Message.KeyIndex.TITLE ) ,
                                            caption ,
-                                           (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) );
+                                           (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                           date );
 
         if ( LOGGER.isTraceEnabled() )
         {

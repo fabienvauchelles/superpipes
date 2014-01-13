@@ -23,11 +23,14 @@ import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -98,6 +101,22 @@ public class FacebookClientPageTest
     }
 
     /**
+     * Remove all links before each test.
+     *
+     * @throws java.lang.Exception
+     */
+    @BeforeMethod
+    public void cleanAndCheck()
+        throws Exception
+    {
+        client.deleteAllPosts();
+
+        final Iterator<FB_Post> itControl = client.iteratorFeed( 1 );
+        assertFalse( "Delete all should remove all links" ,
+                     itControl.hasNext() );
+    }
+
+    /**
      * Test postLink.
      *
      * @throws java.lang.Exception
@@ -109,11 +128,15 @@ public class FacebookClientPageTest
         // Post
         final String message = "Allez voir ce blog #" + new DateTime().getMillis();
 
+        // Force post to be post one month ago
+        final DateTime dt = new DateTime().minusMonths( 1 );
+
         final String ID = client.postLink( message ,
                                            "http://fabien.vauchelles.com/" ,
                                            "Blog de Fabien Vauchelles" ,
                                            "JAVA ou JAVAPA?" ,
-                                           "Du JAVA, du big data, et de l'entreprenariat" );
+                                           "Du JAVA, du big data, et de l'entreprenariat" ,
+                                           dt );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
@@ -139,7 +162,14 @@ public class FacebookClientPageTest
         assertEquals( "URLdescription should be the same" ,
                       "Du JAVA, du big data, et de l'entreprenariat" ,
                       post.getURLdescription() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( post.getCreatedTime() ,
+                                  null ).getMillis() < 60000L );
 
+        // Warning : we cannot control backdating. FB send only real creation date.
+//        assertEquals( "Create date should be the same" ,
+//                      dt.getMillis() ,
+//                      post.getCreatedTime().getMillis() );
         // Like/Unlike
         assertTrue( "Like should work" ,
                     client.likePost( ID ) );
@@ -162,7 +192,12 @@ public class FacebookClientPageTest
     {
         // Post
         final String message = "Allez voir mon blog #" + new DateTime().getMillis();
-        final String ID = client.postMessage( message );
+
+        // Force post to be post one month ago
+        final DateTime dt = new DateTime().minusMonths( 1 );
+
+        final String ID = client.postMessage( message ,
+                                              dt );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
@@ -176,7 +211,14 @@ public class FacebookClientPageTest
         assertEquals( "message should be the same" ,
                       message ,
                       post.getMessage() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( post.getCreatedTime() ,
+                                  null ).getMillis() < 60000L );
 
+        // Warning : we cannot control backdating. FB send only real creation date.
+//        assertEquals( "Create date should be the same" ,
+//                      dt.getMillis() ,
+//                      post.getCreatedTime().getMillis() );
         // Delete
         assertTrue( "Delete should work" ,
                     client.deletePost( ID ) );
@@ -195,7 +237,8 @@ public class FacebookClientPageTest
         throws Exception
     {
         // Post
-        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() );
+        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
+                                              null );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
