@@ -250,7 +250,7 @@ page at http://checkstyle.sourceforge.net/config.html
         <dependency>
             <groupId>com.vaushell</groupId>
             <artifactId>shaarli-java-api</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>commons-daemon</groupId>

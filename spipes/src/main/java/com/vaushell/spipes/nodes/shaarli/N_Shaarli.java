@@ -25,13 +25,13 @@ import com.vaushell.shaarlijavaapi.ShaarliTemplates;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import java.net.URI;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +94,16 @@ public class N_Shaarli
         final int max = Integer.parseInt( getConfig( "max" ) );
 
         int count = 0;
-        final Iterator<ShaarliLink> it = client.searchAllIterator();
+        final Iterator<ShaarliLink> it;
+        if ( "true".equals( getConfig( "reverse" ) ) )
+        {
+            it = client.searchAllReverseIterator();
+        }
+        else
+        {
+            it = client.searchAllIterator();
+        }
+
         while ( it.hasNext() && count < max )
         {
             final ShaarliLink sl = it.next();
@@ -127,11 +136,13 @@ public class N_Shaarli
                     tags
                 );
 
-                final Date dt = client.convertIDstringToDate( sl.getID() );
+                final DateTime dt = client.convertIDstringToDate( sl.getID() );
+
                 if ( dt != null )
                 {
+                    dt.toDateTime( DateTimeZone.UTC );
                     message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                                         new DateTime( dt ) );
+                                         dt );
                 }
 
                 sendMessage( message );
