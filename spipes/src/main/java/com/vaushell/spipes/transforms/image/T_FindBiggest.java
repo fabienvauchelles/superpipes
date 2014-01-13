@@ -77,20 +77,28 @@ public class T_FindBiggest
         {
             final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
 
-            final BufferedImage biggest = extractor.extractBiggest( uri );
-
-            if ( biggest != null )
+            try
             {
-                try( ByteArrayOutputStream bos = new ByteArrayOutputStream() )
-                {
-                    // PNG is lossless
-                    ImageIO.write( biggest ,
-                                   "png" ,
-                                   bos );
+                final BufferedImage biggest = extractor.extractBiggest( uri );
 
-                    message.setProperty( Message.KeyIndex.PICTURE ,
-                                         bos.toByteArray() );
+                if ( biggest != null )
+                {
+                    try( ByteArrayOutputStream bos = new ByteArrayOutputStream() )
+                    {
+                        // PNG is lossless
+                        ImageIO.write( biggest ,
+                                       "png" ,
+                                       bos );
+
+                        message.setProperty( Message.KeyIndex.PICTURE ,
+                                             bos.toByteArray() );
+                    }
                 }
+            }
+            catch( final IOException ex )
+            {
+                LOGGER.error( "Image extraction error" ,
+                              ex );
             }
         }
 
