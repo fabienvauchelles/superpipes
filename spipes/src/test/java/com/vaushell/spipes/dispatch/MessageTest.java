@@ -27,8 +27,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.TreeSet;
+import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -72,7 +72,7 @@ public class MessageTest
             Message.KeyIndex.CONTENT ,
             "Le contenu, je m'en fous" ,
             Message.KeyIndex.PUBLISHED_DATE ,
-            new Date().getTime() ,
+            new DateTime() ,
             Message.KeyIndex.TAGS ,
             new TreeSet<>( Arrays.asList( "ceci" ,
                                           "est" ,

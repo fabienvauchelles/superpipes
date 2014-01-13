@@ -24,10 +24,8 @@ import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.dummy.N_Dummy;
 import com.vaushell.spipes.transforms.A_Transform;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -58,9 +56,9 @@ public class T_DateTest
                                              N_Dummy.class );
         final A_Transform t = n.addTransformIN( T_Date.class );
         t.getProperties().setProperty( "date-min" ,
-                                       "01/03/2014 10:30" );
+                                       "01/03/2014 10:30:00" );
         t.getProperties().setProperty( "date-max" ,
-                                       "02/03/2014 18:00" );
+                                       "02/03/2014 18:00:00" );
 
         // Prepare
         n.prepare();
@@ -69,7 +67,7 @@ public class T_DateTest
         Message m = Message.create( Message.KeyIndex.TITLE ,
                                     "mon titre" ,
                                     Message.KeyIndex.PUBLISHED_DATE ,
-                                    generateTimestamp( "01/03/2014 10:31" ) );
+                                    generateTimestamp( "01/03/2014 10:31:00" ) );
 
         assertNotNull( "Message is inside" ,
                        t.transform( m ) );
@@ -77,7 +75,7 @@ public class T_DateTest
         m = Message.create( Message.KeyIndex.TITLE ,
                             "mon titre" ,
                             Message.KeyIndex.PUBLISHED_DATE ,
-                            generateTimestamp( "01/03/2014 10:29" ) );
+                            generateTimestamp( "01/03/2014 10:29:00" ) );
 
         assertNull( "Message is outside" ,
                     t.transform( m ) );
@@ -85,7 +83,7 @@ public class T_DateTest
         m = Message.create( Message.KeyIndex.TITLE ,
                             "mon titre" ,
                             Message.KeyIndex.PUBLISHED_DATE ,
-                            generateTimestamp( "02/03/2014 18:01" ) );
+                            generateTimestamp( "02/03/2014 18:01:00" ) );
 
         assertNull( "Message is outside" ,
                     t.transform( m ) );
@@ -103,14 +101,8 @@ public class T_DateTest
     // PRIVATE
     private final Dispatcher dispatcher;
 
-    private long generateTimestamp( final String dt )
-        throws ParseException
+    private DateTime generateTimestamp( final String dt )
     {
-        final Calendar cal = Calendar.getInstance();
-
-        cal.setTime( new SimpleDateFormat( "dd/MM/yyyy HH:ss" ,
-                                           Locale.ENGLISH ).parse( dt ) );
-
-        return cal.getTimeInMillis();
+        return DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" ).parseDateTime( dt );
     }
 }

@@ -21,10 +21,9 @@ package com.vaushell.spipes.transforms.date;
 
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.transforms.A_Transform;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +40,7 @@ public class T_Date
     {
         super();
 
-        this.df = new SimpleDateFormat( "dd/MM/yyyy HH:ss" ,
-                                        Locale.ENGLISH );
+        this.df = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
     }
 
     @Override
@@ -52,29 +50,13 @@ public class T_Date
         final String minDateStr = getConfig( "date-min" );
         if ( minDateStr != null )
         {
-            try
-            {
-                minCal = Calendar.getInstance();
-                minCal.setTime( df.parse( minDateStr ) );
-            }
-            catch( final ParseException ex )
-            {
-                // Nothing
-            }
+            minCal = df.parseDateTime( minDateStr );
         }
 
         final String maxDateStr = getConfig( "date-max" );
         if ( maxDateStr != null )
         {
-            try
-            {
-                maxCal = Calendar.getInstance();
-                maxCal.setTime( df.parse( maxDateStr ) );
-            }
-            catch( final ParseException ex )
-            {
-                // Nothing
-            }
+            maxCal = df.parseDateTime( maxDateStr );
         }
     }
 
@@ -92,14 +74,13 @@ public class T_Date
             return null;
         }
 
-        final Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis( (Long) message.getProperty( Message.KeyIndex.PUBLISHED_DATE ) );
-        if ( minCal != null && minCal.after( cal ) )
+        final DateTime cal = (DateTime) message.getProperty( Message.KeyIndex.PUBLISHED_DATE );
+        if ( minCal != null && minCal.isAfter( cal ) )
         {
             return null;
         }
 
-        if ( maxCal != null && maxCal.before( cal ) )
+        if ( maxCal != null && maxCal.isBefore( cal ) )
         {
             return null;
         }
@@ -116,7 +97,7 @@ public class T_Date
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( T_Date.class );
-    private Calendar minCal;
-    private Calendar maxCal;
-    private final SimpleDateFormat df;
+    private DateTime minCal;
+    private DateTime maxCal;
+    private final DateTimeFormatter df;
 }

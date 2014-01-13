@@ -20,6 +20,7 @@
 package com.vaushell.spipes.tools.scribe.fb;
 
 import java.util.Objects;
+import org.joda.time.DateTime;
 
 /**
  * A Facebook Post.
@@ -36,7 +37,7 @@ public class FB_Post
                     final String urlCaption ,
                     final String urlDescription ,
                     final FB_User from ,
-                    final long createdTime )
+                    final DateTime createdTime )
     {
         this.ID = ID;
         this.message = message;
@@ -118,12 +119,12 @@ public class FB_Post
         this.from = from;
     }
 
-    public long getCreatedTime()
+    public DateTime getCreatedTime()
     {
         return createdTime;
     }
 
-    public void setCreatedTime( final long createdTime )
+    public void setCreatedTime( final DateTime createdTime )
     {
         this.createdTime = createdTime;
     }
@@ -131,16 +132,16 @@ public class FB_Post
     @Override
     public int hashCode()
     {
-        int hash = 5;
+        int hash = 3;
 
-        hash = 47 * hash + Objects.hashCode( this.ID );
-        hash = 47 * hash + Objects.hashCode( this.message );
-        hash = 47 * hash + Objects.hashCode( this.url );
-        hash = 47 * hash + Objects.hashCode( this.urlName );
-        hash = 47 * hash + Objects.hashCode( this.urlCaption );
-        hash = 47 * hash + Objects.hashCode( this.urlDescription );
-        hash = 47 * hash + Objects.hashCode( this.from );
-        hash = 47 * hash + (int) ( this.createdTime ^ ( this.createdTime >>> 32 ) );
+        hash = 67 * hash + Objects.hashCode( this.ID );
+        hash = 67 * hash + Objects.hashCode( this.message );
+        hash = 67 * hash + Objects.hashCode( this.url );
+        hash = 67 * hash + Objects.hashCode( this.urlName );
+        hash = 67 * hash + Objects.hashCode( this.urlCaption );
+        hash = 67 * hash + Objects.hashCode( this.urlDescription );
+        hash = 67 * hash + Objects.hashCode( this.from );
+        hash = 67 * hash + Objects.hashCode( this.createdTime );
 
         return hash;
     }
@@ -223,5 +224,5 @@ public class FB_Post
     private String urlCaption;
     private String urlDescription;
     private FB_User from;
-    private long createdTime;
+    private DateTime createdTime;
 }

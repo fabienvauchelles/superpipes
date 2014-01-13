@@ -41,8 +41,8 @@ public class N_Shaarli_Post
     // PUBLIC
     public N_Shaarli_Post()
     {
-        super( 0L ,
-               DEFAULT_ANTIBURST_IN_MS );
+        super( null ,
+               DEFAULT_ANTIBURST );
 
         this.templates = new ShaarliTemplates();
     }

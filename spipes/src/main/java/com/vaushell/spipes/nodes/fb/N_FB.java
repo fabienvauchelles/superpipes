@@ -27,6 +27,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,8 +43,8 @@ public class N_FB
     public N_FB()
     {
         // Read every 10 minutes
-        super( 600000L ,
-               0L );
+        super( new Duration( 600000L ) ,
+               null );
 
         this.client = new FacebookClient();
     }

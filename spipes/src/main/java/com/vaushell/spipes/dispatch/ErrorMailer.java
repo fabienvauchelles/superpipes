@@ -32,6 +32,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +53,7 @@ public class ErrorMailer
         this.activated = true;
         this.internalStack = new ArrayList<>();
         this.properties = new Properties();
-        this.antiBurstInMs = 1000L;
+        this.antiBurst = new Duration( 1000L );
     }
 
     /**
@@ -71,7 +73,12 @@ public class ErrorMailer
 
         if ( properties.containsKey( "anti-burst" ) )
         {
-            antiBurstInMs = Long.parseLong( properties.getProperty( "anti-burst" ) );
+            antiBurst = new Duration( Long.parseLong( properties.getProperty( "anti-burst" ) ) );
+
+            if ( antiBurst.getMillis() <= 0L )
+            {
+                throw new IllegalArgumentException( "anti-burst can't be <=0. Should be null or empty." );
+            }
         }
     }
 
@@ -176,10 +183,10 @@ public class ErrorMailer
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( ErrorMailer.class );
-    private long antiBurstInMs;
+    private Duration antiBurst;
     private final List<Throwable> internalStack;
     private volatile boolean activated;
-    private Long lastPop;
+    private DateTime lastPop;
 
     private boolean isActive()
     {
@@ -199,36 +206,39 @@ public class ErrorMailer
 
         synchronized( internalStack )
         {
-            long remaining;
+            Duration remaining;
             if ( lastPop == null )
             {
-                remaining = 0L;
+                remaining = new Duration( 0L );
             }
             else
             {
-                final long elapsed = System.currentTimeMillis() - lastPop;
-                remaining = antiBurstInMs - elapsed;
+                // Null for now
+                final Duration elapsed = new Duration( lastPop ,
+                                                       null );
+                remaining = antiBurst.minus( elapsed );
             }
 
-            while ( internalStack.isEmpty() || remaining > 0L )
+            while ( internalStack.isEmpty() || remaining.getMillis() > 0L )
             {
-                if ( internalStack.isEmpty() || remaining <= 0L )
+                if ( internalStack.isEmpty() || remaining.getMillis() <= 0L )
                 {
                     internalStack.wait();
                 }
                 else
                 {
-                    internalStack.wait( remaining );
+                    internalStack.wait( remaining.getMillis() );
                 }
 
                 if ( lastPop == null )
                 {
-                    remaining = 0L;
+                    remaining = new Duration( 0L );
                 }
                 else
                 {
-                    final long elapsed = System.currentTimeMillis() - lastPop;
-                    remaining = antiBurstInMs - elapsed;
+                    final Duration elapsed = new Duration( lastPop ,
+                                                           null );
+                    remaining = antiBurst.minus( elapsed );
                 }
             }
 
@@ -237,7 +247,7 @@ public class ErrorMailer
 
             internalStack.clear();
 
-            lastPop = System.currentTimeMillis();
+            lastPop = new DateTime();
 
             return ret;
         }

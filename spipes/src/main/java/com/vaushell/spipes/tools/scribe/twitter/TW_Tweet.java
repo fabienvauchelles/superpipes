@@ -20,6 +20,7 @@
 package com.vaushell.spipes.tools.scribe.twitter;
 
 import java.util.Objects;
+import org.joda.time.DateTime;
 
 /**
  * A tweet.
@@ -32,7 +33,7 @@ public class TW_Tweet
     public TW_Tweet( final long ID ,
                      final String message ,
                      final TW_User user ,
-                     final long createdTime )
+                     final DateTime createdTime )
     {
         this.ID = ID;
         this.message = message;
@@ -70,12 +71,12 @@ public class TW_Tweet
         this.user = user;
     }
 
-    public long getCreatedTime()
+    public DateTime getCreatedTime()
     {
         return createdTime;
     }
 
-    public void setCreatedTime( final long createdTime )
+    public void setCreatedTime( final DateTime createdTime )
     {
         this.createdTime = createdTime;
     }
@@ -83,12 +84,12 @@ public class TW_Tweet
     @Override
     public int hashCode()
     {
-        int hash = 7;
+        int hash = 5;
 
-        hash = 59 * hash + (int) ( this.ID ^ ( this.ID >>> 32 ) );
-        hash = 59 * hash + Objects.hashCode( this.message );
-        hash = 59 * hash + Objects.hashCode( this.user );
-        hash = 59 * hash + (int) ( this.createdTime ^ ( this.createdTime >>> 32 ) );
+        hash = 67 * hash + (int) ( this.ID ^ ( this.ID >>> 32 ) );
+        hash = 67 * hash + Objects.hashCode( this.message );
+        hash = 67 * hash + Objects.hashCode( this.user );
+        hash = 67 * hash + Objects.hashCode( this.createdTime );
 
         return hash;
     }
@@ -142,5 +143,5 @@ public class TW_Tweet
     private long ID;
     private String message;
     private TW_User user;
-    private long createdTime;
+    private DateTime createdTime;
 }

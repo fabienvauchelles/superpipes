@@ -19,11 +19,11 @@
 
 package com.vaushell.spipes.tools;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Throwable helper.
@@ -41,13 +41,12 @@ public final class ThrowableHelper
      */
     public static String formatPlainText( final Throwable th )
     {
-        final SimpleDateFormat df = new SimpleDateFormat( "dd/MM/yyyy HH:mm:ss" ,
-                                                          Locale.ENGLISH );
+        final DateTimeFormatter fmt = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
 
         final StringBuilder sb = new StringBuilder();
 
         sb.append( String.format( "ERROR at %s%n" ,
-                                  df.format( new Date() ) ) );
+                                  fmt.print( new DateTime() ) ) );
 
         // Message
         final List<Throwable> reverse = new ArrayList<>();
@@ -94,13 +93,12 @@ public final class ThrowableHelper
      */
     public static String formatHTML( final Throwable th )
     {
-        final SimpleDateFormat df = new SimpleDateFormat( "dd/MM/yyyy HH:mm:ss" ,
-                                                          Locale.ENGLISH );
+        final DateTimeFormatter fmt = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
 
         final StringBuilder sb = new StringBuilder();
 
         sb.append( String.format( "<h1>ERROR at %s</h1>%n" ,
-                                  df.format( new Date() ) ) );
+                                  fmt.print( new DateTime() ) ) );
 
         // Message
         final List<Throwable> reverse = new ArrayList<>();

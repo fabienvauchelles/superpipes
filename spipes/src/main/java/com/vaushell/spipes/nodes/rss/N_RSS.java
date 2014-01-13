@@ -33,6 +33,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +50,8 @@ public class N_RSS
     public N_RSS()
     {
         // Read every 10 minutes
-        super( 600000L ,
-               0L );
+        super( new Duration( 600000L ) ,
+               null );
     }
 
     // PROTECTED
@@ -124,7 +126,7 @@ public class N_RSS
                 if ( entry.getPublishedDate() != null )
                 {
                     message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                                         entry.getPublishedDate().getTime() );
+                                         new DateTime( entry.getPublishedDate() ) );
                 }
 
                 // Content

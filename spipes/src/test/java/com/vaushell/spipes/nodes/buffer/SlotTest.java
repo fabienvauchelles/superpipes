@@ -19,9 +19,9 @@
 
 package com.vaushell.spipes.nodes.buffer;
 
-import java.text.ParseException;
-import java.util.Calendar;
 import java.util.TreeSet;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -41,303 +41,230 @@ public class SlotTest
 
     /**
      * Test of parse method, of class Slot.
-     *
-     * @throws java.text.ParseException
      */
     @Test
     public void testParse()
-        throws ParseException
     {
         final Slot slot = Slot.parse( "TUE,SAT" ,
-                                      "17:00" ,
-                                      "18:30" );
+                                      "17:00:00" ,
+                                      "18:30:00" );
 
         final TreeSet<Integer> days = new TreeSet<>();
-        days.add( Calendar.TUESDAY );
-        days.add( Calendar.SATURDAY );
+        days.add( DateTimeConstants.TUESDAY );
+        days.add( DateTimeConstants.SATURDAY );
         assertArrayEquals( "Days should be the same" ,
                            days.toArray() ,
                            slot.getDays().toArray() );
 
-        assertEquals( "Hours should be the same" ,
-                      17 ,
-                      slot.getMinHour() );
-        assertEquals( "Minutes should be the same" ,
-                      0 ,
-                      slot.getMinMinute() );
-        assertEquals( "Hours should be the same" ,
-                      18 ,
-                      slot.getMaxHour() );
-        assertEquals( "Minutes should be the same" ,
-                      30 ,
-                      slot.getMaxMinute() );
+        assertEquals( "Min MinMillisOfDay (17:00:00=61200000) should be the same" ,
+                      61200000 ,
+                      slot.getMinMillisOfDay() );
+        assertEquals( "Min MinMillisOfDay (18:30:00=66600000) should be the same" ,
+                      66600000 ,
+                      slot.getMaxMillisOfDay() );
     }
 
     /**
      * Test of parse method, of class Slot.
      *
-     * @throws java.text.ParseException
      */
     @Test( expectedExceptions =
     {
-        ParseException.class
+        IllegalArgumentException.class
     } )
     public void testParse2()
-        throws ParseException
     {
         Slot.parse( "TUE,xvsrtzer" ,
-                    "17:00" ,
-                    "18:30" );
+                    "17:00:00" ,
+                    "18:30:00" );
     }
 
     /**
      * Test of parse method, of class Slot.
-     *
-     * @throws java.text.ParseException
      */
     @Test( expectedExceptions =
     {
-        ParseException.class
+        IllegalArgumentException.class
     } )
     public void testParse3()
-        throws ParseException
     {
         Slot.parse( "TUE,SAT" ,
-                    "17:a00" ,
-                    "18:30" );
+                    "17:a00:00" ,
+                    "18:30:00" );
     }
 
     /**
      * Test of areWeInside method, of class Slot.
      *
-     * @throws java.text.ParseException
      */
     @Test
     public void testAreWeInside()
-        throws ParseException
     {
-        // TUE, SAT with 17:00-18:30
+        // TUE, SAT with 17:00:00-18:30:00
         Slot slot = Slot.parse( "TUE,SAT" ,
-                                "17:00" ,
-                                "18:30" );
+                                "17:00:00" ,
+                                "18:30:00" );
 
-        // With TUE 16:59 => false
-        Calendar cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.TUESDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 16 );
-        cal.set( Calendar.MINUTE ,
-                 59 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertFalse( "TUE 16:59 inside TUE, SAT with 17:00-18:30" ,
-                     slot.areWeInside( cal ) );
+        // With 14/01/2014 (TUE) 16:59:00 => false
+        DateTime dt = new DateTime( 2014 ,
+                                    1 ,
+                                    14 ,
+                                    16 ,
+                                    59 ,
+                                    0 );
+        assertFalse( "14/01/2014 (TUE) 16:59:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                     slot.areWeInside( dt ) );
 
-        // With TUE 17:01 => true
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.TUESDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 17 );
-        cal.set( Calendar.MINUTE ,
-                 1 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertTrue( "TUE 17:01 inside TUE, SAT with 17:00-18:30" ,
-                    slot.areWeInside( cal ) );
+        // With 14/01/2014 (TUE) 17:01:00 => true
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           14 ,
+                           17 ,
+                           1 ,
+                           0 );
+        assertTrue( "14/01/2014 (TUE) 17:01:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                    slot.areWeInside( dt ) );
 
-        // With TUE 18:01 => true
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.TUESDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 18 );
-        cal.set( Calendar.MINUTE ,
-                 1 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertTrue( "TUE 18:01 inside TUE, SAT with 17:00-18:30" ,
-                    slot.areWeInside( cal ) );
+        // With 14/01/2014 (TUE) 18:01:00 => true
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           14 ,
+                           18 ,
+                           1 ,
+                           0 );
+        assertTrue( "14/01/2014 (TUE) 18:01:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                    slot.areWeInside( dt ) );
 
-        // With TUE 19:00 => false
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.TUESDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 19 );
-        cal.set( Calendar.MINUTE ,
-                 0 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertFalse( "TUE 19:00 inside TUE, SAT with 17:00-18:30" ,
-                     slot.areWeInside( cal ) );
+        // With 14/01/2014 (TUE) 19:00:00 => false
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           14 ,
+                           19 ,
+                           0 ,
+                           0 );
+        assertFalse( "14/01/2014 (TUE) 19:00:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                     slot.areWeInside( dt ) );
 
-        // With MON 17:30 => false
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.MONDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 17 );
-        cal.set( Calendar.MINUTE ,
-                 30 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertFalse( "MON 17:30 inside TUE, SAT with 17:00-18:30" ,
-                     slot.areWeInside( cal ) );
+        // With 13/01/2014 (MON) 17:30:00 => false
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           13 ,
+                           17 ,
+                           30 ,
+                           0 );
 
-        // With SAT 17:30 => true
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.SATURDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 17 );
-        cal.set( Calendar.MINUTE ,
-                 30 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertTrue( "SAT 17:30 inside TUE, SAT with 17:00-18:30" ,
-                    slot.areWeInside( cal ) );
+        assertFalse( "13/01/2014 (MON) 17:30:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                     slot.areWeInside( dt ) );
 
-        // MON with 00:00-23:58
+        // With 18/01/2014 (SAT) 17:30:00 => true
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           18 ,
+                           17 ,
+                           30 ,
+                           0 );
+        assertTrue( "18/01/2014 (SAT) 17:30:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                    slot.areWeInside( dt ) );
+
+        // With 13/01/2014 (MON) with 00:00:00-23:58:00
         slot = Slot.parse( "MON" ,
-                           "00:00" ,
-                           "23:58" );
+                           "00:00:00" ,
+                           "23:58:00" );
 
-        // With MON 00:00 => true
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.MONDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 0 );
-        cal.set( Calendar.MINUTE ,
-                 0 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertTrue( "MON 00:00 inside MON with 00:00-23:58" ,
-                    slot.areWeInside( cal ) );
+        // With 13/01/2014 (MON) 00:00:00 => true
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           13 ,
+                           0 ,
+                           0 ,
+                           0 );
+        assertTrue( "13/01/2014 (MON) 00:00:00 inside MON with 00:00:00-23:58:00" ,
+                    slot.areWeInside( dt ) );
 
-        // With MON 23:58 => true
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.MONDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 23 );
-        cal.set( Calendar.MINUTE ,
-                 58 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertTrue( "MON 23:58 inside MON with 00:00-23:58" ,
-                    slot.areWeInside( cal ) );
+        // With 13/01/2014 (MON) 23:57:59 => true
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           13 ,
+                           23 ,
+                           57 ,
+                           59 );
+        assertTrue( "13/01/2014 (MON) 23:57:59 inside MON with 00:00:00-23:58:00" ,
+                    slot.areWeInside( dt ) );
 
-        // With MON 23:59 => false
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.MONDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 23 );
-        cal.set( Calendar.MINUTE ,
-                 59 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertFalse( "MON 23:59 inside MON with 00:00-23:58" ,
-                     slot.areWeInside( cal ) );
+        // With 13/01/2014 (MON) 23:58:00 => false
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           13 ,
+                           23 ,
+                           58 ,
+                           0 );
+        assertFalse( "13/01/2014 (MON) 23:58:00 inside MON with 00:00:00-23:58:00" ,
+                     slot.areWeInside( dt ) );
+
+        // With 13/01/2014 (MON) 23:59:00 => false
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           13 ,
+                           23 ,
+                           59 ,
+                           0 );
+        assertFalse( "13/01/2014 (MON) 23:59:00 inside MON with 00:00:00-23:58:00" ,
+                     slot.areWeInside( dt ) );
     }
 
     /**
-     * Test of getSmallestDiffInMs method, of class Slot.
-     *
-     * @throws java.text.ParseException
+     * Test of getSmallestDiff method, of class Slot.
      */
     @Test
-    public void testGetSmallestDiffInMs()
-        throws ParseException
+    public void testGetSmallestDiff()
     {
-        // TUE, SAT with 17:00-18:30
+        // TUE, SAT with 17:00:00-18:30:00
         final Slot slot = Slot.parse( "TUE,SAT" ,
-                                      "17:00" ,
-                                      "18:30" );
+                                      "17:00:00" ,
+                                      "18:30:00" );
 
-        // with TUE, 16:00 => 3600000
-        Calendar cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.TUESDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 16 );
-        cal.set( Calendar.MINUTE ,
-                 0 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertEquals( "TUE, 16:00 inside TUE, SAT with 17:00-18:30" ,
-                      3600000 ,
-                      slot.getSmallestDiffInMs( cal ) );
+        // With 14/01/2014 (TUE), 16:00:00 => 3600000
+        DateTime dt = new DateTime( 2014 ,
+                                    1 ,
+                                    14 ,
+                                    16 ,
+                                    0 ,
+                                    0 );
+        assertEquals( "With 14/01/2014 (TUE), 16:00:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                      3600000L ,
+                      slot.getSmallestDiff( dt ).getMillis() );
 
-        // with MON, 17:00 => 86400000
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.MONDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 17 );
-        cal.set( Calendar.MINUTE ,
-                 0 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertEquals( "MON, 17:00 inside TUE, SAT with 17:00-18:30" ,
-                      86400000 ,
-                      slot.getSmallestDiffInMs( cal ) );
+        // With 13/01/2014 (MON), 17:00:00 => 86400000
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           13 ,
+                           17 ,
+                           0 ,
+                           0 );
+        assertEquals( "With 13/01/2014 (MON), 17:00 inside TUE, SAT with 17:00-18:30" ,
+                      86400000L ,
+                      slot.getSmallestDiff( dt ).getMillis() );
 
-        // with WED, 17:00 => 259200000
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.WEDNESDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 17 );
-        cal.set( Calendar.MINUTE ,
-                 0 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertEquals( "WED, 17:00 inside TUE, SAT with 17:00-18:30" ,
-                      259200000 ,
-                      slot.getSmallestDiffInMs( cal ) );
+        // With 15/01/2014 (WED), 17:00:00 => 259200000
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           15 ,
+                           17 ,
+                           0 ,
+                           0 );
+        assertEquals( "15/01/2014 (WED), 17:00:00 inside TUE, SAT with 17:00:00-18:30:00" ,
+                      259200000L ,
+                      slot.getSmallestDiff( dt ).getMillis() );
 
-        // with SAT, 18:31 => 253740000
-        cal = Calendar.getInstance();
-        cal.set( Calendar.DAY_OF_WEEK ,
-                 Calendar.SATURDAY );
-        cal.set( Calendar.HOUR_OF_DAY ,
-                 18 );
-        cal.set( Calendar.MINUTE ,
-                 31 );
-        cal.set( Calendar.SECOND ,
-                 0 );
-        cal.set( Calendar.MILLISECOND ,
-                 0 );
-        assertEquals( "SAT, 18:01 inside TUE, SAT with 17:00-18:30" ,
-                      253740000 ,
-                      slot.getSmallestDiffInMs( cal ) );
+        // With 18/01/2014 (SAT), 18:31:00 => 253740000
+        dt = new DateTime( 2014 ,
+                           1 ,
+                           18 ,
+                           18 ,
+                           31 ,
+                           0 );
+        assertEquals( "18/01/2014 (SAT), 18:01 inside TUE, SAT with 17:00:00-18:30:00" ,
+                      253740000L ,
+                      slot.getSmallestDiff( dt ).getMillis() );
     }
 }

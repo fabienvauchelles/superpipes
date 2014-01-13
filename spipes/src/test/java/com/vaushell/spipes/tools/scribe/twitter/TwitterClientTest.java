@@ -25,9 +25,9 @@ import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -104,8 +104,8 @@ public class TwitterClientTest
         throws Exception
     {
         // Post
-        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new Date().
-            getTime();
+        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new DateTime().
+            getMillis();
 
         final long ID = client.tweet( message );
 
@@ -140,7 +140,7 @@ public class TwitterClientTest
         throws Exception
     {
         // Post
-        final long ID = client.tweet( "Allez voir mon blog #" + new Date().getTime() );
+        final long ID = client.tweet( "Allez voir mon blog #" + new DateTime().getMillis() );
 
         assertTrue( "ID should be return" ,
                     ID >= 0 );
@@ -163,8 +163,8 @@ public class TwitterClientTest
         throws Exception
     {
         // Post
-        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new Date().
-            getTime();
+        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new DateTime().
+            getMillis();
 
         final long ID;
         try( InputStream is = getClass().getResourceAsStream( "/media.png" ) )

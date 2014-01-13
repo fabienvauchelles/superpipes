@@ -40,8 +40,8 @@ public class N_TB_Post
     // PUBLIC
     public N_TB_Post()
     {
-        super( 0 ,
-               DEFAULT_ANTIBURST_IN_MS );
+        super( null ,
+               DEFAULT_ANTIBURST );
 
         this.client = new TumblrClient();
     }

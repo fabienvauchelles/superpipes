@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,8 +46,8 @@ public class N_Shaarli
     public N_Shaarli()
     {
         // Read every 10 minutes
-        super( 600000L ,
-               0L );
+        super( new Duration( 600000L ) ,
+               null );
 
         this.templates = new ShaarliTemplates();
     }

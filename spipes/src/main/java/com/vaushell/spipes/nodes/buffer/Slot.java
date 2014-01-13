@@ -19,11 +19,12 @@
 
 package com.vaushell.spipes.nodes.buffer;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 import java.util.TreeSet;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Time slot which allow messages to pass the buffer.
@@ -37,180 +38,116 @@ public final class Slot
      * Create a slot and parse value.
      *
      * @param days List of days, separated by a comma.
-     * @param start Inclusive starting hour (format: HH:MM)
-     * @param end Exclusive ending hour (format: HH:MM)
+     * @param start Inclusive starting hour (format: HH:mm:ss)
+     * @param end Exclusive ending hour (format: HH:mm:ss)
      * @return the slot
-     * @throws ParseException
      */
     public static Slot parse( final String days ,
                               final String start ,
                               final String end )
-        throws ParseException
     {
         // Days
-        final SimpleDateFormat dfDay = new SimpleDateFormat( "E" ,
-                                                             Locale.ENGLISH );
+        final DateTimeFormatter fmtDay = DateTimeFormat.forPattern( "E" );
 
         final TreeSet<Integer> rDays = new TreeSet<>();
         for ( final String sDay : days.split( "," ) )
         {
-            final Calendar cDay = Calendar.getInstance();
-            cDay.setTime( dfDay.parse( sDay ) );
+            final int dayOfWeek = fmtDay.parseLocalDate( sDay ).getDayOfWeek();
 
-            rDays.add( cDay.get( Calendar.DAY_OF_WEEK ) );
+            rDays.add( dayOfWeek );
         }
 
-        // Hours
-        final SimpleDateFormat dfHour = new SimpleDateFormat( "HH:mm" ,
-                                                              Locale.ENGLISH );
+        // Hours (HH:mm:ss)
+        final DateTimeFormatter fmtHour = DateTimeFormat.forPattern( "HH:mm:ss" );
 
-        final Calendar minHour = Calendar.getInstance();
-        minHour.setTime( dfHour.parse( start ) );
-
-        final Calendar maxHour = Calendar.getInstance();
-        maxHour.setTime( dfHour.parse( end ) );
+        final LocalDateTime min = fmtHour.parseLocalDateTime( start ).withMillisOfSecond( 0 );
+        final LocalDateTime max = fmtHour.parseLocalDateTime( end ).withMillisOfSecond( 0 );
 
         return new Slot( rDays ,
-                         minHour.get( Calendar.HOUR_OF_DAY ) ,
-                         minHour.get( Calendar.MINUTE ) ,
-                         maxHour.get( Calendar.HOUR_OF_DAY ) ,
-                         maxHour.get( Calendar.MINUTE ) );
+                         min.getMillisOfDay() ,
+                         max.getMillisOfDay() );
     }
 
     public TreeSet<Integer> getDays()
     {
-        return days;
+        return daysOfWeek;
     }
 
-    public int getMinHour()
+    public int getMinMillisOfDay()
     {
-        return minHour;
+        return minMillisOfDay;
     }
 
-    public int getMinMinute()
+    public int getMaxMillisOfDay()
     {
-        return minMinute;
-    }
-
-    public int getMaxHour()
-    {
-        return maxHour;
-    }
-
-    public int getMaxMinute()
-    {
-        return maxMinute;
+        return maxMillisOfDay;
     }
 
     /**
      * Return the time to wait to be in a slot and not to burst.
      *
-     * @param mdate Actuam date
-     * @return the time to wait (in ms)
+     * @param date Actual date
+     * @return the time to wait
      */
-    public long getSmallestDiffInMs( final Calendar mdate )
+    public Duration getSmallestDiff( final DateTime date )
     {
-        if ( areWeInside( mdate ) )
+        if ( areWeInside( date ) )
         {
-            return 0;
+            return new Duration( 0L );
         }
 
-        long bestDiff = Long.MAX_VALUE;
-        for ( final int dow : days )
+        Duration smallest = null;
+        for ( final int dayOfWeek : daysOfWeek )
         {
-            final Calendar minDayHour = (Calendar) mdate.clone();
-            minDayHour.set( Calendar.DAY_OF_WEEK ,
-                            dow );
-            minDayHour.set( Calendar.HOUR_OF_DAY ,
-                            minHour );
-            minDayHour.set( Calendar.MINUTE ,
-                            minMinute );
-            minDayHour.set( Calendar.SECOND ,
-                            0 );
-            minDayHour.set( Calendar.MILLISECOND ,
-                            0 );
-
-            if ( minDayHour.before( mdate ) )
+            DateTime next = date.withDayOfWeek( dayOfWeek ).withMillisOfDay( minMillisOfDay );
+            if ( next.isBefore( date ) )
             {
-                minDayHour.add( Calendar.WEEK_OF_YEAR ,
-                                1 );
+                next = next.plusWeeks( 1 );
             }
 
-            final long diff = minDayHour.getTimeInMillis() - mdate.getTimeInMillis();
-            if ( diff < bestDiff )
+            final Duration duration = new Duration( date ,
+                                                    next );
+            if ( smallest == null || duration.isShorterThan( smallest ) )
             {
-                bestDiff = diff;
+                smallest = duration;
             }
         }
 
-        return bestDiff;
+        return smallest;
     }
 
     // DEFAULT
     /**
      * Are we inside this slot ?
      *
-     * @param mdate Actual date
+     * @param date Actual date
      * @return true or not
      */
-    boolean areWeInside( final Calendar mdate )
+    boolean areWeInside( final DateTime date )
     {
-        if ( !days.contains( mdate.get( Calendar.DAY_OF_WEEK ) ) )
+
+        if ( !daysOfWeek.contains( date.getDayOfWeek() ) )
         {
             return false;
         }
 
-        final Calendar minDayHour = (Calendar) mdate.clone();
-        minDayHour.set( Calendar.HOUR_OF_DAY ,
-                        minHour );
-        minDayHour.set( Calendar.MINUTE ,
-                        minMinute );
-        minDayHour.set( Calendar.SECOND ,
-                        0 );
-        minDayHour.set( Calendar.MILLISECOND ,
-                        0 );
-
-        if ( mdate.before( minDayHour ) )
-        {
-            return false;
-        }
-
-        final Calendar maxDayHour = (Calendar) mdate.clone();
-        maxDayHour.set( Calendar.HOUR_OF_DAY ,
-                        maxHour );
-        maxDayHour.set( Calendar.MINUTE ,
-                        maxMinute );
-        maxDayHour.set( Calendar.SECOND ,
-                        0 );
-        maxDayHour.set( Calendar.MILLISECOND ,
-                        0 );
-        if ( maxDayHour.before( mdate ) )
-        {
-            return false;
-        }
-
-        return true;
+        final int dayMS = date.getMillisOfDay();
+        return minMillisOfDay <= dayMS && dayMS < maxMillisOfDay;
     }
 
     // PRIVATE
-    private final TreeSet<Integer> days;
-    private final int minHour;
-    private final int minMinute;
-    private final int maxHour;
-    private final int maxMinute;
+    private final TreeSet<Integer> daysOfWeek;
+    private final int minMillisOfDay;
+    private final int maxMillisOfDay;
 
-    private Slot( final TreeSet<Integer> days ,
-                  final int minHour ,
-                  final int minMinute ,
-                  final int maxHour ,
-                  final int maxMinute
+    private Slot( final TreeSet<Integer> daysOfWeek ,
+                  final int minMillisOfDay ,
+                  final int maxMillisOfDay
     )
     {
-        this.days = days;
-        this.minHour = minHour;
-        this.minMinute = minMinute;
-        this.maxHour = maxHour;
-        this.maxMinute = maxMinute;
+        this.daysOfWeek = daysOfWeek;
+        this.minMillisOfDay = minMillisOfDay;
+        this.maxMillisOfDay = maxMillisOfDay;
     }
 
 }

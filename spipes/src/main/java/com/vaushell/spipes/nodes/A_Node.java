@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,11 +41,11 @@ public abstract class A_Node
     extends Thread
 {
     // PUBLIC
-    public static final long DEFAULT_DELAY_IN_MS = 1000L;
-    public static final long DEFAULT_ANTIBURST_IN_MS = 2000L;
+    public static final Duration DEFAULT_DELAY = new Duration( 1000L );
+    public static final Duration DEFAULT_ANTIBURST = new Duration( 2000L );
 
-    public A_Node( final long defaultDelay ,
-                   final long defaultAntiBurstInMs )
+    public A_Node( final Duration defaultDelay ,
+                   final Duration defaultAntiBurst )
     {
         super();
 
@@ -54,7 +56,17 @@ public abstract class A_Node
         this.properties = new Properties();
         this.commonsPropertiesID = new ArrayList<>();
         this.lastPop = null;
-        this.antiBurstInMs = defaultAntiBurstInMs;
+
+        if ( defaultAntiBurst != null && defaultAntiBurst.getMillis() <= 0L )
+        {
+            throw new IllegalArgumentException( "defaultAntiBurst can't be <=0. Should be null." );
+        }
+        this.antiBurst = defaultAntiBurst;
+
+        if ( defaultDelay != null && defaultDelay.getMillis() <= 0L )
+        {
+            throw new IllegalArgumentException( "defaultDelay can't be <=0. Should be null." );
+        }
         this.delay = defaultDelay;
     }
 
@@ -137,11 +149,21 @@ public abstract class A_Node
 
         if ( properties.containsKey( "anti-burst" ) )
         {
-            antiBurstInMs = Long.parseLong( properties.getProperty( "anti-burst" ) );
+            antiBurst = new Duration( Long.parseLong( properties.getProperty( "anti-burst" ) ) );
+
+            if ( antiBurst.getMillis() <= 0L )
+            {
+                throw new IllegalArgumentException( "antiBurst can't be <=0. Should be null or empty." );
+            }
         }
         if ( properties.containsKey( "delay" ) )
         {
-            delay = Long.parseLong( properties.getProperty( "delay" ) );
+            delay = new Duration( Long.parseLong( properties.getProperty( "delay" ) ) );
+
+            if ( delay.getMillis() <= 0L )
+            {
+                throw new IllegalArgumentException( "delay can't be <=0. Should be null or empty." );
+            }
         }
 
         // Load transforms IN
@@ -371,11 +393,11 @@ public abstract class A_Node
                     getDispatcher().postError( ex );
                 }
 
-                if ( delay > 0L )
+                if ( delay != null )
                 {
                     try
                     {
-                        Thread.sleep( delay );
+                        Thread.sleep( delay.getMillis() );
                     }
                     catch( final InterruptedException ex )
                     {
@@ -581,18 +603,20 @@ public abstract class A_Node
             m = internalStack.pollLast();
         }
 
-        if ( lastPop != null && antiBurstInMs > 0 )
+        if ( lastPop != null && antiBurst != null )
         {
-            final long elapsed = System.currentTimeMillis() - lastPop;
-            final long remaining = antiBurstInMs - elapsed;
+            // Null for now
+            final Duration elapsed = new Duration( lastPop ,
+                                                   null );
 
-            if ( remaining > 0L )
+            final Duration remaining = antiBurst.minus( elapsed );
+            if ( remaining.getMillis() > 0L )
             {
-                Thread.sleep( remaining );
+                Thread.sleep( remaining.getMillis() );
             }
         }
 
-        lastPop = System.currentTimeMillis();
+        lastPop = new DateTime();
 
         return m;
     }
@@ -600,16 +624,16 @@ public abstract class A_Node
     /**
      * Pop the last message.
      *
-     * @param timeout max time to wait (in ms). If timeout is smaller than antiburst, use antiburst.
+     * @param timeout max time to wait. If timeout is smaller than antiburst, use antiburst.
      * @return the message (or null if empty)
      * @throws InterruptedException
      */
-    protected Message getLastMessageOrWait( final long timeout )
+    protected Message getLastMessageOrWait( final Duration timeout )
         throws InterruptedException
     {
-        if ( timeout <= 0 )
+        if ( timeout == null )
         {
-            throw new IllegalArgumentException( "you should use getLastMessageOrWait with a timeout=0" );
+            throw new IllegalArgumentException();
         }
 
         if ( LOGGER.isTraceEnabled() )
@@ -620,37 +644,40 @@ public abstract class A_Node
         final Message m;
         synchronized( internalStack )
         {
-            long start = System.currentTimeMillis();
-            long remaining = timeout;
+            DateTime start = new DateTime();
+            Duration remaining = timeout;
             while ( internalStack.isEmpty()
-                    && remaining > 0 )
+                    && remaining.getMillis() > 0L )
             {
-                internalStack.wait( remaining );
+                internalStack.wait( remaining.getMillis() );
 
-                final long actual = System.currentTimeMillis();
-                final long elapsed = actual - start;
-                remaining -= elapsed;
-                start = actual;
+                final DateTime now = new DateTime();
+
+                final Duration elapsed = new Duration( start ,
+                                                       now );
+
+                remaining = remaining.minus( elapsed );
+
+                start = now;
             }
 
             m = internalStack.pollLast();
         }
 
-        if ( m != null )
+        if ( lastPop != null && antiBurst != null )
         {
-            if ( lastPop != null && antiBurstInMs > 0 )
+            // Null for now
+            final Duration elapsed = new Duration( lastPop ,
+                                                   null );
+
+            final Duration remaining = antiBurst.minus( elapsed );
+            if ( remaining.getMillis() > 0L )
             {
-                final long elapsed = System.currentTimeMillis() - lastPop;
-                final long remaining = antiBurstInMs - elapsed;
-
-                if ( remaining > 0L )
-                {
-                    Thread.sleep( remaining );
-                }
+                Thread.sleep( remaining.getMillis() );
             }
-
-            lastPop = System.currentTimeMillis();
         }
+
+        lastPop = new DateTime();
 
         return m;
     }
@@ -664,7 +691,7 @@ public abstract class A_Node
     private volatile boolean activated;
     private final List<A_Transform> transformsIN;
     private final List<A_Transform> transformsOUT;
-    private Long lastPop;
-    private long antiBurstInMs;
-    private long delay;
+    private DateTime lastPop;
+    private Duration antiBurst;
+    private Duration delay;
 }

@@ -25,11 +25,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -159,7 +159,7 @@ public class TumblrClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir mon blog #" + new Date().getTime();
+        final String message = "Allez voir mon blog #" + new DateTime().getMillis();
 
         final Set<String> tags = new TreeSet<>( Arrays.asList( "myblog" ,
                                                                "framework" ,
@@ -207,7 +207,7 @@ public class TumblrClientTest
         throws Exception
     {
         // Post
-        final long ID = client.postMessage( "Allez voir mon blog #" + new Date().getTime() ,
+        final long ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
                                             Collections.EMPTY_SET );
 
         assertTrue( "ID should be return" ,

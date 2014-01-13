@@ -29,13 +29,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -59,8 +58,7 @@ public class TwitterClient
     {
         super();
 
-        this.df = new SimpleDateFormat( "EEE MMM dd HH:mm:ss Z yyyy" ,
-                                        Locale.ENGLISH );
+        this.fmt = DateTimeFormat.forPattern( "EEE MMM dd HH:mm:ss Z yyyy" );
     }
 
     /**
@@ -229,10 +227,9 @@ public class TwitterClient
      * @return the tweet
      * @throws IOException
      * @throws com.vaushell.spipes.tools.scribe.OAuthException
-     * @throws ParseException
      */
     public TW_Tweet readTweet( final long ID )
-        throws IOException , OAuthException , ParseException
+        throws IOException , OAuthException
     {
         if ( ID < 0 )
         {
@@ -280,7 +277,7 @@ public class TwitterClient
                              new TW_User( nodeUser.get( "id" ).asLong() ,
                                           nodeUser.get( "name" ).asText() ,
                                           nodeUser.get( "screen_name" ).asText() ) ,
-                             df.parse( node.get( "created_at" ).asText() ).getTime()
+                             fmt.parseDateTime( node.get( "created_at" ).asText() )
         );
     }
 
@@ -329,7 +326,7 @@ public class TwitterClient
     }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( TwitterClient.class );
-    private final SimpleDateFormat df;
+    private final DateTimeFormatter fmt;
 
     private void checkErrors( final Response response ,
                               final JsonNode root )

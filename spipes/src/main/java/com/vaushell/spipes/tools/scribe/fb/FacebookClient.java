@@ -21,17 +21,17 @@ package com.vaushell.spipes.tools.scribe.fb;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.scribe.builder.api.FacebookApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -53,8 +53,8 @@ public class FacebookClient
     {
         super();
 
-        this.df = new SimpleDateFormat( "yyyy-MM-dd'T'HH:mm:ssZ" ,
-                                        Locale.ENGLISH );
+        this.fmtPST = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ssZ" )
+            .withZone( DateTimeZone.forID( "America/Los_Angeles" ) );
 
         this.target = null;
     }
@@ -176,8 +176,11 @@ public class FacebookClient
         request.addBodyParameter( "message" ,
                                   message );
 
-        request.addBodyParameter( "privacy" ,
-                                  "{'value':'EVERYONE'}" );
+        if ( "me".equals( target ) )
+        {
+            request.addBodyParameter( "privacy" ,
+                                      "{'value':'EVERYONE'}" );
+        }
 
         final Response response = sendSignedRequest( request );
 
@@ -223,8 +226,11 @@ public class FacebookClient
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
                                                        "https://graph.facebook.com/" + target + "/feed" );
 
-        request.addBodyParameter( "privacy" ,
-                                  "{'value':'EVERYONE'}" );
+        if ( "me".equals( target ) )
+        {
+            request.addBodyParameter( "privacy" ,
+                                      "{'value':'EVERYONE'}" );
+        }
 
         if ( message != null && message.length() > 0 )
         {
@@ -271,10 +277,9 @@ public class FacebookClient
      * @return the Post
      * @throws IOException
      * @throws FacebookException
-     * @throws ParseException
      */
     public FB_Post readPost( final String ID )
-        throws IOException , FacebookException , ParseException
+        throws IOException , FacebookException
     {
         if ( ID == null || ID.isEmpty() )
         {
@@ -307,10 +312,9 @@ public class FacebookClient
      * @return the list of Post
      * @throws IOException
      * @throws FacebookException
-     * @throws ParseException
      */
     public List<FB_Post> readFeed()
-        throws IOException , FacebookException , ParseException
+        throws IOException , FacebookException
     {
         if ( LOGGER.isTraceEnabled() )
         {
@@ -355,7 +359,7 @@ public class FacebookClient
                         {
                             links = readFeedImpl( "https://graph.facebook.com/" + target
                                                   + "/feed?limit=" + Integer.toString( limit )
-                                                  + "&until=" + Long.toString( lastTimestamp / 1000L - 1L ) );
+                                                  + "&until=" + Long.toString( lastTimestamp.getMillis() / 1000L - 1L ) );
                         }
 
                         if ( links.isEmpty() )
@@ -373,8 +377,7 @@ public class FacebookClient
                     }
                 }
                 catch( final FacebookException |
-                             IOException |
-                             ParseException ex )
+                             IOException ex )
                 {
                     throw new RuntimeException( ex );
                 }
@@ -395,7 +398,7 @@ public class FacebookClient
             // PRIVATE
             private final List<FB_Post> buffer = new ArrayList<>();
             private int bufferCursor;
-            private Long lastTimestamp;
+            private DateTime lastTimestamp;
         };
     }
 
@@ -509,7 +512,7 @@ public class FacebookClient
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
-    private final SimpleDateFormat df;
+    private final DateTimeFormatter fmtPST;
     private String target;
 
     private void checkErrors( final Response response ,
@@ -573,7 +576,7 @@ public class FacebookClient
     }
 
     private List<FB_Post> readFeedImpl( final String url )
-        throws IOException , FacebookException , ParseException
+        throws IOException , FacebookException
     {
         if ( url == null )
         {
@@ -605,7 +608,6 @@ public class FacebookClient
     }
 
     private FB_Post convertJsonToPost( final JsonNode node )
-        throws ParseException
     {
         final JsonNode nodeFrom = node.get( "from" );
 
@@ -617,6 +619,6 @@ public class FacebookClient
                             convertNodeToString( node.get( "description" ) ) ,
                             new FB_User( nodeFrom.get( "id" ).asText() ,
                                          nodeFrom.get( "name" ).asText() ) ,
-                            df.parse( node.get( "created_time" ).asText() ).getTime() );
+                            fmtPST.parseDateTime( node.get( "created_time" ).asText() ) );
     }
 }

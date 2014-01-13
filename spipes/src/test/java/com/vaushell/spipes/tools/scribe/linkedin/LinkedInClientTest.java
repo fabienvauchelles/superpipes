@@ -23,9 +23,9 @@ import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -102,7 +102,7 @@ public class LinkedInClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir ce blog #" + new Date().getTime();
+        final String message = "Allez voir ce blog #" + new DateTime().getMillis();
 
         final String ID = client.postLink( message ,
                                            "http://fabien.vauchelles.com/" ,
@@ -142,7 +142,7 @@ public class LinkedInClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir mon blog #" + new Date().getTime();
+        final String message = "Allez voir mon blog #" + new DateTime().getMillis();
         final String ID = client.postMessage( message );
 
         assertTrue( "ID should be return" ,

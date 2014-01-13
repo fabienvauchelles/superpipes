@@ -21,9 +21,6 @@ package com.vaushell.spipes.nodes.stub;
 
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
-import com.vaushell.spipes.tools.ValuesGenerator;
-import java.net.URI;
-import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +35,8 @@ public class N_SeqMessageGenerator
     // PUBLIC
     public N_SeqMessageGenerator()
     {
-        super( DEFAULT_DELAY_IN_MS ,
-               0L );
+        super( DEFAULT_DELAY ,
+               null );
 
         this.num = 0;
     }
@@ -60,9 +57,6 @@ public class N_SeqMessageGenerator
         {
             LOGGER.trace( "[" + getNodeID() + "] generate message" );
         }
-
-        final String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
-                                                                         20 );
 
         final Message message = Message.create(
             Message.KeyIndex.TITLE ,

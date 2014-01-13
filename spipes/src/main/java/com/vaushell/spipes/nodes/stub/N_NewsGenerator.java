@@ -23,7 +23,7 @@ import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.ValuesGenerator;
 import java.net.URI;
-import java.util.Date;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +38,8 @@ public class N_NewsGenerator
     // PUBLIC
     public N_NewsGenerator()
     {
-        super( DEFAULT_DELAY_IN_MS ,
-               0L );
+        super( DEFAULT_DELAY ,
+               null );
     }
 
     // PROTECTED
@@ -83,7 +83,7 @@ public class N_NewsGenerator
             ValuesGenerator.getRandomWordSet( 3 ,
                                               8 ) ,
             Message.KeyIndex.PUBLISHED_DATE ,
-            new Date().getTime()
+            new DateTime()
         );
 
         sendMessage( message );

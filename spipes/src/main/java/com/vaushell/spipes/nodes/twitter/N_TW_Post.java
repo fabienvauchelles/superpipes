@@ -43,8 +43,8 @@ public class N_TW_Post
     // PUBLIC
     public N_TW_Post()
     {
-        super( 0 ,
-               DEFAULT_ANTIBURST_IN_MS );
+        super( null ,
+               DEFAULT_ANTIBURST );
 
         this.client = new TwitterClient();
         this.httpClient = null;

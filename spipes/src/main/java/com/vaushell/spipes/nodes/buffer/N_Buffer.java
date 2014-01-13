@@ -28,11 +28,12 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeSet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +48,8 @@ public class N_Buffer
     // PUBLIC
     public N_Buffer()
     {
-        super( 0L ,
-               0L );
+        super( null ,
+               null );
 
         this.slots = new ArrayList<>();
         this.messageIDs = new TreeSet<>();
@@ -83,7 +84,12 @@ public class N_Buffer
         }
         else
         {
-            flowLimit = Long.parseLong( flowLimitStr );
+            flowLimit = new Duration( Long.parseLong( flowLimitStr ) );
+
+            if ( flowLimit.getMillis() <= 0L )
+            {
+                throw new IllegalArgumentException( "flow-limit can't be <=0. Should be null or empty" );
+            }
         }
 
         final String waitMinStr = getConfig( "wait-min" );
@@ -125,18 +131,18 @@ public class N_Buffer
         throws Exception
     {
         // 1. Are we allowed to publish ?
-        final Calendar cal = Calendar.getInstance();
+        final DateTime now = new DateTime();
 
-        final long ttw = getTimeToWait( cal );
-        if ( ttw > 0 )
+        final Duration time2wait = getTimeToWait( now );
+        if ( time2wait.getMillis() <= 0L )
         {
             if ( LOGGER.isTraceEnabled() )
             {
                 LOGGER.trace(
-                    "[" + getNodeID() + "] time to wait : " + ttw + "ms. During this time, we're trying to catch an incoming message." );
+                    "[" + getNodeID() + "] time to wait : " + time2wait + ". During this time, we're trying to catch an incoming message." );
             }
 
-            final Message message = getLastMessageOrWait( ttw );
+            final Message message = getLastMessageOrWait( time2wait );
             if ( message != null )
             {
                 pushMessage( message );
@@ -173,7 +179,7 @@ public class N_Buffer
                         "[" + getNodeID() + "] no time to wait and we found a message in the buffer. We're sending it." );
                 }
 
-                lastWrite = cal.getTimeInMillis();
+                lastWrite = now;
 
                 sendMessage( message );
             }
@@ -189,12 +195,12 @@ public class N_Buffer
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Buffer.class );
-    private Long flowLimit;
+    private Duration flowLimit;
     private final List<Slot> slots;
     private final TreeSet<Long> messageIDs;
     private Integer waitMin;
     private Integer waitMax;
-    private Long lastWrite;
+    private DateTime lastWrite;
     private Path messagesPath;
     private final Random rnd;
 
@@ -220,46 +226,48 @@ public class N_Buffer
     private void pushMessage( final Message message )
         throws IOException
     {
-        final long now = Calendar.getInstance().getTimeInMillis();
+        final DateTime now = new DateTime();
 
-        final long delta;
+        final Duration delta;
         if ( waitMin == null || waitMax == null )
         {
-            delta = 0L;
+            delta = new Duration( 0L );
         }
         else
         {
             if ( waitMin.equals( waitMax ) )
             {
-                delta = waitMin;
+                delta = new Duration( (long) waitMin );
             }
             else
             {
-                delta = (long) ( rnd.nextInt( waitMax - waitMin ) + waitMin );
+                delta = new Duration( (long) ( rnd.nextInt( waitMax - waitMin ) + waitMin ) );
             }
         }
 
-        final long ID;
+        final DateTime ID;
         if ( messageIDs.isEmpty() )
         {
-            ID = now + delta;
+            ID = now.plus( delta );
         }
         else
         {
-            final long askedID = now + delta;
+            final DateTime askedTime = now.plus( delta );
 
-            final long lastTime = messageIDs.last();
-            if ( askedID < lastTime )
+            final long lastID = messageIDs.last();
+            final DateTime lastTime = new DateTime( lastID );
+
+            if ( askedTime.isBefore( lastTime ) )
             {
-                ID = lastTime + 1L;
+                ID = lastTime.plusMillis( 1 );
             }
             else
             {
-                ID = askedID;
+                ID = askedTime;
             }
         }
 
-        final Path p = messagesPath.resolve( Long.toString( ID ) );
+        final Path p = messagesPath.resolve( Long.toString( ID.getMillis() ) );
 
         if ( LOGGER.isDebugEnabled() )
         {
@@ -271,28 +279,28 @@ public class N_Buffer
         writeMessage( p ,
                       message );
 
-        messageIDs.add( ID );
+        messageIDs.add( ID.getMillis() );
     }
 
-    private long getTimeToWait( final Calendar calendar )
+    private Duration getTimeToWait( final DateTime from )
     {
         // Best slot
-        long minTime;
+        Duration minDuration;
         if ( slots.isEmpty() )
         {
-            minTime = 0;
+            minDuration = new Duration( 0L );
         }
         else
         {
-            minTime = Long.MAX_VALUE;
+            minDuration = null;
             for ( final Slot slot : slots )
             {
-                final long time = slot.getSmallestDiffInMs( calendar );
-                if ( time < minTime )
+                final Duration duration = slot.getSmallestDiff( from );
+                if ( minDuration == null || duration.isShorterThan( minDuration ) )
                 {
-                    minTime = time;
+                    minDuration = duration;
 
-                    if ( minTime == 0 )
+                    if ( minDuration.getMillis() <= 0L )
                     {
                         break;
                     }
@@ -303,29 +311,35 @@ public class N_Buffer
         // Anti burst
         if ( flowLimit != null && lastWrite != null )
         {
-            final long diff = calendar.getTimeInMillis() - lastWrite;
-            if ( diff < flowLimit )
+            final Duration diff = new Duration( lastWrite ,
+                                                from );
+
+            final Duration toAdd = flowLimit.minus( diff );
+            if ( toAdd.isLongerThan( minDuration ) )
             {
-                minTime = Math.max( minTime ,
-                                    flowLimit - diff );
+                minDuration = toAdd;
             }
         }
 
         // First message
-        if ( messageIDs.size() > 0 )
+        if ( !messageIDs.isEmpty() )
         {
-            final long firstDate = messageIDs.first();
-            final long now = calendar.getTimeInMillis();
+            final long firstID = messageIDs.first();
+            final DateTime first = new DateTime( firstID );
 
-            if ( firstDate > now )
+            if ( first.isAfter( from ) )
             {
-                minTime = Math.max( minTime ,
-                                    firstDate - now );
+                final Duration diff = new Duration( from ,
+                                                    first );
+                if ( diff.isLongerThan( minDuration ) )
+                {
+                    minDuration = diff;
+                }
             }
         }
 
         // Result
-        return minTime;
+        return minDuration;
     }
 
     private static void writeMessage( final Path p ,

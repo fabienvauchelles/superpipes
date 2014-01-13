@@ -40,8 +40,8 @@ public class N_LNK_Post
     // PUBLIC
     public N_LNK_Post()
     {
-        super( 0 ,
-               DEFAULT_ANTIBURST_IN_MS );
+        super( null ,
+               DEFAULT_ANTIBURST );
 
         this.client = new LinkedInClient();
     }

@@ -35,8 +35,8 @@ public class N_Dummy
     // PUBLIC
     public N_Dummy()
     {
-        super( 0L ,
-               0L );
+        super( null ,
+               null );
     }
 
     // PROTECTED

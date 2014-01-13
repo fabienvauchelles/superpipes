@@ -23,11 +23,11 @@ import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -104,7 +104,7 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir ce blog #" + new Date().getTime();
+        final String message = "Allez voir ce blog #" + new DateTime().getMillis();
 
         final String ID = client.postLink( message ,
                                            "http://fabien.vauchelles.com/" ,
@@ -158,7 +158,7 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String message = "Allez voir mon blog #" + new Date().getTime();
+        final String message = "Allez voir mon blog #" + new DateTime().getMillis();
         final String ID = client.postMessage( message );
 
         assertTrue( "ID should be return" ,
@@ -192,7 +192,7 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String ID = client.postMessage( "Allez voir mon blog #" + new Date().getTime() );
+        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() );
 
         assertTrue( "ID should be return" ,
                     ID != null && !ID.isEmpty() );
@@ -215,14 +215,14 @@ public class FacebookClientTest
         throws Exception
     {
         // Post 1
-        final String message1 = "Allez voir mon blog n°1" + new Date().getTime();
+        final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
         final String ID1 = client.postMessage( message1 );
 
         assertTrue( "ID1 should be return" ,
                     ID1 != null && !ID1.isEmpty() );
 
         // Post 2
-        final String message2 = "Allez voir mon blog n°2" + new Date().getTime();
+        final String message2 = "Allez voir mon blog n°2" + new DateTime().getMillis();
         final String url2 = "http://fabien.vauchelles.com/";
         final String urlName2 = "Blog de Fabien Vauchelles";
         final String urlCaption2 = "du java";
@@ -237,7 +237,7 @@ public class FacebookClientTest
                     ID2 != null && !ID2.isEmpty() );
 
         // Post 3
-        final String message3 = "Allez voir mon blog n°3" + new Date().getTime();
+        final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
         final String ID3 = client.postMessage( message3 );
 
         assertTrue( "ID3 should be return" ,

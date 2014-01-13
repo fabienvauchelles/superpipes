@@ -23,8 +23,8 @@ import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.TreeSet;
+import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -65,7 +65,7 @@ public class N_TW_PostTest
             Message.KeyIndex.CONTENT ,
             "Le contenu, je m'en fous" ,
             Message.KeyIndex.PUBLISHED_DATE ,
-            new Date().getTime() ,
+            new DateTime() ,
             Message.KeyIndex.TAGS ,
             new TreeSet<>( Arrays.asList( "ceci" ,
                                           "est" ,
@@ -119,7 +119,7 @@ public class N_TW_PostTest
             Message.KeyIndex.TAGS ,
             new TreeSet<String>() ,
             Message.KeyIndex.PUBLISHED_DATE ,
-            new Date().getTime()
+            new DateTime()
         );
 
         N_TW_Post.createContent( message ,
@@ -151,7 +151,7 @@ public class N_TW_PostTest
             Message.KeyIndex.TAGS ,
             new TreeSet<String>() ,
             Message.KeyIndex.PUBLISHED_DATE ,
-            new Date().getTime()
+            new DateTime()
         );
 
         N_TW_Post.createContent( message ,
@@ -181,7 +181,7 @@ public class N_TW_PostTest
             Message.KeyIndex.TAGS ,
             new TreeSet<String>() ,
             Message.KeyIndex.PUBLISHED_DATE ,
-            new Date().getTime()
+            new DateTime()
         );
 
         N_TW_Post.createContent( message ,
