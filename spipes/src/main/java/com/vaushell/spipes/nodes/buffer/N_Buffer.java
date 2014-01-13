@@ -134,7 +134,7 @@ public class N_Buffer
         final DateTime now = new DateTime();
 
         final Duration time2wait = getTimeToWait( now );
-        if ( time2wait.getMillis() <= 0L )
+        if ( time2wait.getMillis() > 0L )
         {
             if ( LOGGER.isTraceEnabled() )
             {
