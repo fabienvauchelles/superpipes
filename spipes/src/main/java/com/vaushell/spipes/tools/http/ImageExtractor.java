@@ -95,7 +95,14 @@ public class ImageExtractor
                             final String src = elt.attr( "src" );
                             if ( src != null && !src.isEmpty() )
                             {
-                                imagesURIs.add( rootURI.resolve( src ) );
+                                try
+                                {
+                                    imagesURIs.add( rootURI.resolve( src ) );
+                                }
+                                catch( final IllegalArgumentException ex )
+                                {
+                                    // Ignore wrong encoded URI
+                                }
                             }
                         }
                     }
