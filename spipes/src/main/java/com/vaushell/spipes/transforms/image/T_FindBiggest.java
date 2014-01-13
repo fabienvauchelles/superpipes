@@ -79,15 +79,18 @@ public class T_FindBiggest
 
             final BufferedImage biggest = extractor.extractBiggest( uri );
 
-            try( ByteArrayOutputStream bos = new ByteArrayOutputStream() )
+            if ( biggest != null )
             {
-                // PNG is lossless
-                ImageIO.write( biggest ,
-                               "png" ,
-                               bos );
+                try( ByteArrayOutputStream bos = new ByteArrayOutputStream() )
+                {
+                    // PNG is lossless
+                    ImageIO.write( biggest ,
+                                   "png" ,
+                                   bos );
 
-                message.setProperty( Message.KeyIndex.PICTURE ,
-                                     bos.toByteArray() );
+                    message.setProperty( Message.KeyIndex.PICTURE ,
+                                         bos.toByteArray() );
+                }
             }
         }
 
