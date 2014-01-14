@@ -41,7 +41,7 @@ public class N_FB_Post
     public N_FB_Post()
     {
         super( null ,
-               DEFAULT_ANTIBURST );
+               SECURE_ANTIBURST );
 
         this.client = new FacebookClient();
     }
