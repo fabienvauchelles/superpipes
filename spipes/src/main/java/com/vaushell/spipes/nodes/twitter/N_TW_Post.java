@@ -47,7 +47,7 @@ public class N_TW_Post
     public N_TW_Post()
     {
         super( null ,
-               SECURE_ANTIBURST );
+               DEFAULT_ANTIBURST );
 
         this.client = new TwitterClient();
         this.httpClient = null;
