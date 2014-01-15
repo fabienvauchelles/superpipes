@@ -21,6 +21,7 @@ package com.vaushell.spipes.tools.scribe.tumblr;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.tools.scribe.OAuthClient;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
@@ -28,9 +29,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
 import org.scribe.builder.api.TumblrApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -93,7 +91,7 @@ public class TumblrClient
      * @param uri Link
      * @param uriName Link's name
      * @param uriDescription Link's description
-     * @param tags Link's set of tags
+     * @param tags Link's tags
      * @return Post ID
      * @throws IOException
      * @throws TumblrException
@@ -101,7 +99,7 @@ public class TumblrClient
     public long postLink( final String uri ,
                           final String uriName ,
                           final String uriDescription ,
-                          final Set<String> tags )
+                          final Tags tags )
         throws IOException , TumblrException
     {
         if ( uri == null || uri.isEmpty() )
@@ -138,15 +136,8 @@ public class TumblrClient
 
         if ( tags != null && !tags.isEmpty() )
         {
-            final TreeSet<String> correctedTags = new TreeSet<>();
-            for ( final String tag : tags )
-            {
-                final String correctedTag = tag.toLowerCase( Locale.ENGLISH );
-                correctedTags.add( correctedTag );
-            }
-
             final StringBuilder sbTags = new StringBuilder();
-            for ( final String tag : correctedTags )
+            for ( final String tag : tags.getAll() )
             {
                 if ( sbTags.length() > 0 )
                 {
@@ -178,13 +169,13 @@ public class TumblrClient
      * Post message to Tumblr.
      *
      * @param message Message
-     * @param tags Message's set of tags
+     * @param tags Message's tags
      * @return Post ID
      * @throws IOException
      * @throws TumblrException
      */
     public long postMessage( final String message ,
-                             final Set<String> tags )
+                             final Tags tags )
         throws IOException , TumblrException
     {
         if ( message == null || message.isEmpty() )
@@ -209,15 +200,9 @@ public class TumblrClient
 
         if ( tags != null && !tags.isEmpty() )
         {
-            final TreeSet<String> correctedTags = new TreeSet<>();
-            for ( final String tag : tags )
-            {
-                final String correctedTag = tag.toLowerCase( Locale.ENGLISH );
-                correctedTags.add( correctedTag );
-            }
 
             final StringBuilder sbTags = new StringBuilder();
-            for ( final String tag : correctedTags )
+            for ( final String tag : tags.getAll() )
             {
                 if ( sbTags.length() > 0 )
                 {
@@ -289,7 +274,7 @@ public class TumblrClient
         }
         final JsonNode nodePost = nodePosts.get( 0 );
 
-        final Set<String> tags = new TreeSet<>();
+        final Tags tags = new Tags();
         final JsonNode nodeTags = nodePost.get( "tags" );
         for ( final JsonNode nodeTag : nodeTags )
         {

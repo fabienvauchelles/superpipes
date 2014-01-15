@@ -20,12 +20,12 @@
 package com.vaushell.spipes.nodes.tumblr;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.tumblr.TumblrClient;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,20 +81,11 @@ public class N_TB_Post
 
         // Send to TB
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
-        String uriStr;
-        if ( uri == null )
-        {
-            uriStr = null;
-        }
-        else
-        {
-            uriStr = uri.toString();
-        }
 
-        final long ID = client.postLink( uriStr ,
+        final long ID = client.postLink( uri == null ? null : uri.toString() ,
                                          (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                          (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                         (Set<String>) getMessage().getProperty( Message.KeyIndex.TAGS ) );
+                                         (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) );
 
         if ( LOGGER.isTraceEnabled() )
         {

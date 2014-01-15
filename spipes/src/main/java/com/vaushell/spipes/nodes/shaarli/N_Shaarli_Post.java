@@ -22,10 +22,11 @@ package com.vaushell.spipes.nodes.shaarli;
 import com.vaushell.shaarlijavaapi.ShaarliClient;
 import com.vaushell.shaarlijavaapi.ShaarliTemplates;
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,20 +105,12 @@ public class N_Shaarli_Post
         }
 
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
-        String uriStr;
-        if ( uri == null )
-        {
-            uriStr = null;
-        }
-        else
-        {
-            uriStr = uri.toString();
-        }
+        final Tags tags = (Tags) getMessage().getProperty( Message.KeyIndex.TAGS );
 
-        final String ID = client.createLink( uriStr ,
+        final String ID = client.createLink( uri == null ? null : uri.toString() ,
                                              (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                              (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                             (Set<String>) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
+                                             tags == null ? Collections.EMPTY_SET : tags.getAll() ,
                                              false );
 
         if ( LOGGER.isTraceEnabled() )

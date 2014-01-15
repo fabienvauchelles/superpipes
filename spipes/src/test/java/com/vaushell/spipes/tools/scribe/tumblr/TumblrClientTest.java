@@ -20,14 +20,11 @@
 package com.vaushell.spipes.tools.scribe.tumblr;
 
 import com.vaushell.spipes.dispatch.Dispatcher;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
@@ -111,9 +108,9 @@ public class TumblrClientTest
         throws Exception
     {
         // Post
-        final Set<String> tags = new TreeSet<>( Arrays.asList( "blog" ,
-                                                               "coding" ,
-                                                               "java" ) );
+        final Tags tags = new Tags( "blog" ,
+                                    "coding" ,
+                                    "java" );
 
         final long ID = client.postLink( "http://bit.ly/Ijk3of" ,
                                          "Blog de Fabien Vauchelles" ,
@@ -161,9 +158,9 @@ public class TumblrClientTest
         // Post
         final String message = "Allez voir mon blog #" + new DateTime().getMillis();
 
-        final Set<String> tags = new TreeSet<>( Arrays.asList( "myblog" ,
-                                                               "framework" ,
-                                                               "vauchelles" ) );
+        final Tags tags = new Tags( "myblog" ,
+                                    "framework" ,
+                                    "vauchelles" );
 
         final long ID = client.postMessage( message ,
                                             tags );
@@ -208,7 +205,7 @@ public class TumblrClientTest
     {
         // Post
         final long ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
-                                            Collections.EMPTY_SET );
+                                            new Tags() );
 
         assertTrue( "ID should be return" ,
                     ID > 0 );

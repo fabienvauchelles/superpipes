@@ -26,13 +26,12 @@ import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.HTMLhelper;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
-import java.util.Locale;
-import java.util.TreeSet;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -83,14 +82,14 @@ public class N_RSS
             if ( entry.getUri() != null )
             {
                 // Tags
-                final TreeSet<String> tags = new TreeSet<>();
+                final Tags tags = new Tags();
 
                 final List<SyndCategory> categories = entry.getCategories();
                 if ( categories != null )
                 {
                     for ( final SyndCategory category : categories )
                     {
-                        tags.add( category.getName().toLowerCase( Locale.ENGLISH ) );
+                        tags.add( category.getName() );
                     }
                 }
 

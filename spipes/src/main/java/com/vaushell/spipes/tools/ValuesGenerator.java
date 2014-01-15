@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.tools;
 
+import com.vaushell.spipes.dispatch.Tags;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -64,10 +65,10 @@ public final class ValuesGenerator
      * @param maxWords Maximum words count
      * @return the Set
      */
-    public static HashSet<String> getRandomWordSet( final int minWords ,
-                                                    final int maxWords )
+    public static Tags getRandomTagsSet( final int minWords ,
+                                         final int maxWords )
     {
-        final HashSet<String> s = new HashSet<>();
+        final Tags s = new Tags();
 
         final int count = RND.nextInt( maxWords - minWords ) + minWords;
         for ( int i = 0 ; i < count ; ++i )

@@ -20,12 +20,12 @@
 package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -172,8 +172,8 @@ public class N_TW_Post
 
             if ( message.contains( Message.KeyIndex.TAGS ) )
             {
-                final Set<String> tags = (Set<String>) message.getProperty( Message.KeyIndex.TAGS );
-                for ( final String tag : tags )
+                final Tags tags = (Tags) message.getProperty( Message.KeyIndex.TAGS );
+                for ( final String tag : tags.getAll() )
                 {
                     final String ct = " #" + tag;
 

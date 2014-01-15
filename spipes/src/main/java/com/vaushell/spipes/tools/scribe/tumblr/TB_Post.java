@@ -19,8 +19,8 @@
 
 package com.vaushell.spipes.tools.scribe.tumblr;
 
+import com.vaushell.spipes.dispatch.Tags;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * A Tumblr post.
@@ -38,7 +38,7 @@ public class TB_Post
                     final String type ,
                     final String slug ,
                     final long timestamp ,
-                    final Set<String> tags ,
+                    final Tags tags ,
                     final TB_Blog blog )
     {
         this.ID = ID;
@@ -133,12 +133,12 @@ public class TB_Post
         this.timestamp = timestamp;
     }
 
-    public Set<String> getTags()
+    public Tags getTags()
     {
         return tags;
     }
 
-    public void setTags( final Set<String> tags )
+    public void setTags( final Tags tags )
     {
         this.tags = tags;
     }
@@ -262,6 +262,6 @@ public class TB_Post
     private String type;
     private String slug;
     private long timestamp;
-    private Set<String> tags;
+    private Tags tags;
     private TB_Blog blog;
 }

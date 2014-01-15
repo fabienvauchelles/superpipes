@@ -21,6 +21,7 @@ package com.vaushell.spipes.transforms.tags;
 
 import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.dummy.N_Dummy;
 import com.vaushell.spipes.transforms.A_Transform;
@@ -65,15 +66,15 @@ public class T_TagsTest
 
         // Transform
         final Message mKO = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "blog" ,
-                                                                          "coding" ) ) );
+                                            new Tags( "blog" ,
+                                                      "coding" ) );
 
         assertNull( "Message is not include" ,
                     t.transform( mKO ) );
 
         final Message mOK = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "coding" ,
-                                                                          "java" ) ) );
+                                            new Tags( "coding" ,
+                                                      "java" ) );
 
         assertNotNull( "Messate is include" ,
                        t.transform( mOK ) );
@@ -104,15 +105,15 @@ public class T_TagsTest
 
         // Transform
         final Message mKO = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "coding" ,
-                                                                          "java" ) ) );
+                                            new Tags( "coding" ,
+                                                      "java" ) );
 
         assertNull( "Message is not include" ,
                     t.transform( mKO ) );
 
         final Message mOK = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "extreme" ,
-                                                                          "java" ) ) );
+                                            new Tags( "extreme" ,
+                                                      "java" ) );
 
         assertNotNull( "Messate is include" ,
                        t.transform( mOK ) );
@@ -143,15 +144,16 @@ public class T_TagsTest
 
         // Transform
         final Message mKO = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "blog" ,
-                                                                          "java" ) ) );
+                                            new Tags( "blog" ,
+                                                      "java" ) );
 
         assertNull( "Message is not include" ,
                     t.transform( mKO ) );
 
         final Message mOK = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "blog" ,
-                                                                          "coding" ) ) );
+                                            new Tags( "blog" ,
+                                                      "coding" )
+        );
 
         assertNotNull( "Messate is include" ,
                        t.transform( mOK ) );
@@ -182,15 +184,15 @@ public class T_TagsTest
 
         // Transform
         final Message mKO = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "java" ,
-                                                                          "extreme" ) ) );
+                                            new Tags( "java" ,
+                                                      "extreme" ) );
 
         assertNull( "Message is not include" ,
                     t.transform( mKO ) );
 
         final Message mOK = Message.create( Message.KeyIndex.TAGS ,
-                                            new TreeSet<>( Arrays.asList( "blog" ,
-                                                                          "java" ) ) );
+                                            new Tags( "blog" ,
+                                                      "java" ) );
 
         assertNotNull( "Messate is include" ,
                        t.transform( mOK ) );

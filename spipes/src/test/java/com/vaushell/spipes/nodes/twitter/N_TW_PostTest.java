@@ -20,6 +20,7 @@
 package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.net.URI;
 import java.util.Arrays;
@@ -67,20 +68,20 @@ public class N_TW_PostTest
             Message.KeyIndex.PUBLISHED_DATE ,
             new DateTime() ,
             Message.KeyIndex.TAGS ,
-            new TreeSet<>( Arrays.asList( "ceci" ,
-                                          "est" ,
-                                          "un" ,
-                                          "tag" ,
-                                          "mais" ,
-                                          "je" ,
-                                          "vais" ,
-                                          "en" ,
-                                          "rajouter" ,
-                                          "pour" ,
-                                          "que" ,
-                                          "ca" ,
-                                          "soit" ,
-                                          "long" ) )
+            new Tags( "ceci" ,
+                      "est" ,
+                      "un" ,
+                      "tag" ,
+                      "mais" ,
+                      "je" ,
+                      "vais" ,
+                      "en" ,
+                      "rajouter" ,
+                      "pour" ,
+                      "que" ,
+                      "ca" ,
+                      "soit" ,
+                      "long" )
         );
 
         final String content = N_TW_Post.createContent( message ,
@@ -117,7 +118,7 @@ public class N_TW_PostTest
             Message.KeyIndex.CONTENT ,
             "Le contenu, je m'en fous" ,
             Message.KeyIndex.TAGS ,
-            new TreeSet<String>() ,
+            new Tags() ,
             Message.KeyIndex.PUBLISHED_DATE ,
             new DateTime()
         );
@@ -149,7 +150,7 @@ public class N_TW_PostTest
             Message.KeyIndex.CONTENT ,
             "Le contenu, je m'en fous" ,
             Message.KeyIndex.TAGS ,
-            new TreeSet<String>() ,
+            new Tags() ,
             Message.KeyIndex.PUBLISHED_DATE ,
             new DateTime()
         );
@@ -179,7 +180,7 @@ public class N_TW_PostTest
             Message.KeyIndex.CONTENT ,
             "Le contenu, je m'en fous" ,
             Message.KeyIndex.TAGS ,
-            new TreeSet<String>() ,
+            new Tags() ,
             Message.KeyIndex.PUBLISHED_DATE ,
             new DateTime()
         );

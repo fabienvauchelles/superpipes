@@ -294,7 +294,6 @@ public final class Message
      * @param m message
      * @return the formatted message
      */
-    @SuppressWarnings( "unchecked" )
     public static String formatPlainText( final Message m )
     {
         if ( m == null )
@@ -339,10 +338,10 @@ public final class Message
         }
 
         // Tags
-        final Set<String> tags;
+        final Tags tags;
         if ( keys.contains( KeyIndex.TAGS.index ) )
         {
-            tags = (Set<String>) m.getProperty( KeyIndex.TAGS );
+            tags = (Tags) m.getProperty( KeyIndex.TAGS );
 
             keys.remove( KeyIndex.TAGS.index );
         }
@@ -377,7 +376,7 @@ public final class Message
         {
             sb.append( String.format( "    Tags%n" ) );
 
-            for ( final String tag : tags )
+            for ( final String tag : tags.getAll() )
             {
                 sb.append( String.format( "        %s%n" ,
                                           tag ) );
@@ -400,7 +399,6 @@ public final class Message
      * @param m message
      * @return the formatted message
      */
-    @SuppressWarnings( "unchecked" )
     public static String formatHTML( final Message m )
     {
         if ( m == null )
@@ -445,10 +443,10 @@ public final class Message
         }
 
         // Tags
-        final Set<String> tags;
+        final Tags tags;
         if ( keys.contains( KeyIndex.TAGS.index ) )
         {
-            tags = (Set<String>) m.getProperty( KeyIndex.TAGS );
+            tags = (Tags) m.getProperty( KeyIndex.TAGS );
 
             keys.remove( KeyIndex.TAGS.index );
         }
@@ -485,7 +483,7 @@ public final class Message
         {
             sb.append( String.format( "<h2>Tags</h2>%n<ul>%n" ) );
 
-            for ( final String tag : tags )
+            for ( final String tag : tags.getAll() )
             {
                 sb.append( String.format( "  <li>%s</li>%n" ,
                                           tag ) );

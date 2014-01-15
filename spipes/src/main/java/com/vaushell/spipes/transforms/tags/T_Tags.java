@@ -20,8 +20,8 @@
 package com.vaushell.spipes.transforms.tags;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.transforms.A_Transform;
-import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +80,7 @@ public class T_Tags
             return null;
         }
 
-        final Set<String> mTags = (Set<String>) message.getProperty( Message.KeyIndex.TAGS );
+        final Tags mTags = (Tags) message.getProperty( Message.KeyIndex.TAGS );
 
         switch( op )
         {
@@ -156,12 +156,12 @@ public class T_Tags
     private OpType op;
 
     private static boolean containsOne( final String[] mustHave ,
-                                        final Set<String> tagsSet )
+                                        final Tags tags )
     {
         for ( final String tag1 : mustHave )
         {
             if ( contains( tag1 ,
-                           tagsSet ) )
+                           tags ) )
             {
                 return true;
             }
@@ -171,12 +171,12 @@ public class T_Tags
     }
 
     private static boolean containsAll( final String[] mustHave ,
-                                        final Set<String> tagsSet )
+                                        final Tags tags )
     {
         for ( final String tag1 : mustHave )
         {
             if ( !contains( tag1 ,
-                            tagsSet ) )
+                            tags ) )
             {
                 return false;
             }
@@ -186,9 +186,9 @@ public class T_Tags
     }
 
     private static boolean contains( final String mustHave ,
-                                     final Set<String> tagsSet )
+                                     final Tags tags )
     {
-        for ( final String tag : tagsSet )
+        for ( final String tag : tags.getAll() )
         {
             if ( mustHave.equals( tag ) )
             {

@@ -23,12 +23,11 @@ import com.vaushell.shaarlijavaapi.ShaarliClient;
 import com.vaushell.shaarlijavaapi.ShaarliLink;
 import com.vaushell.shaarlijavaapi.ShaarliTemplates;
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.TreeSet;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -113,10 +112,10 @@ public class N_Shaarli
                  && ( sl.getID() != null || sl.getPermaID() != null ) )
             {
                 // Tags
-                final TreeSet<String> tags = new TreeSet<>();
+                final Tags tags = new Tags();
                 for ( final String tag : sl.getTags() )
                 {
-                    tags.add( tag.toLowerCase( Locale.ENGLISH ) );
+                    tags.add( tag );
                 }
 
                 setMessage( Message.create(
