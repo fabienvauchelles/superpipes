@@ -41,12 +41,15 @@ public final class ThrowableHelper
      */
     public static String formatPlainText( final Throwable th )
     {
-        final DateTimeFormatter fmt = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
+        if ( th == null )
+        {
+            return null;
+        }
 
         final StringBuilder sb = new StringBuilder();
 
         sb.append( String.format( "ERROR at %s%n" ,
-                                  fmt.print( new DateTime() ) ) );
+                                  DATE_FORMAT.print( new DateTime() ) ) );
 
         // Message
         final List<Throwable> reverse = new ArrayList<>();
@@ -93,12 +96,15 @@ public final class ThrowableHelper
      */
     public static String formatHTML( final Throwable th )
     {
-        final DateTimeFormatter fmt = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
+        if ( th == null )
+        {
+            return null;
+        }
 
         final StringBuilder sb = new StringBuilder();
 
         sb.append( String.format( "<h1>ERROR at %s</h1>%n" ,
-                                  fmt.print( new DateTime() ) ) );
+                                  DATE_FORMAT.print( new DateTime() ) ) );
 
         // Message
         final List<Throwable> reverse = new ArrayList<>();
@@ -142,6 +148,8 @@ public final class ThrowableHelper
     }
 
     // PRIVATE
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
+
     private ThrowableHelper()
     {
         // Nothing
