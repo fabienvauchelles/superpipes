@@ -19,7 +19,6 @@
 
 package com.vaushell.spipes.nodes.stub;
 
-import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +50,11 @@ public class N_MessageLogger
     protected void loop()
         throws InterruptedException
     {
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isInfoEnabled() )
         {
-            LOGGER.info( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.info( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
     }
 

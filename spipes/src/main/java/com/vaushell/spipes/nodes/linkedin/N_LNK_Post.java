@@ -65,20 +65,20 @@ public class N_LNK_Post
         throws Exception
     {
         // Receive
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
 
-        if ( !message.contains( Message.KeyIndex.URI ) )
+        if ( !getMessage().contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to Twitter
-        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
+        final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -91,7 +91,7 @@ public class N_LNK_Post
 
         final String ID = client.postLink( null ,
                                            uriStr ,
-                                           (String) message.getProperty( Message.KeyIndex.TITLE ) ,
+                                           (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                            null );
 
         if ( LOGGER.isTraceEnabled() )
@@ -99,10 +99,10 @@ public class N_LNK_Post
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        message.setProperty( "id-linkedin" ,
-                             ID );
+        getMessage().setProperty( "id-linkedin" ,
+                                  ID );
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override

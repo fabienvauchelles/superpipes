@@ -58,12 +58,12 @@ public class N_SeqMessageGenerator
             LOGGER.trace( "[" + getNodeID() + "] generate message" );
         }
 
-        final Message message = Message.create(
+        setMessage( Message.create(
             Message.KeyIndex.TITLE ,
             "message number " + num
-        );
+        ) );
 
-        sendMessage( message );
+        sendMessage();
 
         ++num;
     }

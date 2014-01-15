@@ -67,20 +67,20 @@ public class N_TB_Post
         throws Exception
     {
         // Receive
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
 
-        if ( !message.contains( Message.KeyIndex.URI ) )
+        if ( !getMessage().contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to TB
-        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
+        final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -92,19 +92,19 @@ public class N_TB_Post
         }
 
         final long ID = client.postLink( uriStr ,
-                                         (String) message.getProperty( Message.KeyIndex.TITLE ) ,
-                                         (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                         (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) );
+                                         (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                         (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                         (Set<String>) getMessage().getProperty( Message.KeyIndex.TAGS ) );
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        message.setProperty( "id-tumblr" ,
-                             ID );
+        getMessage().setProperty( "id-tumblr" ,
+                                  ID );
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override

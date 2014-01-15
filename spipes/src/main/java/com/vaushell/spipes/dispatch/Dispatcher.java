@@ -20,6 +20,7 @@
 package com.vaushell.spipes.dispatch;
 
 import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.tools.ThrowableHelper;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -206,10 +207,38 @@ public final class Dispatcher
      * Post an error.
      *
      * @param th the error
+     * @param message the message (could be null)
      */
-    public void postError( final Throwable th )
+    public void postError( final Throwable th ,
+                           final Message message )
     {
-        eMailer.receiveError( th );
+        if ( th == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] postError : th=" + th + " / message=" + Message.formatSimple( message ) );
+        }
+
+        if ( message == null )
+        {
+            LOGGER.error( ThrowableHelper.formatPlainText( th ) );
+
+            eMailer.receiveError( ThrowableHelper.formatHTML( th ) );
+        }
+        else
+        {
+            LOGGER.error( String.format( "%s%n%s" ,
+                                         ThrowableHelper.formatPlainText( th ) ,
+                                         Message.formatPlainText( message ) ) );
+
+            eMailer.receiveError( String.format( "%s%n%s%n" ,
+                                                 ThrowableHelper.formatHTML( th ) ,
+                                                 Message.formatHTML( message ) ) );
+        }
     }
 
     /**

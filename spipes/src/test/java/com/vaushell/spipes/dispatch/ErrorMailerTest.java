@@ -88,13 +88,17 @@ public class ErrorMailerTest
 
         dispatcher.eMailer.start();
 
-        dispatcher.postError( new UnsupportedOperationException( "test null 1" ) );
-        dispatcher.postError( new UnsupportedOperationException( "test null 2" ) );
+        dispatcher.postError( new UnsupportedOperationException( "test null 1" ) ,
+                              null );
+        dispatcher.postError( new UnsupportedOperationException( "test null 2" ) ,
+                              null );
 
         Thread.sleep( 500 );
 
-        dispatcher.postError( new UnsupportedOperationException( "test null 3" ) );
-        dispatcher.postError( new UnsupportedOperationException( "test null 4" ) );
+        dispatcher.postError( new UnsupportedOperationException( "test null 3" ) ,
+                              null );
+        dispatcher.postError( new UnsupportedOperationException( "test null 4" ) ,
+                              null );
 
         Thread.sleep( 800 );
 

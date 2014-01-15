@@ -109,50 +109,50 @@ public class N_FB
 
             if ( post.getID() != null )
             {
-                final Message message = Message.create(
+                setMessage( Message.create(
                     "id-facebook" ,
                     post.getID() ,
                     Message.KeyIndex.PUBLISHED_DATE ,
                     post.getCreatedTime()
-                );
+                ) );
 
                 if ( post.getFrom() != null && post.getFrom().getName() != null )
                 {
-                    message.setProperty( Message.KeyIndex.AUTHOR ,
-                                         post.getFrom().getName() );
+                    getMessage().setProperty( Message.KeyIndex.AUTHOR ,
+                                              post.getFrom().getName() );
                 }
 
                 if ( post.getMessage() != null )
                 {
-                    message.setProperty( Message.KeyIndex.CONTENT ,
-                                         post.getMessage() );
+                    getMessage().setProperty( Message.KeyIndex.CONTENT ,
+                                              post.getMessage() );
                 }
 
                 if ( post.getURL() != null )
                 {
-                    message.setProperty( Message.KeyIndex.URI ,
-                                         URI.create( post.getURL() ) );
+                    getMessage().setProperty( Message.KeyIndex.URI ,
+                                              URI.create( post.getURL() ) );
                 }
 
                 if ( post.getURLcaption() != null )
                 {
-                    message.setProperty( "caption-facebook" ,
-                                         post.getURLcaption() );
+                    getMessage().setProperty( "caption-facebook" ,
+                                              post.getURLcaption() );
                 }
 
                 if ( post.getURLdescription() != null )
                 {
-                    message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                                         post.getURLdescription() );
+                    getMessage().setProperty( Message.KeyIndex.DESCRIPTION ,
+                                              post.getURLdescription() );
                 }
 
                 if ( post.getURLname() != null )
                 {
-                    message.setProperty( Message.KeyIndex.TITLE ,
-                                         post.getURLname() );
+                    getMessage().setProperty( Message.KeyIndex.TITLE ,
+                                              post.getURLname() );
                 }
 
-                sendMessage( message );
+                sendMessage();
             }
 
             ++count;

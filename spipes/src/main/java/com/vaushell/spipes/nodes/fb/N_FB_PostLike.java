@@ -22,8 +22,6 @@ package com.vaushell.spipes.nodes.fb;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
-import com.vaushell.spipes.tools.scribe.fb.FacebookException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.slf4j.Logger;
@@ -75,23 +73,23 @@ public class N_FB_PostLike
 
     @Override
     protected void loop()
-        throws InterruptedException , IOException , FacebookException
+        throws Exception
     {
         // Receive
-        final Message message = (Message) getLastMessageOrWait();
+        setMessage( (Message) getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
 
-        if ( !message.contains( "id-facebook" ) )
+        if ( !getMessage().contains( "id-facebook" ) )
         {
             throw new IllegalArgumentException( "message doesn't have an post id" );
         }
 
         // Like
-        client.likePost( (String) message.getProperty( "id-facebook" ) );
+        client.likePost( (String) getMessage().getProperty( "id-facebook" ) );
     }
 
     @Override

@@ -57,6 +57,7 @@ public abstract class A_Node
         this.properties = new Properties();
         this.commonsPropertiesID = new ArrayList<>();
         this.lastPop = null;
+        this.message = null;
 
         if ( defaultAntiBurst != null && defaultAntiBurst.getMillis() <= 0L )
         {
@@ -381,7 +382,9 @@ public abstract class A_Node
             {
                 try
                 {
+                    setMessage( null );
                     loop();
+                    setMessage( null );
                 }
                 catch( final InterruptedException ex )
                 {
@@ -389,9 +392,8 @@ public abstract class A_Node
                 }
                 catch( final Throwable ex )
                 {
-                    LOGGER.error( "Error" ,
-                                  ex );
-                    getDispatcher().postError( ex );
+                    getDispatcher().postError( ex ,
+                                               message );
                 }
 
                 if ( delay != null )
@@ -409,9 +411,8 @@ public abstract class A_Node
         }
         catch( final Throwable th )
         {
-            LOGGER.error( "Error" ,
-                          th );
-            getDispatcher().postError( th );
+            getDispatcher().postError( th ,
+                                       null );
         }
 
         if ( LOGGER.isDebugEnabled() )
@@ -520,7 +521,7 @@ public abstract class A_Node
     /**
      * Loop execution. The execution is looped until message reception.
      *
-     * @throws Exception
+     * @throws MessageException
      */
     protected abstract void loop()
         throws Exception;
@@ -534,17 +535,16 @@ public abstract class A_Node
         throws Exception;
 
     /**
-     * Send a message to every connected nodes.
+     * Send actual message to every connected nodes.
      *
-     * @param message Message.
      * @throws java.lang.Exception
      */
-    protected void sendMessage( final Message message )
+    protected void sendMessage()
         throws Exception
     {
         if ( message == null )
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException( "Message is not set" );
         }
 
         if ( LOGGER.isTraceEnabled() )
@@ -682,6 +682,17 @@ public abstract class A_Node
 
         return m;
     }
+
+    protected Message getMessage()
+    {
+        return message;
+    }
+
+    protected void setMessage( final Message message )
+    {
+        this.message = message;
+    }
+
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
     private String nodeID;
@@ -695,4 +706,5 @@ public abstract class A_Node
     private DateTime lastPop;
     private Duration antiBurst;
     private Duration delay;
+    private Message message;
 }

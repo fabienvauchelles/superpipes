@@ -62,7 +62,7 @@ public class N_NewsGenerator
         final String uriStr = "http://" + ValuesGenerator.getRandomWord( 10 ,
                                                                          20 );
 
-        final Message message = Message.create(
+        setMessage( Message.create(
             Message.KeyIndex.TITLE ,
             ValuesGenerator.getRandomText( 10 ,
                                            20 ) ,
@@ -84,9 +84,9 @@ public class N_NewsGenerator
                                               8 ) ,
             Message.KeyIndex.PUBLISHED_DATE ,
             new DateTime()
-        );
+        ) );
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override

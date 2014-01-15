@@ -75,29 +75,29 @@ public class N_TW_Post
         throws Exception
     {
         // Receive
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
 
         // Send to Twitter
         final long ID;
-        if ( message.contains( Message.KeyIndex.PICTURE ) )
+        if ( getMessage().contains( Message.KeyIndex.PICTURE ) )
         {
-            final byte[] picture = (byte[]) message.getProperty( Message.KeyIndex.PICTURE );
+            final byte[] picture = (byte[]) getMessage().getProperty( Message.KeyIndex.PICTURE );
 
             try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
             {
-                ID = client.tweetPicture( createContent( message ,
+                ID = client.tweetPicture( createContent( getMessage() ,
                                                          TwitterClient.TWEET_SIZE - TwitterClient.MEDIA_RESERVED ) ,
                                           bis );
             }
         }
         else
         {
-            ID = client.tweet( createContent( message ,
+            ID = client.tweet( createContent( getMessage() ,
                                               TwitterClient.TWEET_SIZE ) );
         }
 
@@ -106,10 +106,10 @@ public class N_TW_Post
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        message.setProperty( "id-twitter" ,
-                             ID );
+        getMessage().setProperty( "id-twitter" ,
+                                  ID );
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override

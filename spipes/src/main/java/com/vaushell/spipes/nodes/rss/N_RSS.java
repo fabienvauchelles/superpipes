@@ -94,39 +94,39 @@ public class N_RSS
                     }
                 }
 
-                final Message message = Message.create(
+                setMessage( Message.create(
                     Message.KeyIndex.URI ,
                     new URI( entry.getUri() ) ,
                     Message.KeyIndex.TAGS ,
                     tags
-                );
+                ) );
 
                 // Title
                 if ( entry.getTitle() != null )
                 {
-                    message.setProperty( Message.KeyIndex.TITLE ,
-                                         HTMLhelper.cleanHTML( entry.getTitle() ) );
+                    getMessage().setProperty( Message.KeyIndex.TITLE ,
+                                              HTMLhelper.cleanHTML( entry.getTitle() ) );
                 }
 
                 // Description
                 if ( entry.getDescription() != null )
                 {
-                    message.setProperty( Message.KeyIndex.DESCRIPTION ,
-                                         HTMLhelper.cleanHTML( entry.getDescription().getValue() ) );
+                    getMessage().setProperty( Message.KeyIndex.DESCRIPTION ,
+                                              HTMLhelper.cleanHTML( entry.getDescription().getValue() ) );
                 }
 
                 // Author
                 if ( entry.getAuthor() != null )
                 {
-                    message.setProperty( Message.KeyIndex.AUTHOR ,
-                                         entry.getAuthor() );
+                    getMessage().setProperty( Message.KeyIndex.AUTHOR ,
+                                              entry.getAuthor() );
                 }
 
                 // Published date
                 if ( entry.getPublishedDate() != null )
                 {
-                    message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                                         new DateTime( entry.getPublishedDate() ) );
+                    getMessage().setProperty( Message.KeyIndex.PUBLISHED_DATE ,
+                                              new DateTime( entry.getPublishedDate() ) );
                 }
 
                 // Content
@@ -141,12 +141,12 @@ public class N_RSS
 
                     if ( sb.length() > 0 )
                     {
-                        message.setProperty( Message.KeyIndex.CONTENT ,
-                                             sb.toString() );
+                        getMessage().setProperty( Message.KeyIndex.CONTENT ,
+                                                  sb.toString() );
                     }
                 }
 
-                sendMessage( message );
+                sendMessage();
             }
         }
     }

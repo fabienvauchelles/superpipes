@@ -81,16 +81,16 @@ public class N_Shaarli_Post
         throws Exception
     {
         // Receive
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
 
-        if ( !message.contains( Message.KeyIndex.URI )
-             || !message.contains( Message.KeyIndex.TITLE )
-             || !message.contains( Message.KeyIndex.TAGS ) )
+        if ( !getMessage().contains( Message.KeyIndex.URI )
+             || !getMessage().contains( Message.KeyIndex.TITLE )
+             || !getMessage().contains( Message.KeyIndex.TAGS ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri, a title or a set of tags" );
         }
@@ -103,7 +103,7 @@ public class N_Shaarli_Post
             throw new IllegalArgumentException( "Login error" );
         }
 
-        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
+        final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -115,9 +115,9 @@ public class N_Shaarli_Post
         }
 
         final String ID = client.createLink( uriStr ,
-                                             (String) message.getProperty( Message.KeyIndex.TITLE ) ,
-                                             (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                             (Set<String>) message.getProperty( Message.KeyIndex.TAGS ) ,
+                                             (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                             (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                             (Set<String>) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
                                              false );
 
         if ( LOGGER.isTraceEnabled() )
@@ -125,10 +125,10 @@ public class N_Shaarli_Post
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        message.setProperty( "id-shaarli" ,
-                             ID );
+        getMessage().setProperty( "id-shaarli" ,
+                                  ID );
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override

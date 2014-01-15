@@ -19,7 +19,6 @@
 
 package com.vaushell.spipes.dispatch;
 
-import com.vaushell.spipes.tools.ThrowableHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +98,7 @@ public class ErrorMailer
                     final StringBuilder sb = new StringBuilder( "<html><body>" );
 
                     boolean first = true;
-                    for ( final Throwable th : getLastErrorsOrWait() )
+                    for ( final String content : getLastErrorsOrWait() )
                     {
                         if ( first )
                         {
@@ -110,7 +109,7 @@ public class ErrorMailer
                             sb.append( String.format( "<hr/>%n" ) );
                         }
 
-                        sb.append( ThrowableHelper.formatHTML( th ) );
+                        sb.append( content );
                     }
 
                     sb.append( "</body></html>" );
@@ -138,23 +137,23 @@ public class ErrorMailer
     /**
      * Receive a error and stack it.
      *
-     * @param error Error
+     * @param content content
      */
-    public void receiveError( final Throwable error )
+    public void receiveError( final String content )
     {
-        if ( error == null )
+        if ( content == null )
         {
             throw new IllegalArgumentException();
         }
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getClass().getSimpleName() + "] receiveError : error=" + error );
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] receiveError : content=" + content );
         }
 
         synchronized( internalStack )
         {
-            internalStack.add( error );
+            internalStack.add( content );
 
             internalStack.notifyAll();
         }
@@ -184,7 +183,7 @@ public class ErrorMailer
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( ErrorMailer.class );
     private Duration antiBurst;
-    private final List<Throwable> internalStack;
+    private final List<String> internalStack;
     private volatile boolean activated;
     private DateTime lastPop;
 
@@ -196,7 +195,7 @@ public class ErrorMailer
         }
     }
 
-    private List<Throwable> getLastErrorsOrWait()
+    private List<String> getLastErrorsOrWait()
         throws InterruptedException
     {
         if ( LOGGER.isTraceEnabled() )
@@ -242,7 +241,7 @@ public class ErrorMailer
                 }
             }
 
-            final List<Throwable> ret = new ArrayList<>();
+            final List<String> ret = new ArrayList<>();
             ret.addAll( internalStack );
 
             internalStack.clear();

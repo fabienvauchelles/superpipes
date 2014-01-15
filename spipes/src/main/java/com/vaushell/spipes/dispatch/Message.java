@@ -29,7 +29,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.helpers.DateTimeDateFormat;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -258,6 +257,12 @@ public final class Message
         return sb.toString();
     }
 
+    /**
+     * Return message essential (TITLE or URI_SOURCE or URI or ID).
+     *
+     * @param m message
+     * @return the formatted message
+     */
     public static String formatSimple( final Message m )
     {
         if ( m == null )
@@ -283,6 +288,13 @@ public final class Message
         }
     }
 
+    /**
+     * Return full message in plain text.
+     *
+     * @param m message
+     * @return the formatted message
+     */
+    @SuppressWarnings( "unchecked" )
     public static String formatPlainText( final Message m )
     {
         if ( m == null )
@@ -382,6 +394,13 @@ public final class Message
         return sb.toString();
     }
 
+    /**
+     * Return full message in HTML.
+     *
+     * @param m message
+     * @return the formatted message
+     */
+    @SuppressWarnings( "unchecked" )
     public static String formatHTML( final Message m )
     {
         if ( m == null )

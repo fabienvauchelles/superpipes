@@ -142,10 +142,10 @@ public class N_Buffer
                     "[" + getNodeID() + "] time to wait : " + time2wait + ". During this time, we're trying to catch an incoming message." );
             }
 
-            final Message message = getLastMessageOrWait( time2wait );
-            if ( message != null )
+            setMessage( getLastMessageOrWait( time2wait ) );
+            if ( getMessage() != null )
             {
-                pushMessage( message );
+                pushMessage( getMessage() );
             }
 
             // And loop again.
@@ -153,8 +153,8 @@ public class N_Buffer
         else
         {
             // 2. Pop from stack
-            Message message = popMessage();
-            if ( message == null )
+            setMessage( popMessage() );
+            if ( getMessage() == null )
             {
                 if ( LOGGER.isTraceEnabled() )
                 {
@@ -163,10 +163,10 @@ public class N_Buffer
                 }
 
                 // Nothing : we wait for external
-                message = getLastMessageOrWait();
+                setMessage( getLastMessageOrWait() );
 
                 // Push to stack
-                pushMessage( message );
+                pushMessage( getMessage() );
 
                 // And loop to check if we're allowed to publish.
             }
@@ -181,7 +181,7 @@ public class N_Buffer
 
                 lastWrite = now;
 
-                sendMessage( message );
+                sendMessage();
             }
         }
     }

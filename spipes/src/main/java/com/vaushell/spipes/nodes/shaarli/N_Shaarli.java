@@ -119,7 +119,7 @@ public class N_Shaarli
                     tags.add( tag.toLowerCase( Locale.ENGLISH ) );
                 }
 
-                final Message message = Message.create(
+                setMessage( Message.create(
                     Message.KeyIndex.URI ,
                     new URI( sl.getUrl() ) ,
                     Message.KeyIndex.TITLE ,
@@ -134,18 +134,18 @@ public class N_Shaarli
                     sl.getPermaURL( client.getEndpoint() ) ,
                     Message.KeyIndex.TAGS ,
                     tags
-                );
+                ) );
 
                 final DateTime dt = client.convertIDstringToDate( sl.getID() );
 
                 if ( dt != null )
                 {
                     dt.toDateTime( DateTimeZone.UTC );
-                    message.setProperty( Message.KeyIndex.PUBLISHED_DATE ,
-                                         dt );
+                    getMessage().setProperty( Message.KeyIndex.PUBLISHED_DATE ,
+                                              dt );
                 }
 
-                sendMessage( message );
+                sendMessage();
             }
 
             ++count;

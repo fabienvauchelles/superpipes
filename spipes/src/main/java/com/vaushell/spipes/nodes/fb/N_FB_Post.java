@@ -91,20 +91,20 @@ public class N_FB_Post
         throws Exception
     {
         // Receive
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
         }
 
-        if ( !message.contains( Message.KeyIndex.URI ) )
+        if ( !getMessage().contains( Message.KeyIndex.URI ) )
         {
             throw new IllegalArgumentException( "message doesn't have an uri" );
         }
 
         // Send to FB
-        final URI uri = (URI) message.getProperty( Message.KeyIndex.URI );
+        final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
         String uriStr;
         if ( uri == null )
         {
@@ -116,9 +116,9 @@ public class N_FB_Post
         }
 
         final String caption;
-        if ( message.contains( Message.KeyIndex.URI_SOURCE ) )
+        if ( getMessage().contains( Message.KeyIndex.URI_SOURCE ) )
         {
-            caption = ( (URI) message.getProperty( Message.KeyIndex.URI_SOURCE ) ).getHost();
+            caption = ( (URI) getMessage().getProperty( Message.KeyIndex.URI_SOURCE ) ).getHost();
         }
         else
         {
@@ -128,7 +128,7 @@ public class N_FB_Post
         final DateTime date;
         if ( "true".equals( getConfig( "backdating" ) ) )
         {
-            date = (DateTime) message.getProperty( Message.KeyIndex.PUBLISHED_DATE );
+            date = (DateTime) getMessage().getProperty( Message.KeyIndex.PUBLISHED_DATE );
         }
         else
         {
@@ -137,9 +137,9 @@ public class N_FB_Post
 
         final String ID = client.postLink( null ,
                                            uriStr ,
-                                           (String) message.getProperty( Message.KeyIndex.TITLE ) ,
+                                           (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                            caption ,
-                                           (String) message.getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                           (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
                                            date );
 
         if ( LOGGER.isTraceEnabled() )
@@ -147,10 +147,10 @@ public class N_FB_Post
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        message.setProperty( "id-facebook" ,
-                             ID );
+        getMessage().setProperty( "id-facebook" ,
+                                  ID );
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override

@@ -19,7 +19,6 @@
 
 package com.vaushell.spipes.nodes.dummy;
 
-import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,14 +51,14 @@ public class N_Dummy
         throws Exception
     {
         // Receive
-        final Message message = getLastMessageOrWait();
+        setMessage( getLastMessageOrWait() );
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive and send message : " + message );
+            LOGGER.trace( "[" + getNodeID() + "] receive and send message : " + getMessage() );
         }
 
-        sendMessage( message );
+        sendMessage();
     }
 
     @Override
