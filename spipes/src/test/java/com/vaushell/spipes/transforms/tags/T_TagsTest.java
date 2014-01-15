@@ -25,8 +25,6 @@ import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.nodes.dummy.N_Dummy;
 import com.vaushell.spipes.transforms.A_Transform;
-import java.util.Arrays;
-import java.util.TreeSet;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 

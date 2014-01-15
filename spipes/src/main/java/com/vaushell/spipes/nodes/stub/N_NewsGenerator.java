@@ -80,7 +80,7 @@ public class N_NewsGenerator
             ValuesGenerator.getRandomText( 100 ,
                                            200 ) ,
             Message.KeyIndex.TAGS ,
-            ValuesGenerator.getRandomWordSet( 3 ,
+            ValuesGenerator.getRandomTagsSet( 3 ,
                                               8 ) ,
             Message.KeyIndex.PUBLISHED_DATE ,
             new DateTime()

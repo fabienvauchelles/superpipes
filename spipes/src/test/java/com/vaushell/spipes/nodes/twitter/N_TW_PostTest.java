@@ -23,8 +23,6 @@ import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.TreeSet;
 import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;

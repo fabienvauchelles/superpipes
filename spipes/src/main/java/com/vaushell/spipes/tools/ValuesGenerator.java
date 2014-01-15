@@ -20,7 +20,6 @@
 package com.vaushell.spipes.tools;
 
 import com.vaushell.spipes.dispatch.Tags;
-import java.util.HashSet;
 import java.util.Random;
 
 /**

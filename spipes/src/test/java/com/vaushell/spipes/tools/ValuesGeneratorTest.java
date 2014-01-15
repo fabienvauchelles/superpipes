@@ -19,7 +19,7 @@
 
 package com.vaushell.spipes.tools;
 
-import java.util.Set;
+import com.vaushell.spipes.dispatch.Tags;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -85,8 +85,8 @@ public class ValuesGeneratorTest
     {
         for ( int i = 0 ; i < 1000 ; ++i )
         {
-            final Set<String> s = ValuesGenerator.getRandomWordSet( 10 ,
-                                                                    60 );
+            final Tags s = ValuesGenerator.getRandomTagsSet( 10 ,
+                                                             60 );
 
             assertTrue( "Set length must be greather than 10 characters" ,
                         s.size() >= 10 );

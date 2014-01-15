@@ -26,8 +26,6 @@ import java.io.Serializable;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.TreeSet;
 import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
