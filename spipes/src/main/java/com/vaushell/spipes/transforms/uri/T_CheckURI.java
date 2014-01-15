@@ -28,6 +28,9 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -59,6 +62,14 @@ public class T_CheckURI
             .create()
             .setDefaultCookieStore( new BasicCookieStore() )
             .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
+            .setSSLSocketFactory(
+                new SSLConnectionSocketFactory(
+                    new SSLContextBuilder()
+                    .loadTrustMaterial( null ,
+                                        new TrustSelfSignedStrategy() )
+                    .build()
+                )
+            )
             .build();
     }
 
@@ -82,7 +93,8 @@ public class T_CheckURI
 
         try
         {
-            if ( isURIvalid( uri ) )
+            if ( isURIvalid( uri ,
+                             RETRY ) )
             {
                 return message;
             }
@@ -99,7 +111,7 @@ public class T_CheckURI
         }
         catch( final IOException ex )
         {
-            LOGGER.warn( "Error while checking URI" ,
+            LOGGER.warn( "Error while checking URI : '" + uri.toString() + "'" ,
                          ex );
 
             return null;
@@ -118,18 +130,25 @@ public class T_CheckURI
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( T_CheckURI.class );
+    private static final int RETRY = 2;
     private CloseableHttpClient client;
 
-    private boolean isURIvalid( final URI uri )
+    private boolean isURIvalid( final URI uri ,
+                                final int retry )
         throws IOException
     {
+        if ( uri == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
         HttpEntity responseEntity = null;
         try
         {
             // Exec request
             final HttpGet get = new HttpGet( uri );
 
-            int timeout = 5000;
+            int timeout = 20000;
 
             final String timeoutStr = getConfig( "timeout" );
             if ( timeoutStr != null )
@@ -157,14 +176,41 @@ public class T_CheckURI
                 final StatusLine sl = response.getStatusLine();
                 responseEntity = response.getEntity();
 
-                return sl.getStatusCode() >= 200 && sl.getStatusCode() < 300;
+                if ( sl.getStatusCode() >= 200 && sl.getStatusCode() < 300 )
+                {
+                    return true;
+                }
+                else
+                {
+                    if ( retry > 0 )
+                    {
+                        return isURIvalid( uri ,
+                                           retry - 1 );
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        catch( final IOException ex )
+        {
+            if ( retry > 0 )
+            {
+                return isURIvalid( uri ,
+                                   retry - 1 );
+            }
+            else
+            {
+                throw ex;
             }
         }
         finally
         {
             if ( responseEntity != null )
             {
-                EntityUtils.consume( responseEntity );
+                EntityUtils.consumeQuietly( responseEntity );
             }
         }
     }
