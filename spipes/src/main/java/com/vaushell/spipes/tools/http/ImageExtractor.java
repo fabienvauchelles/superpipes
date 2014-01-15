@@ -20,6 +20,8 @@
 package com.vaushell.spipes.tools.http;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -29,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
+import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
@@ -210,9 +213,25 @@ public class ImageExtractor
                     return null;
                 }
 
-                try( final InputStream is = responseEntity.getContent() )
+                try( final ByteArrayOutputStream bos = new ByteArrayOutputStream() )
                 {
-                    return ImageIO.read( is );
+                    try( final InputStream is = responseEntity.getContent() )
+                    {
+                        IOUtils.copy( is ,
+                                      bos );
+                    }
+
+                    if ( bos.size() <= 0 )
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        try( final ByteArrayInputStream bis = new ByteArrayInputStream( bos.toByteArray() ) )
+                        {
+                            return ImageIO.read( bis );
+                        }
+                    }
                 }
             }
         }

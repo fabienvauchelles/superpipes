@@ -91,8 +91,11 @@ public class T_FindBiggest
                                        "png" ,
                                        bos );
 
-                        message.setProperty( Message.KeyIndex.PICTURE ,
-                                             bos.toByteArray() );
+                        if ( bos.size() > 0 )
+                        {
+                            message.setProperty( Message.KeyIndex.PICTURE ,
+                                                 bos.toByteArray() );
+                        }
                     }
                 }
             }
