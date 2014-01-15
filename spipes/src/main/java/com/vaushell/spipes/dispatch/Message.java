@@ -23,10 +23,16 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.helpers.DateTimeDateFormat;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Message object.
@@ -252,8 +258,236 @@ public final class Message
         return sb.toString();
     }
 
+    public static String formatSimple( final Message m )
+    {
+        if ( m == null )
+        {
+            return null;
+        }
+
+        if ( m.contains( KeyIndex.TITLE ) )
+        {
+            return "{Title=" + m.getProperty( KeyIndex.TITLE ) + "}";
+        }
+        else if ( m.contains( KeyIndex.URI_SOURCE ) )
+        {
+            return "{URI_Source=" + m.getProperty( KeyIndex.URI_SOURCE ) + "}";
+        }
+        else if ( m.contains( KeyIndex.URI ) )
+        {
+            return "{URI=" + m.getProperty( KeyIndex.URI ) + "}";
+        }
+        else
+        {
+            return "{ID=" + m.getID() + "}";
+        }
+    }
+
+    public static String formatPlainText( final Message m )
+    {
+        if ( m == null )
+        {
+            return null;
+        }
+
+        final StringBuilder sb = new StringBuilder( String.format( "MESSAGE%n    Properties%n" ) );
+
+        final List<String> keys = new ArrayList<>();
+        keys.addAll( m.properties.keySet() );
+
+        // Title
+        if ( keys.contains( KeyIndex.TITLE.index ) )
+        {
+            sb.append( String.format( "        Title: '%s'%n" ,
+                                      m.getProperty( KeyIndex.TITLE ) ) );
+
+            keys.remove( KeyIndex.TITLE.index );
+        }
+
+        // Published date
+        if ( keys.contains( KeyIndex.PUBLISHED_DATE.index ) )
+        {
+            final DateTime date = (DateTime) m.getProperty( KeyIndex.PUBLISHED_DATE );
+
+            sb.append( String.format( "        Published date: '%s'%n" ,
+                                      PUBLISHED_DATE_FORMAT.print( date ) ) );
+
+            keys.remove( KeyIndex.PUBLISHED_DATE.index );
+        }
+
+        // Picture
+        if ( keys.contains( KeyIndex.PICTURE.index ) )
+        {
+            final byte[] image = (byte[]) m.getProperty( KeyIndex.PICTURE );
+
+            sb.append( String.format( "        Picture size (in kb): %d%n" ,
+                                      (int) ( image.length / 1024 ) ) );
+
+            keys.remove( KeyIndex.PICTURE.index );
+        }
+
+        // Tags
+        final Set<String> tags;
+        if ( keys.contains( KeyIndex.TAGS.index ) )
+        {
+            tags = (Set<String>) m.getProperty( KeyIndex.TAGS );
+
+            keys.remove( KeyIndex.TAGS.index );
+        }
+        else
+        {
+            tags = null;
+        }
+
+        // Content
+        final String content;
+        if ( keys.contains( KeyIndex.CONTENT.index ) )
+        {
+            content = (String) m.getProperty( KeyIndex.CONTENT );
+
+            keys.remove( KeyIndex.CONTENT.index );
+        }
+        else
+        {
+            content = null;
+        }
+
+        // Other
+        for ( final String key : keys )
+        {
+            sb.append( String.format( "        %s: '%s'%n" ,
+                                      key ,
+                                      m.getProperty( key ) ) );
+        }
+
+        // Tags (next)
+        if ( tags != null )
+        {
+            sb.append( String.format( "    Tags%n" ) );
+
+            for ( final String tag : tags )
+            {
+                sb.append( String.format( "        %s%n" ,
+                                          tag ) );
+            }
+        }
+
+        // Content (print)
+        if ( content != null )
+        {
+            sb.append( String.format( "    Content%n        %s%n" ,
+                                      content ) );
+        }
+
+        return sb.toString();
+    }
+
+    public static String formatHTML( final Message m )
+    {
+        if ( m == null )
+        {
+            return null;
+        }
+
+        final StringBuilder sb = new StringBuilder( String.format( "<h1>MESSAGE</h1>%n<h2>Properties</h2>%n<ul>%n" ) );
+
+        final List<String> keys = new ArrayList<>();
+        keys.addAll( m.properties.keySet() );
+
+        // Title
+        if ( keys.contains( KeyIndex.TITLE.index ) )
+        {
+            sb.append( String.format( "  <li>Title: '%s'</li>%n" ,
+                                      m.getProperty( KeyIndex.TITLE ) ) );
+
+            keys.remove( KeyIndex.TITLE.index );
+        }
+
+        // Published date
+        if ( keys.contains( KeyIndex.PUBLISHED_DATE.index ) )
+        {
+            final DateTime date = (DateTime) m.getProperty( KeyIndex.PUBLISHED_DATE );
+
+            sb.append( String.format( "  <li>Published date: '%s'</li>%n" ,
+                                      PUBLISHED_DATE_FORMAT.print( date ) ) );
+
+            keys.remove( KeyIndex.PUBLISHED_DATE.index );
+        }
+
+        // Picture
+        if ( keys.contains( KeyIndex.PICTURE.index ) )
+        {
+            final byte[] image = (byte[]) m.getProperty( KeyIndex.PICTURE );
+
+            sb.append( String.format( "  <li>Picture size (in kb): %d</li>%n" ,
+                                      (int) ( image.length / 1024 ) ) );
+
+            keys.remove( KeyIndex.PICTURE.index );
+        }
+
+        // Tags
+        final Set<String> tags;
+        if ( keys.contains( KeyIndex.TAGS.index ) )
+        {
+            tags = (Set<String>) m.getProperty( KeyIndex.TAGS );
+
+            keys.remove( KeyIndex.TAGS.index );
+        }
+        else
+        {
+            tags = null;
+        }
+
+        // Content
+        final String content;
+        if ( keys.contains( KeyIndex.CONTENT.index ) )
+        {
+            content = (String) m.getProperty( KeyIndex.CONTENT );
+
+            keys.remove( KeyIndex.CONTENT.index );
+        }
+        else
+        {
+            content = null;
+        }
+
+        // Other
+        for ( final String key : keys )
+        {
+            sb.append( String.format( "  <li>%s: '%s'</li>%n" ,
+                                      key ,
+                                      m.getProperty( key ) ) );
+        }
+
+        sb.append( String.format( "</ul>%n" ) );
+
+        // Tags (next)
+        if ( tags != null )
+        {
+            sb.append( String.format( "<h2>Tags</h2>%n<ul>%n" ) );
+
+            for ( final String tag : tags )
+            {
+                sb.append( String.format( "  <li>%s</li>%n" ,
+                                          tag ) );
+            }
+
+            sb.append( String.format( "</ul>%n" ) );
+        }
+
+        // Content (print)
+        if ( content != null )
+        {
+            sb.append( String.format( "<h2>Content</h2>%n<p>%s</p>%n" ,
+                                      content ) );
+        }
+
+        return sb.toString();
+    }
+
     // PRIVATE
     private static final long serialVersionUID = 944934823467345234L;
+    private static final DateTimeFormatter PUBLISHED_DATE_FORMAT = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
     private transient String ID;
     private TreeMap<String , Serializable> properties;
     private transient boolean hasToRebuildID;
@@ -284,7 +518,8 @@ public final class Message
         os.writeObject( properties );
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings(
+         "unchecked" )
     private void readObject( final ObjectInputStream is )
         throws IOException , ClassNotFoundException
     {
