@@ -331,8 +331,8 @@ public final class Message
         {
             final byte[] image = (byte[]) m.getProperty( KeyIndex.PICTURE );
 
-            sb.append( String.format( "        Picture size (in kb): %d%n" ,
-                                      (int) ( image.length / 1024 ) ) );
+            sb.append( String.format( "        Picture size (in bytes): %d%n" ,
+                                      image.length ) );
 
             keys.remove( KeyIndex.PICTURE.index );
         }
@@ -436,8 +436,8 @@ public final class Message
         {
             final byte[] image = (byte[]) m.getProperty( KeyIndex.PICTURE );
 
-            sb.append( String.format( "  <li>Picture size (in kb): %d</li>%n" ,
-                                      (int) ( image.length / 1024 ) ) );
+            sb.append( String.format( "  <li>Picture size (in bytes): %d</li>%n" ,
+                                      image.length ) );
 
             keys.remove( KeyIndex.PICTURE.index );
         }
