@@ -114,12 +114,14 @@ public class ErrorMailerTest
         final Iterator<SmtpMessage> it = server.getReceivedEmail();
 
         final SmtpMessage msg1 = it.next();
-        assertTrue( "Mail n°1 must contain test 1 & 2" ,
-                    msg1.getBody().contains( "test null 1" ) && msg1.getBody().contains( "test null 2" ) );
+        assertTrue( "Mail n°1 must contain test 1" ,
+                    msg1.getBody().contains( "test null 1" ) );
 
         final SmtpMessage msg2 = it.next();
-        assertTrue( "Mail n°2 must contain test 3 & 4" ,
-                    msg2.getBody().contains( "test null 3" ) && msg2.getBody().contains( "test null 4" ) );
+        assertTrue( "Mail n°2 must contain test 2, 3 & 4" ,
+                    msg2.getBody().contains( "test null 2" )
+                    && msg2.getBody().contains( "test null 3" )
+                    && msg2.getBody().contains( "test null 4" ) );
     }
 
     // PRIVATE
