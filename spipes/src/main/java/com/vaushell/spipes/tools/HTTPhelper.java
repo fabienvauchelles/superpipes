@@ -21,6 +21,7 @@ package com.vaushell.spipes.tools;
 
 import java.io.IOException;
 import java.net.URI;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -30,6 +31,9 @@ import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultRedirectStrategy;
@@ -97,14 +101,23 @@ public final class HTTPhelper
      * @param source Source URI
      * @return a list of redirected URLs
      * @throws IOException
+     * @throws GeneralSecurityException
      */
     public static List<URI> getRedirected( final URI source )
-        throws IOException
+        throws IOException , GeneralSecurityException
     {
         final HttpClientBuilder builder = HttpClientBuilder
             .create()
             .setDefaultCookieStore( new BasicCookieStore() )
-            .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" );
+            .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
+            .setSSLSocketFactory(
+                new SSLConnectionSocketFactory(
+                    new SSLContextBuilder()
+                    .loadTrustMaterial( null ,
+                                        new TrustSelfSignedStrategy() )
+                    .build()
+                )
+            );
 
         return getRedirected( builder ,
                               source );
@@ -117,10 +130,11 @@ public final class HTTPhelper
      * @param message the message
      * @return the message with expanded URLs
      * @throws IOException
+     * @throws GeneralSecurityException
      */
     public static String expandShortenURLinMessage( final HttpClientBuilder builder ,
                                                     final String message )
-        throws IOException
+        throws IOException , GeneralSecurityException
     {
         final Pattern p = Pattern.compile( "http\\://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?" );
         final Matcher m = p.matcher( message );
@@ -149,9 +163,10 @@ public final class HTTPhelper
      * @param message the message
      * @return the message with expanded URLs
      * @throws IOException
+     * @throws GeneralSecurityException
      */
     public static String expandShortenURLinMessage( final String message )
-        throws IOException
+        throws IOException , GeneralSecurityException
     {
         final HttpClientBuilder builder = HttpClientBuilder
             .create()

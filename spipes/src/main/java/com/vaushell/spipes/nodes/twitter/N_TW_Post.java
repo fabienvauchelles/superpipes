@@ -26,6 +26,9 @@ import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.io.ByteArrayInputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -67,6 +70,14 @@ public class N_TW_Post
             .create()
             .setDefaultCookieStore( new BasicCookieStore() )
             .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
+            .setSSLSocketFactory(
+                new SSLConnectionSocketFactory(
+                    new SSLContextBuilder()
+                    .loadTrustMaterial( null ,
+                                        new TrustSelfSignedStrategy() )
+                    .build()
+                )
+            )
             .build();
     }
 

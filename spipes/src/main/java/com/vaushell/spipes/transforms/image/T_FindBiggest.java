@@ -27,6 +27,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import javax.imageio.ImageIO;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -58,6 +61,14 @@ public class T_FindBiggest
             .create()
             .setDefaultCookieStore( new BasicCookieStore() )
             .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
+            .setSSLSocketFactory(
+                new SSLConnectionSocketFactory(
+                    new SSLContextBuilder()
+                    .loadTrustMaterial( null ,
+                                        new TrustSelfSignedStrategy() )
+                    .build()
+                )
+            )
             .build();
 
         this.extractor = new ImageExtractor( this.client );
