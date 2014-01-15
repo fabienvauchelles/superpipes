@@ -84,9 +84,9 @@ public class ErrorMailer
     @Override
     public void run()
     {
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] start thread" );
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] start thread" );
         }
 
         try
@@ -128,9 +128,9 @@ public class ErrorMailer
                           th );
         }
 
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] stop thread" );
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] stop thread" );
         }
     }
 

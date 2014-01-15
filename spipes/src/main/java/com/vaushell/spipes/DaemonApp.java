@@ -26,8 +26,6 @@ import java.nio.file.Paths;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.daemon.Daemon;
 import org.apache.commons.daemon.DaemonContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Daemon for JSVC.
@@ -47,11 +45,6 @@ public class DaemonApp
     public void init( final DaemonContext context )
         throws Exception
     {
-        if ( LOGGER.isDebugEnabled() )
-        {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] init()" );
-        }
-
         final String[] args = context.getArguments();
 
         // My config
@@ -92,11 +85,6 @@ public class DaemonApp
     public void start()
         throws Exception
     {
-        if ( LOGGER.isDebugEnabled() )
-        {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] start()" );
-        }
-
         dispatcher.start();
     }
 
@@ -104,24 +92,15 @@ public class DaemonApp
     public void stop()
         throws Exception
     {
-        if ( LOGGER.isDebugEnabled() )
-        {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] stop()" );
-        }
-
         dispatcher.stopAndWait();
     }
 
     @Override
     public void destroy()
     {
-        if ( LOGGER.isDebugEnabled() )
-        {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] destroy()" );
-        }
+        // Nothing
     }
 
     // PRIVATE
-    private static final Logger LOGGER = LoggerFactory.getLogger( Daemon.class );
     private final Dispatcher dispatcher;
 }

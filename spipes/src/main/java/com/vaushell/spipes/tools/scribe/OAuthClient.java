@@ -84,9 +84,9 @@ public class OAuthClient
             throw new IllegalArgumentException();
         }
 
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] loginImpl() : api=" + api + " / key=" + key + " / scope=" + scope + " / callback=" + callback + " / useRequestToken=" + useRequestToken + " / tokenPath=" + tokenPath );
         }
 
@@ -141,9 +141,9 @@ public class OAuthClient
             throw new IllegalArgumentException();
         }
 
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug(
+            LOGGER.trace(
                 "[" + getClass().getSimpleName() + "] changeAccessToken() : newToken=" + newToken );
         }
 

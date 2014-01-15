@@ -249,9 +249,9 @@ public final class Dispatcher
     public void start()
         throws Exception
     {
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isInfoEnabled() )
         {
-            LOGGER.debug(
+            LOGGER.info(
                 "[" + getClass().getSimpleName() + "] start" );
         }
 
@@ -279,9 +279,9 @@ public final class Dispatcher
     public void stopAndWait()
         throws Exception
     {
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isInfoEnabled() )
         {
-            LOGGER.debug(
+            LOGGER.info(
                 "[" + getClass().getSimpleName() + "] stopAndWait" );
         }
 
@@ -366,9 +366,9 @@ public final class Dispatcher
             throw new IllegalArgumentException();
         }
 
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isInfoEnabled() )
         {
-            LOGGER.debug( "[" + getClass().getSimpleName() + "] load() : datas=" + datas );
+            LOGGER.info( "[" + getClass().getSimpleName() + "] load() : datas=" + datas );
         }
 
         if ( Files.notExists( datas ) )

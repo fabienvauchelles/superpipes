@@ -367,17 +367,13 @@ public abstract class A_Node
     @Override
     public void run()
     {
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug( "[" + getNodeID() + "] start thread" );
+            LOGGER.trace( "[" + getNodeID() + "] start thread" );
         }
 
         try
         {
-            if ( LOGGER.isTraceEnabled() )
-            {
-                LOGGER.trace( "[" + getNodeID() + "] loopin'" );
-            }
             while ( isActive() )
             {
                 try
@@ -415,9 +411,9 @@ public abstract class A_Node
                                        null );
         }
 
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug( "[" + getNodeID() + "] stop thread" );
+            LOGGER.trace( "[" + getNodeID() + "] stop thread" );
         }
     }
 
@@ -479,8 +475,19 @@ public abstract class A_Node
             result = transform.transform( result );
             if ( result == null )
             {
+                if ( LOGGER.isDebugEnabled() )
+                {
+                    LOGGER.debug( "[" + getNodeID() + "] receive but discard message=" + Message.formatSimple(
+                        message ) );
+                }
+
                 return;
             }
+        }
+
+        if ( LOGGER.isDebugEnabled() )
+        {
+            LOGGER.debug( "[" + getNodeID() + "] receive and stack message=" + Message.formatSimple( message ) );
         }
 
         synchronized( internalStack )
@@ -521,7 +528,7 @@ public abstract class A_Node
     /**
      * Loop execution. The execution is looped until message reception.
      *
-     * @throws MessageException
+     * @throws java.lang.Exception
      */
     protected abstract void loop()
         throws Exception;
@@ -558,8 +565,19 @@ public abstract class A_Node
             result = transform.transform( result );
             if ( result == null )
             {
+                if ( LOGGER.isDebugEnabled() )
+                {
+                    LOGGER.
+                        debug( "[" + getNodeID() + "] send but discard message=" + Message.formatSimple( message ) );
+                }
+
                 return;
             }
+        }
+
+        if ( LOGGER.isDebugEnabled() )
+        {
+            LOGGER.debug( "[" + getNodeID() + "] send message=" + Message.formatSimple( message ) );
         }
 
         dispatcher.sendMessage( nodeID ,
@@ -593,7 +611,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait" );
         }
 
-        final Message m;
+        final Message message;
         synchronized( internalStack )
         {
             while ( internalStack.isEmpty() )
@@ -601,7 +619,7 @@ public abstract class A_Node
                 internalStack.wait();
             }
 
-            m = internalStack.pollLast();
+            message = internalStack.pollLast();
         }
 
         if ( lastPop != null && antiBurst != null )
@@ -619,7 +637,12 @@ public abstract class A_Node
 
         lastPop = new DateTime();
 
-        return m;
+        if ( LOGGER.isDebugEnabled() )
+        {
+            LOGGER.debug( "[" + getNodeID() + "] wait message and get message=" + Message.formatSimple( message ) );
+        }
+
+        return message;
     }
 
     /**
@@ -642,7 +665,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] getLastMessageOrWait() : timeout=" + timeout );
         }
 
-        final Message m;
+        final Message message;
         synchronized( internalStack )
         {
             DateTime start = new DateTime();
@@ -662,7 +685,7 @@ public abstract class A_Node
                 start = now;
             }
 
-            m = internalStack.pollLast();
+            message = internalStack.pollLast();
         }
 
         if ( lastPop != null && antiBurst != null )
@@ -680,7 +703,20 @@ public abstract class A_Node
 
         lastPop = new DateTime();
 
-        return m;
+        if ( LOGGER.isDebugEnabled() )
+        {
+            if ( message == null )
+            {
+                LOGGER.debug( "[" + getNodeID() + "] wait message for " + timeout + "ms and get nothing" );
+            }
+            else
+            {
+                LOGGER.debug( "[" + getNodeID() + "] wait message for " + timeout + "ms and get message=" + Message.formatSimple(
+                    message ) );
+            }
+        }
+
+        return message;
     }
 
     protected Message getMessage()

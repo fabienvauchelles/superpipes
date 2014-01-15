@@ -269,9 +269,9 @@ public class N_Buffer
 
         final Path p = messagesPath.resolve( Long.toString( ID.getMillis() ) );
 
-        if ( LOGGER.isDebugEnabled() )
+        if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.debug(
+            LOGGER.trace(
                 "[" + getNodeID() + "] write message with ID=" + ID
             );
         }
