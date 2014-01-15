@@ -70,7 +70,8 @@ public class T_FindBiggest
         // Receive
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
+            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + Message.
+                formatSimple( message ) );
         }
 
         if ( message.contains( Message.KeyIndex.URI ) )

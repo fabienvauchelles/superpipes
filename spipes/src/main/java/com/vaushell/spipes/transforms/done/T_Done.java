@@ -82,7 +82,8 @@ public class T_Done
     {
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + message );
+            LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] transform message : " + Message.
+                formatSimple( message ) );
         }
 
         if ( ids.contains( message.getID() ) )

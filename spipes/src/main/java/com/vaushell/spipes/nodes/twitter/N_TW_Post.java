@@ -79,7 +79,7 @@ public class N_TW_Post
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + Message.formatSimple( getMessage() ) );
         }
 
         // Send to Twitter

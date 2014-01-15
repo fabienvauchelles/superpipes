@@ -19,6 +19,7 @@
 
 package com.vaushell.spipes.nodes.stub;
 
+import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +55,7 @@ public class N_MessageLogger
 
         if ( LOGGER.isInfoEnabled() )
         {
-            LOGGER.info( "[" + getNodeID() + "] receive message : " + getMessage() );
+            LOGGER.info( "[" + getNodeID() + "] receive message : " + Message.formatSimple( getMessage() ) );
         }
     }
 

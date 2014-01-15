@@ -331,7 +331,8 @@ public final class Dispatcher
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getClass().getSimpleName() + "] sendMessage : sourceID=" + sourceID + " / message=" + message );
+            LOGGER.trace( "[" + getClass().getSimpleName() + "] sendMessage : sourceID=" + sourceID + " / message=" + Message.
+                formatSimple( message ) );
         }
 
         final Set<String> subRoutes = routes.get( sourceID );

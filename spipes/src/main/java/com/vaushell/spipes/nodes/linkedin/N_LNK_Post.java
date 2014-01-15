@@ -69,7 +69,7 @@ public class N_LNK_Post
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receive message : " + getMessage() );
+            LOGGER.trace( "[" + getNodeID() + "] receive message : " + Message.formatSimple( getMessage() ) );
         }
 
         if ( !getMessage().contains( Message.KeyIndex.URI ) )

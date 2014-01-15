@@ -470,7 +470,7 @@ public abstract class A_Node
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] receiveMessage : message=" + message );
+            LOGGER.trace( "[" + getNodeID() + "] receiveMessage : message=" + Message.formatSimple( message ) );
         }
 
         Message result = message;
@@ -549,7 +549,7 @@ public abstract class A_Node
 
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] sendMessage : message=" + message );
+            LOGGER.trace( "[" + getNodeID() + "] sendMessage : message=" + Message.formatSimple( message ) );
         }
 
         Message result = message;
