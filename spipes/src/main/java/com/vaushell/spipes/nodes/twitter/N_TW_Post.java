@@ -102,7 +102,7 @@ public class N_TW_Post
             try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
             {
                 ID = client.tweetPicture( createContent( getMessage() ,
-                                                         TwitterClient.TWEET_SIZE - TwitterClient.MEDIA_RESERVED ) ,
+                                                         TwitterClient.TWEET_IMAGE_SIZE ) ,
                                           bis );
             }
         }
