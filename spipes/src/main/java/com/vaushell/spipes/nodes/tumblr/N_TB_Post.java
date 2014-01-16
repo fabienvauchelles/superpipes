@@ -23,9 +23,13 @@ import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.tumblr.TumblrClient;
+import com.vaushell.spipes.tools.scribe.tumblr.TumblrException;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,45 @@ public class N_TB_Post
                DEFAULT_ANTIBURST );
 
         this.client = new TumblrClient();
+        this.retry = 3;
+        this.delayBetweenRetry = new Duration( 5L * 1000L );
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        // Load retry count if exists.
+        final String retryStr = getConfig( "retry" );
+        if ( retryStr != null )
+        {
+            try
+            {
+                retry = Integer.parseInt( retryStr );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'retry' must be an integer" ,
+                                                    ex );
+            }
+        }
+
+        // Load delay between retry if exists.
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        if ( delayBetweenRetryStr != null )
+        {
+            try
+            {
+                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
+                                                    ex );
+            }
+        }
     }
 
     // PROTECTED
@@ -82,20 +125,24 @@ public class N_TB_Post
         // Send to TB
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
 
-        final long ID = client.postLink( uri == null ? null : uri.toString() ,
-                                         (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
-                                         (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                         (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) );
+        final long ID = postLink( uri == null ? null : uri.toString() ,
+                                  (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                  (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                  (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
+                                  retry );
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        getMessage().setProperty( "id-tumblr" ,
-                                  ID );
+        if ( ID >= 0 )
+        {
+            getMessage().setProperty( "id-tumblr" ,
+                                      ID );
 
-        sendMessage();
+            sendMessage();
+        }
     }
 
     @Override
@@ -107,4 +154,60 @@ public class N_TB_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TB_Post.class );
     private final TumblrClient client;
+    private int retry;
+    private Duration delayBetweenRetry;
+
+    private long postLink( final String uri ,
+                           final String title ,
+                           final String description ,
+                           final Tags tags ,
+                           final int remainingRetry )
+        throws IOException , TumblrException
+    {
+        try
+        {
+            final long ID = client.postLink( uri ,
+                                             title ,
+                                             description ,
+                                             tags );
+
+            if ( ID >= 0 )
+            {
+                return ID;
+            }
+            else
+            {
+                if ( remainingRetry <= 0 )
+                {
+                    return ID;
+                }
+            }
+        }
+        catch( final IOException |
+                     TumblrException ex )
+        {
+            if ( remainingRetry <= 0 )
+            {
+                throw ex;
+            }
+        }
+
+        if ( delayBetweenRetry.getMillis() > 0L )
+        {
+            try
+            {
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
+            }
+        }
+
+        return postLink( uri ,
+                         title ,
+                         description ,
+                         tags ,
+                         remainingRetry - 1 );
+    }
 }
