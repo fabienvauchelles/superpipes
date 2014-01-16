@@ -22,10 +22,14 @@ package com.vaushell.spipes.nodes.fb;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
 import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
+import com.vaushell.spipes.tools.scribe.fb.FacebookException;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,45 @@ public class N_FB_Post
                SECURE_ANTIBURST );
 
         this.client = new FacebookClient();
+        this.retry = 3;
+        this.delayBetweenRetry = new Duration( 5L * 1000L );
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        // Load retry count if exists.
+        final String retryStr = getConfig( "retry" );
+        if ( retryStr != null )
+        {
+            try
+            {
+                retry = Integer.parseInt( retryStr );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'retry' must be an integer" ,
+                                                    ex );
+            }
+        }
+
+        // Load delay between retry if exists.
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        if ( delayBetweenRetryStr != null )
+        {
+            try
+            {
+                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
+                                                    ex );
+            }
+        }
     }
 
     // PROTECTED
@@ -135,22 +178,25 @@ public class N_FB_Post
             date = null;
         }
 
-        final String ID = client.postLink( null ,
-                                           uriStr ,
-                                           (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
-                                           caption ,
-                                           (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                           date );
+        final String ID = postLink( uriStr ,
+                                    (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                    caption ,
+                                    (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                    date ,
+                                    retry );
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        getMessage().setProperty( "id-facebook" ,
-                                  ID );
+        if ( ID != null && !ID.isEmpty() )
+        {
+            getMessage().setProperty( "id-facebook" ,
+                                      ID );
 
-        sendMessage();
+            sendMessage();
+        }
     }
 
     @Override
@@ -162,4 +208,65 @@ public class N_FB_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_FB_Post.class );
     private final FacebookClient client;
+    private int retry;
+    private Duration delayBetweenRetry;
+
+    private String postLink( final String uriStr ,
+                             final String title ,
+                             final String caption ,
+                             final String description ,
+                             final DateTime date ,
+                             final int remainingRetry )
+        throws FacebookException , IOException
+    {
+        try
+        {
+            final String ID = client.postLink( null ,
+                                               uriStr ,
+                                               (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                               caption ,
+                                               (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                               date );
+
+            if ( ID == null || ID.isEmpty() )
+            {
+                if ( remainingRetry <= 0 )
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return ID;
+            }
+        }
+        catch( final FacebookException |
+                     IOException ex )
+        {
+            if ( remainingRetry <= 0 )
+            {
+                throw ex;
+            }
+        }
+
+        if ( delayBetweenRetry.getMillis() > 0L )
+        {
+            try
+            {
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
+            }
+        }
+
+        return postLink( uriStr ,
+                         title ,
+                         caption ,
+                         description ,
+                         date ,
+                         remainingRetry - 1 );
+    }
+
 }
