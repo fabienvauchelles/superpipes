@@ -104,8 +104,7 @@ public class TwitterClientTest
         throws Exception
     {
         // Post
-        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new DateTime().
-            getMillis();
+        final String message = "Bloggé de codé de Fabien Vauchelles (http://bit.ly/Ijk3of) #java at " + new DateTime().getMillis();
 
         final long ID = client.tweet( message );
 
@@ -163,8 +162,7 @@ public class TwitterClientTest
         throws Exception
     {
         // Post
-        final String message = "Blog de Fabien Vauchelles (http://bit.ly/Ijk3of) #java #coding #bigdata at " + new DateTime().
-            getMillis();
+        final String message = "Bloggé de codé de Fabien Vauchelles (http://bit.ly/Ijk3of) #java at " + new DateTime().getMillis();
 
         final long ID;
         try( InputStream is = getClass().getResourceAsStream( "/media.png" ) )

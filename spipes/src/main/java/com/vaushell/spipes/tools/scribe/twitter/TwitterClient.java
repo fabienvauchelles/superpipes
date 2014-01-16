@@ -191,8 +191,8 @@ public class TwitterClient
                                                        "https://api.twitter.com/1.1/statuses/update_with_media.json" );
         final HttpEntity entity = MultipartEntityBuilder
             .create()
-            .addTextBody( "status" ,
-                          message )
+            .addBinaryBody( "status" ,
+                            message.getBytes( "UTF-8" ) )
             .addBinaryBody( "media[]" ,
                             is ,
                             ContentType.APPLICATION_OCTET_STREAM ,
