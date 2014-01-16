@@ -22,10 +22,14 @@ package com.vaushell.spipes.nodes.twitter;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +48,45 @@ public class N_TW_Post
                DEFAULT_ANTIBURST );
 
         this.client = new TwitterClient();
+        this.retry = 3;
+        this.delayBetweenRetry = new Duration( 5L * 1000L );
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        // Load retry count if exists.
+        final String retryStr = getConfig( "retry" );
+        if ( retryStr != null )
+        {
+            try
+            {
+                retry = Integer.parseInt( retryStr );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'retry' must be an integer" ,
+                                                    ex );
+            }
+        }
+
+        // Load delay between retry if exists.
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        if ( delayBetweenRetryStr != null )
+        {
+            try
+            {
+                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
+                                                    ex );
+            }
+        }
     }
 
     // PROTECTED
@@ -78,17 +121,16 @@ public class N_TW_Post
         {
             final byte[] picture = (byte[]) getMessage().getProperty( Message.KeyIndex.PICTURE );
 
-            try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
-            {
-                ID = client.tweetPicture( createContent( getMessage() ,
-                                                         TwitterClient.TWEET_IMAGE_SIZE ) ,
-                                          bis );
-            }
+            ID = tweetPicture( createContent( getMessage() ,
+                                              TwitterClient.TWEET_IMAGE_SIZE ) ,
+                               picture ,
+                               retry - 1 );
         }
         else
         {
-            ID = client.tweet( createContent( getMessage() ,
-                                              TwitterClient.TWEET_SIZE ) );
+            ID = tweet( createContent( getMessage() ,
+                                       TwitterClient.TWEET_SIZE ) ,
+                        retry );
         }
 
         if ( LOGGER.isTraceEnabled() )
@@ -96,10 +138,13 @@ public class N_TW_Post
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        getMessage().setProperty( "id-twitter" ,
-                                  ID );
+        if ( ID >= 0 )
+        {
+            getMessage().setProperty( "id-twitter" ,
+                                      ID );
 
-        sendMessage();
+            sendMessage();
+        }
     }
 
     @Override
@@ -189,4 +234,99 @@ public class N_TW_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
     private final TwitterClient client;
+    private int retry;
+    private Duration delayBetweenRetry;
+
+    private long tweet( final String message ,
+                        final int remainingRetry )
+        throws IOException , OAuthException
+    {
+        try
+        {
+            final long ID = client.tweet( message );
+
+            if ( ID >= 0 )
+            {
+                return ID;
+            }
+            else
+            {
+                if ( remainingRetry <= 0 )
+                {
+                    return ID;
+                }
+            }
+        }
+        catch( final IOException |
+                     OAuthException ex )
+        {
+            if ( remainingRetry <= 0 )
+            {
+                throw ex;
+            }
+        }
+
+        if ( delayBetweenRetry.getMillis() > 0L )
+        {
+            try
+            {
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
+            }
+        }
+
+        return tweet( message ,
+                      remainingRetry - 1 );
+    }
+
+    private long tweetPicture( final String message ,
+                               final byte[] picture ,
+                               final int remainingRetry )
+        throws IOException , OAuthException
+    {
+        try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
+        {
+            final long ID = client.tweetPicture( message ,
+                                                 bis );
+
+            if ( ID >= 0 )
+            {
+                return ID;
+            }
+            else
+            {
+                if ( remainingRetry <= 0 )
+                {
+                    return ID;
+                }
+            }
+        }
+        catch( final IOException |
+                     OAuthException ex )
+        {
+            if ( remainingRetry <= 0 )
+            {
+                throw ex;
+            }
+        }
+
+        if ( delayBetweenRetry.getMillis() > 0L )
+        {
+            try
+            {
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
+            }
+        }
+
+        return tweetPicture( message ,
+                             picture ,
+                             remainingRetry - 1 );
+    }
 }
