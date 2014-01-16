@@ -21,6 +21,7 @@ package com.vaushell.spipes.tools.scribe.tumblr;
 
 import com.vaushell.spipes.dispatch.Tags;
 import java.util.Objects;
+import org.joda.time.DateTime;
 
 /**
  * A Tumblr post.
@@ -37,7 +38,7 @@ public class TB_Post
                     final String urlDescription ,
                     final String type ,
                     final String slug ,
-                    final long timestamp ,
+                    final DateTime timestamp ,
                     final Tags tags ,
                     final TB_Blog blog )
     {
@@ -123,12 +124,12 @@ public class TB_Post
         this.slug = slug;
     }
 
-    public long getTimestamp()
+    public DateTime getTimestamp()
     {
         return timestamp;
     }
 
-    public void setTimestamp( final long timestamp )
+    public void setTimestamp( final DateTime timestamp )
     {
         this.timestamp = timestamp;
     }
@@ -156,18 +157,18 @@ public class TB_Post
     @Override
     public int hashCode()
     {
-        int hash = 3;
+        int hash = 7;
 
-        hash = 67 * hash + (int) ( this.ID ^ ( this.ID >>> 32 ) );
-        hash = 67 * hash + Objects.hashCode( this.message );
-        hash = 67 * hash + Objects.hashCode( this.url );
-        hash = 67 * hash + Objects.hashCode( this.urlName );
-        hash = 67 * hash + Objects.hashCode( this.urlDescription );
-        hash = 67 * hash + Objects.hashCode( this.type );
-        hash = 67 * hash + Objects.hashCode( this.slug );
-        hash = 67 * hash + (int) ( this.timestamp ^ ( this.timestamp >>> 32 ) );
-        hash = 67 * hash + Objects.hashCode( this.tags );
-        hash = 67 * hash + Objects.hashCode( this.blog );
+        hash = 97 * hash + (int) ( this.ID ^ ( this.ID >>> 32 ) );
+        hash = 97 * hash + Objects.hashCode( this.message );
+        hash = 97 * hash + Objects.hashCode( this.url );
+        hash = 97 * hash + Objects.hashCode( this.urlName );
+        hash = 97 * hash + Objects.hashCode( this.urlDescription );
+        hash = 97 * hash + Objects.hashCode( this.type );
+        hash = 97 * hash + Objects.hashCode( this.slug );
+        hash = 97 * hash + Objects.hashCode( this.timestamp );
+        hash = 97 * hash + Objects.hashCode( this.tags );
+        hash = 97 * hash + Objects.hashCode( this.blog );
 
         return hash;
     }
@@ -261,7 +262,7 @@ public class TB_Post
     private String urlDescription;
     private String type;
     private String slug;
-    private long timestamp;
+    private DateTime timestamp;
     private Tags tags;
     private TB_Blog blog;
 }

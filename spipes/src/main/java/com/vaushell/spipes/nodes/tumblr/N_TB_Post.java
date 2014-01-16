@@ -29,6 +29,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,10 +126,21 @@ public class N_TB_Post
         // Send to TB
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
 
+        final DateTime date;
+        if ( "true".equals( getConfig( "backdating" ) ) )
+        {
+            date = (DateTime) getMessage().getProperty( Message.KeyIndex.PUBLISHED_DATE );
+        }
+        else
+        {
+            date = null;
+        }
+
         final long ID = postLink( uri == null ? null : uri.toString() ,
                                   (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                   (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
                                   (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
+                                  date ,
                                   retry );
 
         if ( LOGGER.isTraceEnabled() )
@@ -161,6 +173,7 @@ public class N_TB_Post
                            final String title ,
                            final String description ,
                            final Tags tags ,
+                           final DateTime date ,
                            final int remainingRetry )
         throws IOException , TumblrException
     {
@@ -169,7 +182,8 @@ public class N_TB_Post
             final long ID = client.postLink( uri ,
                                              title ,
                                              description ,
-                                             tags );
+                                             tags ,
+                                             date );
 
             if ( ID >= 0 )
             {
@@ -208,6 +222,7 @@ public class N_TB_Post
                          title ,
                          description ,
                          tags ,
+                         date ,
                          remainingRetry - 1 );
     }
 }

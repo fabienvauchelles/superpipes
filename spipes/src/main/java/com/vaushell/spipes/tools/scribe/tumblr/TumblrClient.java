@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.scribe.builder.api.TumblrApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -92,6 +95,7 @@ public class TumblrClient
      * @param uriName Link's name
      * @param uriDescription Link's description
      * @param tags Link's tags
+     * @param date Force message's date
      * @return Post ID
      * @throws IOException
      * @throws TumblrException
@@ -99,7 +103,8 @@ public class TumblrClient
     public long postLink( final String uri ,
                           final String uriName ,
                           final String uriDescription ,
-                          final Tags tags )
+                          final Tags tags ,
+                          final DateTime date )
         throws IOException , TumblrException
     {
         if ( uri == null || uri.isEmpty() )
@@ -110,7 +115,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postLink() : uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags );
+                "[" + getClass().getSimpleName() + "] postLink() : uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags + " / date=" + date );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -151,6 +156,12 @@ public class TumblrClient
                                       sbTags.toString() );
         }
 
+        if ( date != null )
+        {
+            request.addBodyParameter( "date" ,
+                                      FORMAT_DATE.print( date ) );
+        }
+
         final Response response = sendSignedRequest( request );
 
         final ObjectMapper mapper = new ObjectMapper();
@@ -170,12 +181,14 @@ public class TumblrClient
      *
      * @param message Message
      * @param tags Message's tags
+     * @param date Force message's date
      * @return Post ID
      * @throws IOException
      * @throws TumblrException
      */
     public long postMessage( final String message ,
-                             final Tags tags )
+                             final Tags tags ,
+                             final DateTime date )
         throws IOException , TumblrException
     {
         if ( message == null || message.isEmpty() )
@@ -186,7 +199,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message + " / tags=" + tags );
+                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message + " / tags=" + tags + " / date=" + date );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -214,6 +227,12 @@ public class TumblrClient
 
             request.addBodyParameter( "tags" ,
                                       sbTags.toString() );
+        }
+
+        if ( date != null )
+        {
+            request.addBodyParameter( "date" ,
+                                      FORMAT_DATE.print( date ) );
         }
 
         final Response response = sendSignedRequest( request );
@@ -305,7 +324,7 @@ public class TumblrClient
                             convertNodeToString( nodePost.get( "description" ) ) ,
                             type ,
                             nodePost.get( "slug" ).asText() ,
-                            nodePost.get( "timestamp" ).asLong() ,
+                            new DateTime( nodePost.get( "timestamp" ).asLong() * 1000L ) ,
                             tags ,
                             new TB_Blog( nodeBlog.get( "name" ).asText() ,
                                          convertNodeToString( nodeBlog.get( "title" ) ) ,
@@ -348,6 +367,7 @@ public class TumblrClient
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
     private String blogname;
+    private static final DateTimeFormatter FORMAT_DATE = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ssZ" );
 
     private void checkErrors( final Response response ,
                               final JsonNode root ,

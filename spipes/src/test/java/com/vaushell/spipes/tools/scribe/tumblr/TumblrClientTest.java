@@ -112,10 +112,14 @@ public class TumblrClientTest
                                     "coding" ,
                                     "java" );
 
+        // Force post to be post one month ago
+        final DateTime dt = new DateTime().minusMonths( 1 ).withMillisOfSecond( 0 );
+
         final long ID = client.postLink( "http://bit.ly/Ijk3of" ,
                                          "Blog de Fabien Vauchelles" ,
                                          "Du JAVA, du big data, et de l'entreprenariat" ,
-                                         tags );
+                                         tags ,
+                                         dt );
 
         assertTrue( "ID should be return" ,
                     ID > 0 );
@@ -140,6 +144,9 @@ public class TumblrClientTest
         assertArrayEquals( "tags should be the same" ,
                            tags.toArray() ,
                            post.getTags().toArray() );
+        assertEquals( "Create date should be the same" ,
+                      dt.getMillis() ,
+                      post.getTimestamp().getMillis() );
 
         // Delete
         assertTrue( "Delete should work" ,
@@ -162,8 +169,12 @@ public class TumblrClientTest
                                     "framework" ,
                                     "vauchelles" );
 
+        // Force post to be post one month ago
+        final DateTime dt = new DateTime().minusMonths( 1 ).withMillisOfSecond( 0 );
+
         final long ID = client.postMessage( message ,
-                                            tags );
+                                            tags ,
+                                            dt );
 
         assertTrue( "ID should be return" ,
                     ID > 0 );
@@ -184,6 +195,9 @@ public class TumblrClientTest
         assertArrayEquals( "tags should be the same" ,
                            tags.toArray() ,
                            post.getTags().toArray() );
+        assertEquals( "Create date should be the same" ,
+                      dt.getMillis() ,
+                      post.getTimestamp().getMillis() );
 
         // Delete
         assertTrue( "Delete should work" ,
@@ -205,7 +219,8 @@ public class TumblrClientTest
     {
         // Post
         final long ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
-                                            new Tags() );
+                                            new Tags() ,
+                                            null );
 
         assertTrue( "ID should be return" ,
                     ID > 0 );
