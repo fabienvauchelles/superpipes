@@ -43,7 +43,7 @@ public class N_FB_Delete
     public N_FB_Delete()
     {
         super( null ,
-               SECURE_ANTIBURST );
+               LIGHT_ANTIBURST );
 
         this.client = new FacebookClient();
         this.retry = 3;

@@ -44,6 +44,7 @@ public abstract class A_Node
     public static final Duration DEFAULT_DELAY = new Duration( 1L * 1000L );
     public static final Duration DEFAULT_ANTIBURST = new Duration( 2L * 1000L );
     public static final Duration SECURE_ANTIBURST = new Duration( 60L * 1000L );
+    public static final Duration LIGHT_ANTIBURST = new Duration( 500L );
 
     public A_Node( final Duration defaultDelay ,
                    final Duration defaultAntiBurst )

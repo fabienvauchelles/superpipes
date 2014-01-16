@@ -43,7 +43,7 @@ public class N_TB_Delete
     public N_TB_Delete()
     {
         super( null ,
-               DEFAULT_ANTIBURST );
+               LIGHT_ANTIBURST );
 
         this.client = new TumblrClient();
         this.retry = 3;
