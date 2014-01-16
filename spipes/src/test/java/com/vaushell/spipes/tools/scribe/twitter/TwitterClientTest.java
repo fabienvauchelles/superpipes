@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -120,6 +121,9 @@ public class TwitterClientTest
         assertEquals( "message should be the same" ,
                       message ,
                       tweet.getMessage() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( tweet.getCreatedTime() ,
+                                  null ).getMillis() < 60000L );
 
         // Delete
         assertTrue( "Delete should work" ,
@@ -182,6 +186,9 @@ public class TwitterClientTest
                       tweet.getID() );
         assertTrue( "message should be the same (except the image link which is end added)" ,
                     tweet.getMessage().startsWith( message ) );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( tweet.getCreatedTime() ,
+                                  null ).getMillis() < 60000L );
 
         // Delete
         assertTrue( "Delete should work" ,
