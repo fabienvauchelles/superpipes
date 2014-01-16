@@ -21,9 +21,13 @@ package com.vaushell.spipes.nodes.twitter;
 
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,45 @@ public class N_TW_Delete
                DEFAULT_ANTIBURST );
 
         this.client = new TwitterClient();
+        this.retry = 3;
+        this.delayBetweenRetry = new Duration( 5L * 1000L );
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        // Load retry count if exists.
+        final String retryStr = getConfig( "retry" );
+        if ( retryStr != null )
+        {
+            try
+            {
+                retry = Integer.parseInt( retryStr );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'retry' must be an integer" ,
+                                                    ex );
+            }
+        }
+
+        // Load delay between retry if exists.
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        if ( delayBetweenRetryStr != null )
+        {
+            try
+            {
+                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
+                                                    ex );
+            }
+        }
     }
 
     // PROTECTED
@@ -70,12 +113,13 @@ public class N_TW_Delete
             LOGGER.trace( "[" + getNodeID() + "] receive message : " + Message.formatSimple( getMessage() ) );
         }
 
-        // Send to Twitter
+        // Delete from Twitter
         if ( getMessage().contains( "id-twitter" ) )
         {
             final long ID = (long) getMessage().getProperty( "id-twitter" );
 
-            if ( client.deleteTweet( ID ) )
+            if ( deleteTweet( ID ,
+                              retry ) )
             {
                 if ( LOGGER.isTraceEnabled() )
                 {
@@ -103,4 +147,50 @@ public class N_TW_Delete
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Delete.class );
     private final TwitterClient client;
+    private int retry;
+    private Duration delayBetweenRetry;
+
+    private boolean deleteTweet( final long ID ,
+                                 final int remainingRetry )
+        throws IOException , OAuthException
+    {
+        try
+        {
+            if ( client.deleteTweet( ID ) )
+            {
+                return true;
+            }
+            else
+            {
+                if ( remainingRetry <= 0 )
+                {
+                    return false;
+                }
+            }
+        }
+        catch( final IOException |
+                     OAuthException ex )
+        {
+            if ( remainingRetry <= 0 )
+            {
+                throw ex;
+            }
+        }
+
+        if ( delayBetweenRetry.getMillis() > 0L )
+        {
+            try
+            {
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
+            }
+        }
+
+        return deleteTweet( ID ,
+                            remainingRetry - 1 );
+    }
+
 }
