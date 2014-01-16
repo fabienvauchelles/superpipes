@@ -130,7 +130,7 @@ public class N_Shaarli
                     "id-permanent" ,
                     sl.getPermaID() ,
                     "uri-permanent" ,
-                    sl.getPermaURL( client.getEndpoint() ) ,
+                    URI.create( sl.getPermaURL( client.getEndpoint() ) ) ,
                     Message.KeyIndex.TAGS ,
                     tags
                 ) );
