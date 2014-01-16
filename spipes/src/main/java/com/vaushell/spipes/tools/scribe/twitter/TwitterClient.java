@@ -77,7 +77,7 @@ public class TwitterClient
                        final A_ValidatorCode vCode )
         throws IOException , InterruptedException
     {
-        loginImpl( TwitterApi.class ,
+        loginImpl( TwitterApi.SSL.class ,
                    key ,
                    secret ,
                    null ,
