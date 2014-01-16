@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -130,6 +131,9 @@ public class LinkedInClientTest
         assertEquals( "URLdescription should be the same" ,
                       "du java, du big data et de l'entreprenariat" ,
                       status.getURLdescription() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( status.getTimestamp() ,
+                                  null ).getMillis() < 60000L );
     }
 
     /**
@@ -157,6 +161,9 @@ public class LinkedInClientTest
         assertEquals( "message should be the same" ,
                       message ,
                       status.getMessage() );
+        assertTrue( "Post should have been created less than 1 minute" ,
+                    new Duration( status.getTimestamp() ,
+                                  null ).getMillis() < 60000L );
     }
 
     // PRIVATE

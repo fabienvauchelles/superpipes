@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.joda.time.DateTime;
 import org.scribe.builder.api.LinkedInApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
@@ -272,7 +273,7 @@ public class LinkedInClient
                                              convertNodeToString( nodeAuthor.get( "firstName" ) ) ,
                                              convertNodeToString( nodeAuthor.get( "lastName" ) ) ,
                                              convertNodeToString( nodeAuthor.get( "headline" ) ) ) ,
-                               nodeCurrent.get( "timestamp" ).asLong() );
+                               new DateTime( nodeCurrent.get( "timestamp" ).asLong() ) );
     }
 
     // PRIVATE

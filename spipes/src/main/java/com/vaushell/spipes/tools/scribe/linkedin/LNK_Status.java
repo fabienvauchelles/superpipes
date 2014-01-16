@@ -20,6 +20,7 @@
 package com.vaushell.spipes.tools.scribe.linkedin;
 
 import java.util.Objects;
+import org.joda.time.DateTime;
 
 /**
  * A LinkedIn status.
@@ -37,7 +38,7 @@ public class LNK_Status
                        final String urlName ,
                        final String urlDescription ,
                        final LNK_User person ,
-                       final long timestamp )
+                       final DateTime timestamp )
     {
         this.ID = ID;
         this.message = message;
@@ -119,12 +120,12 @@ public class LNK_Status
         this.person = person;
     }
 
-    public long getTimestamp()
+    public DateTime getTimestamp()
     {
         return timestamp;
     }
 
-    public void setTimestamp( final long timestamp )
+    public void setTimestamp( final DateTime timestamp )
     {
         this.timestamp = timestamp;
     }
@@ -132,16 +133,16 @@ public class LNK_Status
     @Override
     public int hashCode()
     {
-        int hash = 7;
+        int hash = 5;
 
-        hash = 59 * hash + Objects.hashCode( this.ID );
-        hash = 59 * hash + Objects.hashCode( this.message );
-        hash = 59 * hash + Objects.hashCode( this.url );
-        hash = 59 * hash + Objects.hashCode( this.urlShorten );
-        hash = 59 * hash + Objects.hashCode( this.urlName );
-        hash = 59 * hash + Objects.hashCode( this.urlDescription );
-        hash = 59 * hash + Objects.hashCode( this.person );
-        hash = 59 * hash + (int) ( this.timestamp ^ ( this.timestamp >>> 32 ) );
+        hash = 37 * hash + Objects.hashCode( this.ID );
+        hash = 37 * hash + Objects.hashCode( this.message );
+        hash = 37 * hash + Objects.hashCode( this.url );
+        hash = 37 * hash + Objects.hashCode( this.urlShorten );
+        hash = 37 * hash + Objects.hashCode( this.urlName );
+        hash = 37 * hash + Objects.hashCode( this.urlDescription );
+        hash = 37 * hash + Objects.hashCode( this.person );
+        hash = 37 * hash + Objects.hashCode( this.timestamp );
 
         return hash;
     }
@@ -224,5 +225,5 @@ public class LNK_Status
     private String urlName;
     private String urlDescription;
     private LNK_User person;
-    private long timestamp;
+    private DateTime timestamp;
 }
