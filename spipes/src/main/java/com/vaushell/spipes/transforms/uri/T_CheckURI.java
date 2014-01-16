@@ -20,21 +20,13 @@
 package com.vaushell.spipes.transforms.uri;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.tools.HTTPhelper;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.io.IOException;
 import java.net.URI;
-import org.apache.http.HttpEntity;
-import org.apache.http.StatusLine;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +44,9 @@ public class T_CheckURI
         super();
 
         this.client = null;
+        this.timeout = new Duration( 20L * 1000L );
+        this.retry = 3;
+        this.delayBetweenRetry = new Duration( 5L * 1000L );
     }
 
     @Override
@@ -59,6 +54,58 @@ public class T_CheckURI
         throws Exception
     {
         this.client = HTTPhelper.createBuilder().build();
+    }
+
+    @Override
+    public void load( final HierarchicalConfiguration cNode )
+        throws Exception
+    {
+        super.load( cNode );
+
+        // Load timeout if exists.
+        final String timeoutStr = getConfig( "timeout" );
+        if ( timeoutStr != null )
+        {
+            try
+            {
+                timeout = new Duration( Long.parseLong( timeoutStr ) );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'timeout' must be a long" ,
+                                                    ex );
+            }
+        }
+
+        // Load retry count if exists.
+        final String retryStr = getConfig( "retry" );
+        if ( retryStr != null )
+        {
+            try
+            {
+                retry = Integer.parseInt( retryStr );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'retry' must be an integer" ,
+                                                    ex );
+            }
+        }
+
+        // Load delay between retry if exists.
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        if ( delayBetweenRetryStr != null )
+        {
+            try
+            {
+                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
+            }
+            catch( final NumberFormatException ex )
+            {
+                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
+                                                    ex );
+            }
+        }
     }
 
     @Override
@@ -82,7 +129,7 @@ public class T_CheckURI
         try
         {
             if ( isURIvalid( uri ,
-                             RETRY ) )
+                             retry ) )
             {
                 return message;
             }
@@ -118,11 +165,13 @@ public class T_CheckURI
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( T_CheckURI.class );
-    private static final int RETRY = 2;
     private CloseableHttpClient client;
+    private Duration timeout;
+    private int retry;
+    private Duration delayBetweenRetry;
 
     private boolean isURIvalid( final URI uri ,
-                                final int retry )
+                                final int remainingRetry )
         throws IOException
     {
         if ( uri == null )
@@ -130,76 +179,43 @@ public class T_CheckURI
             throw new IllegalArgumentException();
         }
 
-        HttpEntity responseEntity = null;
         try
         {
-            // Exec request
-            final HttpGet get = new HttpGet( uri );
-
-            int timeout = 20000;
-
-            final String timeoutStr = getConfig( "timeout" );
-            if ( timeoutStr != null )
+            if ( HTTPhelper.isURIvalid( client ,
+                                        uri ,
+                                        timeout ) )
             {
-                try
-                {
-                    timeout = Integer.parseInt( timeoutStr );
-                }
-                catch( final NumberFormatException ex )
-                {
-                    // Ignore
-                }
+                return true;
             }
-
-            get.setConfig(
-                RequestConfig.custom()
-                .setConnectTimeout( timeout )
-                .setConnectionRequestTimeout( timeout )
-                .setSocketTimeout( timeout )
-                .build()
-            );
-
-            try( final CloseableHttpResponse response = client.execute( get ) )
+            else
             {
-                final StatusLine sl = response.getStatusLine();
-                responseEntity = response.getEntity();
-
-                if ( sl.getStatusCode() >= 200 && sl.getStatusCode() < 300 )
+                if ( remainingRetry <= 0 )
                 {
-                    return true;
-                }
-                else
-                {
-                    if ( retry > 0 )
-                    {
-                        return isURIvalid( uri ,
-                                           retry - 1 );
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
         }
         catch( final IOException ex )
         {
-            if ( retry > 0 )
-            {
-                return isURIvalid( uri ,
-                                   retry - 1 );
-            }
-            else
+            if ( remainingRetry <= 0 )
             {
                 throw ex;
             }
         }
-        finally
+
+        if ( delayBetweenRetry.getMillis() > 0L )
         {
-            if ( responseEntity != null )
+            try
             {
-                EntityUtils.consumeQuietly( responseEntity );
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
             }
         }
+
+        return isURIvalid( uri ,
+                           remainingRetry - 1 );
     }
 }
