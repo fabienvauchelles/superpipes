@@ -19,12 +19,22 @@
 
 package com.vaushell.spipes.nodes.twitter;
 
+import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.dispatch.Message;
 import com.vaushell.spipes.dispatch.Tags;
-import com.vaushell.spipes.tools.scribe.twitter.TwitterClient;
+import com.vaushell.spipes.nodes.A_Node;
+import com.vaushell.spipes.nodes.test.N_ReceiveBlocking;
+import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
+import com.vaushell.spipes.transforms.bitly.T_Shorten;
+import com.vaushell.spipes.transforms.image.T_FindBiggest;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import static org.testng.AssertJUnit.*;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -38,152 +48,190 @@ public class N_TW_PostTest
     // PUBLIC
     public N_TW_PostTest()
     {
-        // Nothing
+        this.dispatcher = null;
     }
 
     /**
-     * Check tweet content length.
+     * Initialize the dispatcher before every test.
      *
+     * @throws Exception
+     */
+    @BeforeMethod
+    public void loadDispatcher()
+        throws Exception
+    {
+        // My config
+        String conf = System.getProperty( "conf" );
+        if ( conf == null )
+        {
+            conf = "conf-local/twitter/configuration.xml";
+        }
+
+        String datas = System.getProperty( "datas" );
+        if ( datas == null )
+        {
+            datas = "conf-local/twitter/datas";
+        }
+
+        final XMLConfiguration config = new XMLConfiguration( conf );
+
+        final Path pDatas = Paths.get( datas );
+
+        dispatcher = new Dispatcher();
+        dispatcher.init( config ,
+                         pDatas ,
+                         new VC_FileFactory( pDatas ) );
+    }
+
+    /**
+     * Send a tweet, use bitly, no image.
+     *
+     * @throws java.lang.Exception
      */
     @Test
-    public void testConvertNews()
+    public void testSendTweetBitlyNoImage()
+        throws Exception
     {
-        final String uriStr = "http://url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
+        // Construct path
+        final A_Node nTwitter = dispatcher.addNode( "twitter" ,
+                                                    N_TW_Post.class ,
+                                                    "twitter" );
+        nTwitter.addTransformIN( T_FindBiggest.class );
+        nTwitter.addTransformIN( T_Shorten.class ,
+                                 "bitly" );
 
+        final N_ReceiveBlocking nReceive = (N_ReceiveBlocking) dispatcher.addNode( "receive" ,
+                                                                                   N_ReceiveBlocking.class );
+
+        dispatcher.addNode( "delete" ,
+                            N_TW_Delete.class ,
+                            "twitter" );
+
+        dispatcher.addRoute( "twitter" ,
+                             "delete" );
+        dispatcher.addRoute( "delete" ,
+                             "receive" );
+
+        // Start
+        dispatcher.start();
+
+        // Create the message
         final Message message = Message.create(
             Message.KeyIndex.TITLE ,
-            "Le titre de cette news n'est pas trop long" ,
+            "The algorithm for a perfectly balanced photo gallery – Summit Stories from Crispy Mountain" ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new DateTime( 2013 ,
+                          8 ,
+                          13 ,
+                          11 ,
+                          32 ,
+                          10 ,
+                          00 ) ,
             Message.KeyIndex.DESCRIPTION ,
-            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
+            "un algo pour afficher une galerie d'image en maximisant l'utilisation et en répartissant les photos même si elles sont d'un ratio hauteur/largeur très différent. Exemple de résultat: http://www.chromatic.io/FQrLQsb'" ,
+            "id-permanent" ,
+            "geKSvg" ,
+            "id-shaarli" ,
+            "20130813_113210" ,
             Message.KeyIndex.URI ,
-            URI.create( uriStr ) ,
-            Message.KeyIndex.URI_SOURCE ,
-            URI.create( uriStr ) ,
-            Message.KeyIndex.AUTHOR ,
-            "John Kiki" ,
-            Message.KeyIndex.CONTENT ,
-            "Le contenu, je m'en fous" ,
-            Message.KeyIndex.PUBLISHED_DATE ,
-            new DateTime() ,
+            URI.create( "http://www.crispymtn.com/stories/the-algorithm-for-a-perfectly-balanced-photo-gallery" ) ,
+            "uri-permanent" ,
+            URI.create( "http://lesliensducode.com/?geKSvg" ) ,
             Message.KeyIndex.TAGS ,
-            new Tags( "ceci" ,
-                      "est" ,
-                      "un" ,
-                      "tag" ,
-                      "mais" ,
-                      "je" ,
-                      "vais" ,
-                      "en" ,
-                      "rajouter" ,
-                      "pour" ,
-                      "que" ,
-                      "ca" ,
-                      "soit" ,
-                      "long" )
+            new Tags( "image" ,
+                      "optimize" ,
+                      "picture" ,
+                      "position" ,
+                      "ratio" )
         );
 
-        final String content = N_TW_Post.createContent( message ,
-                                                        TwitterClient.TWEET_SIZE );
+        // Send it
+        nTwitter.receiveMessage( message );
 
-        assertEquals( "(" + content.length() + ") " + content ,
-                      content.length() ,
-                      TwitterClient.TWEET_SIZE );
+        // Wait to be receive
+        final Message messageRcv = nReceive.getProcessingMessageOrWait( new Duration( 10L * 1000L ) );
+        assertNotNull( "Message shouldn't be null" ,
+                       messageRcv );
+
+        // Stop
+        dispatcher.stopAndWait();
     }
 
     /**
-     * Check tweet content length (2).
+     * Send a tweet, use bitly, with an image.
      *
+     * @throws java.lang.Exception
      */
-    @Test( expectedExceptions =
+    @Test
+    public void testSendTweetBitlyWithImage()
+        throws Exception
     {
-        IllegalArgumentException.class
-    } )
-    public void testURLlong()
-    {
-        final String uriStr = "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234";
+        // Construct path
+        final A_Node nTwitter = dispatcher.addNode( "twitter" ,
+                                                    N_TW_Post.class ,
+                                                    "twitter" );
+        nTwitter.addTransformIN( T_FindBiggest.class );
+        nTwitter.addTransformIN( T_Shorten.class ,
+                                 "bitly" );
 
+        final N_ReceiveBlocking nReceive = (N_ReceiveBlocking) dispatcher.addNode( "receive" ,
+                                                                                   N_ReceiveBlocking.class );
+
+        dispatcher.addNode( "delete" ,
+                            N_TW_Delete.class ,
+                            "twitter" );
+
+        dispatcher.addRoute( "twitter" ,
+                             "delete" );
+        dispatcher.addRoute( "delete" ,
+                             "receive" );
+
+        // Start
+        dispatcher.start();
+
+        // Create the message
         final Message message = Message.create(
             Message.KeyIndex.TITLE ,
-            "Le titre de cette news n'est pas trop long" ,
+            "The Secret Weapon: Evernote and GTD smoothly integrated into TSW" ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new DateTime( 2013 ,
+                          6 ,
+                          20 ,
+                          21 ,
+                          59 ,
+                          45 ,
+                          00 ) ,
             Message.KeyIndex.DESCRIPTION ,
-            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
+            "Amélioration de la méthodologie GTD avec Evernote" ,
+            "id-permanent" ,
+            "Vp_SOA" ,
+            "id-shaarli" ,
+            "20130620_215945" ,
             Message.KeyIndex.URI ,
-            URI.create( uriStr ) ,
-            Message.KeyIndex.URI_SOURCE ,
-            URI.create( uriStr ) ,
-            Message.KeyIndex.AUTHOR ,
-            "John Kiki" ,
-            Message.KeyIndex.CONTENT ,
-            "Le contenu, je m'en fous" ,
+            URI.create( "http://www.thesecretweapon.org/" ) ,
+            "uri-permanent" ,
+            URI.create( "http://lesliensducode.com/?Vp_SOA" ) ,
             Message.KeyIndex.TAGS ,
-            new Tags() ,
-            Message.KeyIndex.PUBLISHED_DATE ,
-            new DateTime()
+            new Tags( "evernote" ,
+                      "gtd" ,
+                      "methodologie" ,
+                      "organize" ,
+                      "task" ,
+                      "todo" )
         );
 
-        N_TW_Post.createContent( message ,
-                                 TwitterClient.TWEET_SIZE );
+        // Send it
+        nTwitter.receiveMessage( message );
+
+        // Wait to be receive
+        final Message messageRcv = nReceive.getProcessingMessageOrWait( new Duration( 10L * 1000L ) );
+        assertNotNull( "Message shouldn't be null" ,
+                       messageRcv );
+
+        // Stop
+        dispatcher.stopAndWait();
     }
 
-    /**
-     * Check tweet URL null.
-     *
-     */
-    @Test( expectedExceptions =
-    {
-        IllegalArgumentException.class
-    } )
-    public void testURLnull()
-    {
-        final Message message = Message.create(
-            Message.KeyIndex.TITLE ,
-            "Le titre de cette news n'est pas trop long" ,
-            Message.KeyIndex.DESCRIPTION ,
-            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
-            Message.KeyIndex.URI_SOURCE ,
-            URI.create(
-            "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
-            Message.KeyIndex.AUTHOR ,
-            "John Kiki" ,
-            Message.KeyIndex.CONTENT ,
-            "Le contenu, je m'en fous" ,
-            Message.KeyIndex.TAGS ,
-            new Tags() ,
-            Message.KeyIndex.PUBLISHED_DATE ,
-            new DateTime()
-        );
-
-        N_TW_Post.createContent( message ,
-                                 TwitterClient.TWEET_SIZE );
-    }
-
-    /**
-     * Check tweet title null.
-     *
-     */
-    @Test( expectedExceptions =
-    {
-        IllegalArgumentException.class
-    } )
-    public void testURLtitleNull()
-    {
-        final Message message = Message.create(
-            Message.KeyIndex.DESCRIPTION ,
-            "La description de la news est vraiment longue c'est pourquoi je vais bientôt la couper mais je vais en rajouter un peu histoire que la ligne soit suffisament longue pour le test et j'adore écrire les descriptions" ,
-            Message.KeyIndex.URI_SOURCE ,
-            URI.create(
-            "http://ceci-est-une-enorme-url.com/encore-jen-rajoute/qui-est-bien-trop-longue/url.de.ouf/qui-est-enorme/sur-ce-site/et-je-suis-sure-que-ca-va-peter/mais-il-faut-toujours-en-rajouter/car-cela-ne-suffit-pas/p=1234" ) ,
-            Message.KeyIndex.AUTHOR ,
-            "John Kiki" ,
-            Message.KeyIndex.CONTENT ,
-            "Le contenu, je m'en fous" ,
-            Message.KeyIndex.TAGS ,
-            new Tags() ,
-            Message.KeyIndex.PUBLISHED_DATE ,
-            new DateTime()
-        );
-
-        N_TW_Post.createContent( message ,
-                                 TwitterClient.TWEET_SIZE );
-    }
+    // PRIVATE
+    private Dispatcher dispatcher;
 }
