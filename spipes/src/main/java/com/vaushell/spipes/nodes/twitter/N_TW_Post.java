@@ -133,22 +133,34 @@ public class N_TW_Post
         }
 
         final StringBuilder sb = new StringBuilder();
+        // 15 caracters minimum size for message
         if ( uri.length() > size - 15 )
         {
             sb.append( uri );
         }
         else
         {
+            final int realsize;
+            if ( uri.length() >= 22 )
+            {
+                realsize = size;
+            }
+            else
+            {
+                realsize = size - 22 + uri.length();
+            }
+
+            sb.append( " (" ).append( uri ).append( ')' );
+
             if ( message.contains( Message.KeyIndex.TITLE ) )
             {
                 final String title = (String) message.getProperty( Message.KeyIndex.TITLE );
 
-                sb.append( " (" ).append( uri ).append( ')' );
-                if ( title.length() + sb.length() > size )
+                if ( title.length() + sb.length() > realsize )
                 {
                     sb.insert( 0 ,
                                title.substring( 0 ,
-                                                size - sb.length() ) );
+                                                realsize - sb.length() ) );
                 }
                 else
                 {
@@ -164,7 +176,7 @@ public class N_TW_Post
                 {
                     final String ct = " #" + tag;
 
-                    if ( sb.length() + ct.length() <= size )
+                    if ( sb.length() + ct.length() <= realsize )
                     {
                         sb.append( ct );
                     }

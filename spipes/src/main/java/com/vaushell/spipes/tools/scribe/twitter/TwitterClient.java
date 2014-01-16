@@ -52,7 +52,7 @@ public class TwitterClient
 {
     // PUBLIC
     public static final int TWEET_SIZE = 140;
-    public static final int TWEET_IMAGE_SIZE = 118;
+    public static final int TWEET_IMAGE_SIZE = 112;
 
     public TwitterClient()
     {
