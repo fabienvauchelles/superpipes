@@ -19,9 +19,8 @@
 
 package com.vaushell.spipes.tools.http;
 
+import com.vaushell.spipes.tools.HTTPhelper;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -30,9 +29,6 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -133,7 +129,8 @@ public class ImageExtractor
                 {
                     try
                     {
-                        images[ num] = loadPicture( imagesURIs.get( num ) );
+                        images[ num] = HTTPhelper.loadPicture( client ,
+                                                              imagesURIs.get( num ) );
                     }
                     catch( final IOException ex )
                     {
@@ -176,71 +173,4 @@ public class ImageExtractor
 
     // PRIVATE
     private final CloseableHttpClient client;
-
-    private BufferedImage loadPicture( final URI uri )
-        throws IOException
-    {
-        HttpEntity responseEntity = null;
-        try
-        {
-            // Exec request
-            final HttpGet get = new HttpGet( uri );
-
-            try( final CloseableHttpResponse response = client.execute( get ) )
-            {
-                final StatusLine sl = response.getStatusLine();
-                if ( sl.getStatusCode() != 200 )
-                {
-                    throw new IOException( sl.getReasonPhrase() );
-                }
-
-                responseEntity = response.getEntity();
-
-                final Header ct = responseEntity.getContentType();
-                if ( ct == null )
-                {
-                    return null;
-                }
-
-                final String type = ct.getValue();
-                if ( type == null )
-                {
-                    return null;
-                }
-
-                if ( !type.startsWith( "image/" ) )
-                {
-                    return null;
-                }
-
-                try( final ByteArrayOutputStream bos = new ByteArrayOutputStream() )
-                {
-                    try( final InputStream is = responseEntity.getContent() )
-                    {
-                        IOUtils.copy( is ,
-                                      bos );
-                    }
-
-                    if ( bos.size() <= 0 )
-                    {
-                        return null;
-                    }
-                    else
-                    {
-                        try( final ByteArrayInputStream bis = new ByteArrayInputStream( bos.toByteArray() ) )
-                        {
-                            return ImageIO.read( bis );
-                        }
-                    }
-                }
-            }
-        }
-        finally
-        {
-            if ( responseEntity != null )
-            {
-                EntityUtils.consume( responseEntity );
-            }
-        }
-    }
 }

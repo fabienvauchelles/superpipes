@@ -20,6 +20,7 @@
 package com.vaushell.spipes.transforms.image;
 
 import com.vaushell.spipes.dispatch.Message;
+import com.vaushell.spipes.tools.HTTPhelper;
 import com.vaushell.spipes.tools.http.ImageExtractor;
 import com.vaushell.spipes.transforms.A_Transform;
 import java.awt.image.BufferedImage;
@@ -27,12 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import javax.imageio.ImageIO;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,19 +53,7 @@ public class T_FindBiggest
     public void prepare()
         throws Exception
     {
-        this.client = HttpClientBuilder
-            .create()
-            .setDefaultCookieStore( new BasicCookieStore() )
-            .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
-            .setSSLSocketFactory(
-                new SSLConnectionSocketFactory(
-                    new SSLContextBuilder()
-                    .loadTrustMaterial( null ,
-                                        new TrustSelfSignedStrategy() )
-                    .build()
-                )
-            )
-            .build();
+        this.client = HTTPhelper.createBuilder().build();
 
         this.extractor = new ImageExtractor( this.client );
     }

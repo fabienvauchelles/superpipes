@@ -58,19 +58,7 @@ public class T_CheckURI
     public void prepare()
         throws Exception
     {
-        this.client = HttpClientBuilder
-            .create()
-            .setDefaultCookieStore( new BasicCookieStore() )
-            .setUserAgent( "Mozilla/5.0 (Windows NT 5.1; rv:15.0) Gecko/20100101 Firefox/15.0.1" )
-            .setSSLSocketFactory(
-                new SSLConnectionSocketFactory(
-                    new SSLContextBuilder()
-                    .loadTrustMaterial( null ,
-                                        new TrustSelfSignedStrategy() )
-                    .build()
-                )
-            )
-            .build();
+        this.client = HTTPhelper.createBuilder().build();
     }
 
     @Override
