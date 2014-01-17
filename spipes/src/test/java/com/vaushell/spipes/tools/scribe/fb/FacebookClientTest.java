@@ -286,9 +286,11 @@ public class FacebookClientTest
                     ID3 != null && !ID3.isEmpty() );
 
         // Retrieve post
-        final List<FB_Post> posts = client.readFeed( null );
-        assertTrue( "We should have minimum 3 posts" ,
-                    posts.size() >= 3 );
+        final List<FB_Post> posts = client.readFeed( null ,
+                                                     3 );
+        assertEquals( "We should have 3 posts" ,
+                      3 ,
+                      posts.size() );
 
         // Check Post 3
         final FB_Post post3 = posts.get( 0 );
@@ -329,6 +331,7 @@ public class FacebookClientTest
                       message1 ,
                       post1.getMessage() );
 
+        // Check iterator
         final Iterator<FB_Post> it = client.iteratorFeed( null ,
                                                           1 );
         assertTrue( "We should have result" ,

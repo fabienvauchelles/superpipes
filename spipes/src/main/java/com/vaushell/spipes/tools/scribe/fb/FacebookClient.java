@@ -28,6 +28,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -331,32 +333,48 @@ public class FacebookClient
      * Read a Facebook Feed.
      *
      * @param forcedTarget Target's ID (user or page). Could be null to use login target.
-     * @return the list of Post
+     * @param limit Maximum number of results. Could be null to use default.
+     * @return a list of posts
      * @throws IOException
      * @throws FacebookException
      */
-    public List<FB_Post> readFeed( final String forcedTarget )
+    public List<FB_Post> readFeed( final String forcedTarget ,
+                                   final Integer limit )
         throws IOException , FacebookException
     {
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] readFeed()" );
+                "[" + getClass().getSimpleName() + "] readFeed() : forcedTarget=" + forcedTarget + " / limit=" + limit );
         }
 
-        return readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget ) + "/feed" );
+        final Properties properties = new Properties();
+        if ( limit != null )
+        {
+            properties.setProperty( "limit" ,
+                                    Integer.toString( limit ) );
+        }
+
+        return readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget ) + "/feed" ,
+                             properties );
     }
 
     /**
-     * Iterator a Facebook Feed.
+     * Iterate a Facebook Feed.
      *
      * @param forcedTarget Target's ID (user or page). Could be null to use login target.
-     * @param limit Maximum number of results by call
-     * @return An iterator
+     * @param limit Maximum number of results by call. Could be null to use default.
+     * @return a posts iterator
      */
     public Iterator<FB_Post> iteratorFeed( final String forcedTarget ,
-                                           final int limit )
+                                           final Integer limit )
     {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] iteratorFeed() : forcedTarget=" + forcedTarget + " / limit=" + limit );
+        }
+
         return new Iterator<FB_Post>()
         {
             @Override
@@ -373,19 +391,21 @@ public class FacebookClient
                         buffer.clear();
                         bufferCursor = 0;
 
-                        final List<FB_Post> links;
-                        if ( lastTimestamp == null )
+                        final Properties properties = new Properties();
+                        if ( limit != null )
                         {
-                            links = readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget )
-                                                  + "/feed?limit=" + Integer.toString( limit ) );
+                            properties.setProperty( "limit" ,
+                                                    Integer.toString( limit ) );
                         }
-                        else
+                        if ( lastTimestamp != null )
                         {
-                            links = readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget )
-                                                  + "/feed?limit=" + Integer.toString( limit )
-                                                  + "&until=" + Long.toString( lastTimestamp.getMillis() / 1000L - 1L ) );
+                            properties.setProperty( "until" ,
+                                                    Long.toString( lastTimestamp.getMillis() / 1000L - 1L ) );
                         }
 
+                        final List<FB_Post> links = readFeedImpl(
+                            "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget ) + "/feed" ,
+                            properties );
                         if ( links.isEmpty() )
                         {
                             return false;
@@ -471,7 +491,8 @@ public class FacebookClient
     public void deleteAllPosts()
         throws IOException , FacebookException
     {
-        List<FB_Post> posts = readFeed( null );
+        List<FB_Post> posts = readFeed( null ,
+                                        null );
         while ( !posts.isEmpty() )
         {
             for ( final FB_Post post : posts )
@@ -479,7 +500,8 @@ public class FacebookClient
                 deletePost( post.getID() );
             }
 
-            posts = readFeed( null );
+            posts = readFeed( null ,
+                              null );
         }
     }
 
@@ -621,18 +643,25 @@ public class FacebookClient
         throw new IllegalArgumentException( "Page '" + pageName + "' is not accessible" );
     }
 
-    private List<FB_Post> readFeedImpl( final String url )
+    private List<FB_Post> readFeedImpl( final String url ,
+                                        final Properties properties )
         throws IOException , FacebookException
     {
-        if ( url == null )
+        if ( url == null || properties == null )
         {
             throw new IllegalArgumentException();
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.GET ,
                                                        url );
+        for ( final Entry<Object , Object> entry : properties.entrySet() )
+        {
+            request.addQuerystringParameter( (String) entry.getKey() ,
+                                             (String) entry.getValue() );
+        }
 
         final Response response = sendSignedRequest( request );
+
         final ObjectMapper mapper = new ObjectMapper();
         final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
 
