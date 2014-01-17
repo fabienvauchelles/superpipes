@@ -282,6 +282,10 @@ public final class Message
         {
             return "{URI=" + m.getProperty( KeyIndex.URI ) + "}";
         }
+        else if ( m.contains( KeyIndex.CONTENT ) )
+        {
+            return "{Content=" + m.getProperty( KeyIndex.CONTENT ) + "}";
+        }
         else
         {
             return "{ID=" + m.getID() + "}";
