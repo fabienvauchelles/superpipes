@@ -23,6 +23,8 @@ import com.vaushell.spipes.dispatch.Dispatcher;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
@@ -154,7 +156,6 @@ public class LinkedInClientTest
 
         // Read
         final LNK_Status status = client.readStatus( ID );
-
         assertEquals( "ID should be the same" ,
                       ID ,
                       status.getID() );
@@ -166,6 +167,106 @@ public class LinkedInClientTest
                                   null ).getMillis() < 60000L );
     }
 
+    /**
+     * Test testReadFeed.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testReadFeed()
+        throws Exception
+    {
+        // Status 1
+        final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
+        final String ID1 = client.postMessage( message1 );
+
+        assertTrue( "ID1 should be return" ,
+                    ID1 != null && !ID1.isEmpty() );
+
+        // Status 2
+        final String message2 = "Allez voir mon blog n°2" + new DateTime().getMillis();
+        final String url2 = "http://fabien.vauchelles.com/";
+        final String urlName2 = "Blog de Fabien Vauchelles";
+        final String urlDescription2 = "du code, des infos, des trucs";
+        final String ID2 = client.postLink( message2 ,
+                                            url2 ,
+                                            urlName2 ,
+                                            urlDescription2 );
+
+        assertTrue( "ID2 should be return" ,
+                    ID2 != null && !ID2.isEmpty() );
+
+        // Status 3
+        final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
+        final String ID3 = client.postMessage( message3 );
+
+        assertTrue( "ID3 should be return" ,
+                    ID3 != null && !ID3.isEmpty() );
+
+        // Retrieve Status
+        final List<LNK_Status> status = client.readFeed( null ,
+                                                         3 );
+        assertEquals( "We should have 3 posts" ,
+                      3 ,
+                      status.size() );
+
+        // Check Status 3
+        final LNK_Status status3 = status.get( 0 );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      status3.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message3 ,
+                      status3.getMessage() );
+
+        // Check Status 2
+        final LNK_Status status2 = status.get( 1 );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      status2.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message2 ,
+                      status2.getMessage() );
+        assertEquals( "URLs should be the same" ,
+                      url2 ,
+                      status2.getURL() );
+        assertEquals( "URLs names should be the same" ,
+                      urlName2 ,
+                      status2.getURLname() );
+        assertEquals( "URLs descriptions should be the same" ,
+                      urlDescription2 ,
+                      status2.getURLdescription() );
+
+        // Check Status 1
+        final LNK_Status status1 = status.get( 2 );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      status1.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message1 ,
+                      status1.getMessage() );
+
+        // Check iterator
+        final Iterator<LNK_Status> it = client.iteratorFeed( null ,
+                                                             1 );
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      it.next().getID() );
+    }
     // PRIVATE
     private final Dispatcher dispatcher;
     private final LinkedInClient client;

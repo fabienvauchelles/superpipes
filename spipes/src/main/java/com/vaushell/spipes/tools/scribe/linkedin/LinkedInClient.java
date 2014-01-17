@@ -26,6 +26,13 @@ import com.vaushell.spipes.tools.scribe.OAuthException;
 import com.vaushell.spipes.tools.scribe.code.A_ValidatorCode;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -152,7 +159,7 @@ public class LinkedInClient
         checkErrors( response ,
                      node );
 
-        return node.get( "updateKey" ).asText();
+        return extractID( node.get( "updateKey" ).asText() );
     }
 
     /**
@@ -204,7 +211,7 @@ public class LinkedInClient
         checkErrors( response ,
                      node );
 
-        return node.get( "updateKey" ).asText();
+        return extractID( node.get( "updateKey" ).asText() );
     }
 
     /**
@@ -230,7 +237,7 @@ public class LinkedInClient
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.GET ,
-                                                       "http://api.linkedin.com/v1/people/~/network/updates/key=" + ID + "?type=SHAR&format=json" );
+                                                       "http://api.linkedin.com/v1/people/~/network/updates/key=UNIU-" + ID + "-SHARE?type=SHAR&format=json" );
 
         final Response response = sendSignedRequest( request );
 
@@ -240,6 +247,234 @@ public class LinkedInClient
         checkErrors( response ,
                      node );
 
+        return convertJsonToStatus( node );
+    }
+
+    /**
+     * Read a LinkedIn Feed.
+     *
+     * @@param forcedTarget Target's ID. Could be null to use login target.
+     * @param count Max status by call. Could be null to use default.
+     * @return a list of status.
+     * @throws IOException
+     * @throws LinkedInException
+     */
+    public List<LNK_Status> readFeed( final String forcedTarget ,
+                                      final Integer count )
+        throws IOException , LinkedInException
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readFeed() : forcedTarget=" + forcedTarget + " / count=" + count );
+        }
+
+        final Properties properties = new Properties();
+        properties.setProperty( "scope" ,
+                                "self" );
+        properties.setProperty( "type" ,
+                                "SHAR" );
+        properties.setProperty( "format" ,
+                                "json" );
+        if ( count != null )
+        {
+            properties.setProperty( "count" ,
+                                    Integer.toString( count ) );
+        }
+
+        if ( forcedTarget == null )
+        {
+            return readFeedImpl( "http://api.linkedin.com/v1/people/~/network/updates" ,
+                                 properties );
+        }
+        else
+        {
+            return readFeedImpl( "http://api.linkedin.com/v1/people/id=" + forcedTarget + "/network/updates" ,
+                                 properties );
+        }
+    }
+
+    /**
+     * Iterate a LinkedIn Feed.
+     *
+     * @param forcedTarget Target's ID. Could be null to use login target.
+     * @param count Max status by call. Could be null to use default.
+     * @return a status iterator.
+     */
+    public Iterator<LNK_Status> iteratorFeed( final String forcedTarget ,
+                                              final Integer count )
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] iteratorFeed() : forcedTarget=" + forcedTarget + " / count=" + count );
+        }
+
+        return new Iterator<LNK_Status>()
+        {
+            @Override
+            public boolean hasNext()
+            {
+                try
+                {
+                    if ( bufferCursor < buffer.size() )
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        buffer.clear();
+                        bufferCursor = 0;
+
+                        final String url;
+                        final Properties properties = new Properties();
+                        properties.setProperty( "scope" ,
+                                                "self" );
+                        properties.setProperty( "type" ,
+                                                "SHAR" );
+                        properties.setProperty( "format" ,
+                                                "json" );
+                        if ( count != null )
+                        {
+                            properties.setProperty( "count" ,
+                                                    Integer.toString( count ) );
+                        }
+
+                        if ( forcedTarget == null )
+                        {
+                            url = "http://api.linkedin.com/v1/people/~/network/updates";
+                        }
+                        else
+                        {
+                            url = "http://api.linkedin.com/v1/people/id=" + forcedTarget + "/network/updates";
+                        }
+
+                        if ( lastTimestamp != null )
+                        {
+                            properties.setProperty( "before" ,
+                                                    Long.toString( lastTimestamp.getMillis() - 1L ) );
+                        }
+
+                        final List<LNK_Status> posts = readFeedImpl( url ,
+                                                                     properties );
+                        if ( posts.isEmpty() )
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            lastTimestamp = posts.get( posts.size() - 1 ).getTimestamp();
+
+                            buffer.addAll( posts );
+
+                            return true;
+                        }
+                    }
+                }
+                catch( final LinkedInException |
+                             IOException ex )
+                {
+                    throw new RuntimeException( ex );
+                }
+            }
+
+            @Override
+            public LNK_Status next()
+            {
+                return buffer.get( bufferCursor++ );
+            }
+
+            @Override
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+
+            // PRIVATE
+            private final List<LNK_Status> buffer = new ArrayList<>();
+            private int bufferCursor;
+            private DateTime lastTimestamp;
+        };
+    }
+
+    // PRIVATE
+    private static final Logger LOGGER = LoggerFactory.getLogger( LinkedInClient.class );
+    private static final Pattern PATTERN_ID = Pattern.compile( "\\d+-\\d+" );
+
+    private void checkErrors( final Response response ,
+                              final JsonNode root )
+        throws LinkedInException
+    {
+        final JsonNode error = root.get( "errorCode" );
+        if ( error != null )
+        {
+            throw new LinkedInException( response.getCode() ,
+                                         error.asInt() ,
+                                         root.get( "message" ).asText() ,
+                                         root.get( "status" ).asInt() );
+        }
+    }
+
+    private String extractID( final String fullID )
+    {
+        if ( fullID == null )
+        {
+            return null;
+        }
+
+        final Matcher m = PATTERN_ID.matcher( fullID );
+        if ( m.find() )
+        {
+            return m.group();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private List<LNK_Status> readFeedImpl( final String url ,
+                                           final Properties properties )
+        throws IOException , LinkedInException
+    {
+        if ( url == null || properties == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       url );
+
+        for ( final Map.Entry<Object , Object> entry : properties.entrySet() )
+        {
+            request.addQuerystringParameter( (String) entry.getKey() ,
+                                             (String) entry.getValue() );
+        }
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        final List<LNK_Status> status = new ArrayList<>();
+
+        final JsonNode nValues = node.get( "values" );
+        if ( nValues != null && nValues.size() > 0 )
+        {
+            for ( final JsonNode nValue : nValues )
+            {
+                status.add( convertJsonToStatus( nValue ) );
+            }
+        }
+
+        return status;
+    }
+
+    private LNK_Status convertJsonToStatus( final JsonNode node )
+    {
         final JsonNode nodeCurrent = node.get( "updateContent" ).get( "person" ).get( "currentShare" );
         final JsonNode nodeAuthor = nodeCurrent.get( "author" );
 
@@ -263,7 +498,7 @@ public class LinkedInClient
             description = convertNodeToString( nodeContent.get( "description" ) );
         }
 
-        return new LNK_Status( node.get( "updateKey" ).asText() ,
+        return new LNK_Status( extractID( node.get( "updateKey" ).asText() ) ,
                                convertNodeToString( nodeCurrent.get( "comment" ) ) ,
                                submittedUrl ,
                                shortenedUrl ,
@@ -274,22 +509,5 @@ public class LinkedInClient
                                              convertNodeToString( nodeAuthor.get( "lastName" ) ) ,
                                              convertNodeToString( nodeAuthor.get( "headline" ) ) ) ,
                                new DateTime( nodeCurrent.get( "timestamp" ).asLong() ) );
-    }
-
-    // PRIVATE
-    private static final Logger LOGGER = LoggerFactory.getLogger( LinkedInClient.class );
-
-    private void checkErrors( final Response response ,
-                              final JsonNode root )
-        throws LinkedInException
-    {
-        final JsonNode error = root.get( "errorCode" );
-        if ( error != null )
-        {
-            throw new LinkedInException( response.getCode() ,
-                                         error.asInt() ,
-                                         root.get( "message" ).asText() ,
-                                         root.get( "status" ).asInt() );
-        }
     }
 }

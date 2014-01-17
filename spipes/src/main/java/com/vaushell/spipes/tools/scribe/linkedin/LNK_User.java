@@ -140,6 +140,43 @@ public class LNK_User
         return "LNK_User{" + "ID=" + ID + ", firstName=" + firstName + ", lastName=" + lastName + ", job=" + job + '}';
     }
 
+    /**
+     * Format user to full user name.
+     *
+     * @param user user object.
+     * @return a username.
+     */
+    public static String formatName( final LNK_User user )
+    {
+        if ( user == null )
+        {
+            return null;
+        }
+
+        if ( user.getFirstName() == null )
+        {
+            if ( user.getLastName() == null )
+            {
+                return null;
+            }
+            else
+            {
+                return user.getLastName();
+            }
+        }
+        else
+        {
+            if ( user.getLastName() == null )
+            {
+                return user.getFirstName();
+            }
+            else
+            {
+                return user.getFirstName() + ' ' + user.getLastName();
+            }
+        }
+    }
+
     // PRIVATE
     private String ID;
     private String firstName;
