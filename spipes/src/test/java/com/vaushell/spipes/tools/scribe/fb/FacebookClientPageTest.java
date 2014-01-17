@@ -111,7 +111,8 @@ public class FacebookClientPageTest
     {
         client.deleteAllPosts();
 
-        final Iterator<FB_Post> itControl = client.iteratorFeed( 1 );
+        final Iterator<FB_Post> itControl = client.iteratorFeed( null ,
+                                                                 1 );
         assertFalse( "Delete all should remove all links" ,
                      itControl.hasNext() );
     }
@@ -131,7 +132,8 @@ public class FacebookClientPageTest
         // Force post to be post one month ago
         final DateTime dt = new DateTime().minusMonths( 1 );
 
-        final String ID = client.postLink( message ,
+        final String ID = client.postLink( null ,
+                                           message ,
                                            "http://fabien.vauchelles.com/" ,
                                            "Blog de Fabien Vauchelles" ,
                                            "JAVA ou JAVAPA?" ,
@@ -196,7 +198,8 @@ public class FacebookClientPageTest
         // Force post to be post one month ago
         final DateTime dt = new DateTime().minusMonths( 1 );
 
-        final String ID = client.postMessage( message ,
+        final String ID = client.postMessage( null ,
+                                              message ,
                                               dt );
 
         assertTrue( "ID should be return" ,
@@ -237,7 +240,8 @@ public class FacebookClientPageTest
         throws Exception
     {
         // Post
-        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
+        final String ID = client.postMessage( null ,
+                                              "Allez voir mon blog #" + new DateTime().getMillis() ,
                                               null );
 
         assertTrue( "ID should be return" ,

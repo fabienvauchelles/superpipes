@@ -47,6 +47,7 @@ public class N_FB
                null );
 
         this.client = new FacebookClient();
+        this.forcedTarget = null;
     }
 
     // PROTECTED
@@ -60,23 +61,12 @@ public class N_FB
         final String pageName = getConfig( "pagename" );
         if ( pageName == null )
         {
-            final String userID = getConfig( "userid" );
-            if ( userID == null )
-            {
-                client.login( getConfig( "key" ) ,
-                              getConfig( "secret" ) ,
-                              tokenPath ,
-                              getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-            }
-            else
-            {
-                client.loginAsOtherUser( userID ,
-                                         getConfig( "key" ) ,
-                                         getConfig( "secret" ) ,
-                                         tokenPath ,
-                                         getDispatcher().getVCodeFactory().create(
-                    "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-            }
+            client.login( getConfig( "key" ) ,
+                          getConfig( "secret" ) ,
+                          tokenPath ,
+                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+
+            forcedTarget = getConfig( "userid" );
         }
         else
         {
@@ -101,7 +91,8 @@ public class N_FB
         final int max = Integer.parseInt( getConfig( "max" ) );
 
         int count = 0;
-        final Iterator<FB_Post> it = client.iteratorFeed( Math.min( POST_MAX_COUNT ,
+        final Iterator<FB_Post> it = client.iteratorFeed( forcedTarget ,
+                                                          Math.min( POST_MAX_COUNT ,
                                                                     max ) );
         while ( it.hasNext() && count < max )
         {
@@ -169,4 +160,5 @@ public class N_FB
     private static final Logger LOGGER = LoggerFactory.getLogger( N_FB.class );
     private static final int POST_MAX_COUNT = 25;
     private final FacebookClient client;
+    private String forcedTarget;
 }

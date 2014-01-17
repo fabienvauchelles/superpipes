@@ -98,23 +98,10 @@ public class N_FB_Delete
         final String pageName = getConfig( "pagename" );
         if ( pageName == null )
         {
-            final String userID = getConfig( "userid" );
-            if ( userID == null )
-            {
-                client.login( getConfig( "key" ) ,
-                              getConfig( "secret" ) ,
-                              tokenPath ,
-                              getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-            }
-            else
-            {
-                client.loginAsOtherUser( userID ,
-                                         getConfig( "key" ) ,
-                                         getConfig( "secret" ) ,
-                                         tokenPath ,
-                                         getDispatcher().getVCodeFactory().create(
-                    "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-            }
+            client.login( getConfig( "key" ) ,
+                          getConfig( "secret" ) ,
+                          tokenPath ,
+                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
         }
         else
         {

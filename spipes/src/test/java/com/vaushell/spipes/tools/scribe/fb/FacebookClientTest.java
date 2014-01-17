@@ -126,7 +126,8 @@ public class FacebookClientTest
         // Force post to be post one month ago, but it won't work.
         final DateTime dt = new DateTime().minusMonths( 1 );
 
-        final String ID = client.postLink( message ,
+        final String ID = client.postLink( null ,
+                                           message ,
                                            "http://fabien.vauchelles.com/" ,
                                            "Blog de Fabien Vauchelles" ,
                                            "JAVA ou JAVAPA?" ,
@@ -187,7 +188,8 @@ public class FacebookClientTest
         // Force post to be post one month ago, but it won't work.
         final DateTime dt = new DateTime().minusMonths( 1 );
 
-        final String ID = client.postMessage( message ,
+        final String ID = client.postMessage( null ,
+                                              message ,
                                               dt );
 
         assertTrue( "ID should be return" ,
@@ -224,7 +226,8 @@ public class FacebookClientTest
         throws Exception
     {
         // Post
-        final String ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
+        final String ID = client.postMessage( null ,
+                                              "Allez voir mon blog #" + new DateTime().getMillis() ,
                                               null );
 
         assertTrue( "ID should be return" ,
@@ -249,7 +252,8 @@ public class FacebookClientTest
     {
         // Post 1
         final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
-        final String ID1 = client.postMessage( message1 ,
+        final String ID1 = client.postMessage( null ,
+                                               message1 ,
                                                null );
 
         assertTrue( "ID1 should be return" ,
@@ -261,7 +265,8 @@ public class FacebookClientTest
         final String urlName2 = "Blog de Fabien Vauchelles";
         final String urlCaption2 = "du java";
         final String urlDescription2 = "du code, des infos, des trucs";
-        final String ID2 = client.postLink( message2 ,
+        final String ID2 = client.postLink( null ,
+                                            message2 ,
                                             url2 ,
                                             urlName2 ,
                                             urlCaption2 ,
@@ -273,14 +278,15 @@ public class FacebookClientTest
 
         // Post 3
         final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
-        final String ID3 = client.postMessage( message3 ,
+        final String ID3 = client.postMessage( null ,
+                                               message3 ,
                                                null );
 
         assertTrue( "ID3 should be return" ,
                     ID3 != null && !ID3.isEmpty() );
 
         // Retrieve post
-        final List<FB_Post> posts = client.readFeed();
+        final List<FB_Post> posts = client.readFeed( null );
         assertTrue( "We should have minimum 3 posts" ,
                     posts.size() >= 3 );
 
@@ -323,7 +329,8 @@ public class FacebookClientTest
                       message1 ,
                       post1.getMessage() );
 
-        final Iterator<FB_Post> it = client.iteratorFeed( 1 );
+        final Iterator<FB_Post> it = client.iteratorFeed( null ,
+                                                          1 );
         assertTrue( "We should have result" ,
                     it.hasNext() );
         assertEquals( "IDs should be the same" ,

@@ -59,7 +59,6 @@ public class FacebookClient
         this.fmtPSTwrite = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ss-0800" );
 
         this.target = null;
-        this.targetType = null;
     }
 
     /**
@@ -88,38 +87,6 @@ public class FacebookClient
                    vCode );
 
         target = "me";
-        targetType = TargetType.ME;
-    }
-
-    /**
-     * Log in as an other user.
-     *
-     * @param userID Force user ID
-     * @param key Facebook key
-     * @param secret Facebook secret
-     * @param tokenPath Path to save the token
-     * @param vCode How to get the verification code
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void loginAsOtherUser( final String userID ,
-                                  final String key ,
-                                  final String secret ,
-                                  final Path tokenPath ,
-                                  final A_ValidatorCode vCode )
-        throws IOException , InterruptedException
-    {
-        loginImpl( FacebookApi.class ,
-                   key ,
-                   secret ,
-                   "read_stream,publish_actions" ,
-                   "http://www.facebook.com/connect/login_success.html" ,
-                   false ,
-                   tokenPath ,
-                   vCode );
-
-        target = userID;
-        targetType = TargetType.OTHER;
     }
 
     /**
@@ -151,19 +118,20 @@ public class FacebookClient
                    vCode );
 
         updateTarget( pageName );
-        targetType = TargetType.PAGE;
     }
 
     /**
      * Post a message to Facebook.
      *
+     * @param forcedTarget Target's ID (user or page). Could be null to use login target.
      * @param message Message's content
      * @param date Force message's date
      * @return Post ID
      * @throws FacebookException
      * @throws IOException
      */
-    public String postMessage( final String message ,
+    public String postMessage( final String forcedTarget ,
+                               final String message ,
                                final DateTime date )
         throws FacebookException , IOException
     {
@@ -175,46 +143,36 @@ public class FacebookClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message + " / date=" + date );
+                "[" + getClass().getSimpleName() + "] postMessage() : forcedTarget=" + forcedTarget + " / message=" + message + " / date=" + date );
         }
 
+        final String realTarget = forcedTarget == null ? target : forcedTarget;
+
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                       "https://graph.facebook.com/" + target + "/feed" );
+                                                       "https://graph.facebook.com/" + realTarget + "/feed" );
 
-        switch( targetType )
+        if ( "me".equals( realTarget ) )
         {
-            case ME:
+            // Me only
+            request.addBodyParameter( "privacy" ,
+                                      "{'value':'EVERYONE'}" );
+        }
+        else
+        {
+            if ( date != null )
             {
-                request.addBodyParameter( "privacy" ,
-                                          "{'value':'EVERYONE'}" );
+                final DateTime now = new DateTime();
 
-                break;
-            }
-
-            case PAGE:
-            {
-                if ( date != null )
+                if ( date.isBefore( now ) )
                 {
-                    final DateTime now = new DateTime();
-
-                    if ( date.isBefore( now ) )
-                    {
-                        request.addBodyParameter( "backdated_time" ,
-                                                  fmtPSTwrite.print( date ) );
-                    }
-                    else if ( date.isAfter( now ) )
-                    {
-                        request.addBodyParameter( "scheduled_publish_time" ,
-                                                  fmtPSTwrite.print( date ) );
-                    }
+                    request.addBodyParameter( "backdated_time" ,
+                                              fmtPSTwrite.print( date ) );
                 }
-
-                break;
-            }
-
-            default:
-            {
-                break;
+                else if ( date.isAfter( now ) )
+                {
+                    request.addBodyParameter( "scheduled_publish_time" ,
+                                              fmtPSTwrite.print( date ) );
+                }
             }
         }
 
@@ -235,6 +193,7 @@ public class FacebookClient
     /**
      * Post a link to Facebook.
      *
+     * @param forcedTarget Target's ID (user or page). Could be null to use login target.
      * @param message Message's content
      * @param uri Message's link
      * @param uriName Link's name
@@ -245,7 +204,8 @@ public class FacebookClient
      * @throws FacebookException
      * @throws IOException
      */
-    public String postLink( final String message ,
+    public String postLink( final String forcedTarget ,
+                            final String message ,
                             final String uri ,
                             final String uriName ,
                             final String uriCaption ,
@@ -261,46 +221,35 @@ public class FacebookClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postLink() : message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription + " / date=" + date );
+                "[" + getClass().getSimpleName() + "] postLink() : forcedTarget=" + forcedTarget + " / message=" + message + " / uri=" + uri + " / uriName=" + uriName + " / uriCaption=" + uriCaption + " / uriDescription=" + uriDescription + " / date=" + date );
         }
 
+        final String realTarget = forcedTarget == null ? target : forcedTarget;
+
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
-                                                       "https://graph.facebook.com/" + target + "/feed" );
+                                                       "https://graph.facebook.com/" + realTarget + "/feed" );
 
-        switch( targetType )
+        if ( "me".equals( realTarget ) )
         {
-            case ME:
+            request.addBodyParameter( "privacy" ,
+                                      "{'value':'EVERYONE'}" );
+        }
+        else
+        {
+            if ( date != null )
             {
-                request.addBodyParameter( "privacy" ,
-                                          "{'value':'EVERYONE'}" );
+                final DateTime now = new DateTime();
 
-                break;
-            }
-
-            case PAGE:
-            {
-                if ( date != null )
+                if ( date.isBefore( now ) )
                 {
-                    final DateTime now = new DateTime();
-
-                    if ( date.isBefore( now ) )
-                    {
-                        request.addBodyParameter( "backdated_time" ,
-                                                  fmtPSTwrite.print( date ) );
-                    }
-                    else if ( date.isAfter( now ) )
-                    {
-                        request.addBodyParameter( "scheduled_publish_time" ,
-                                                  fmtPSTwrite.print( date ) );
-                    }
+                    request.addBodyParameter( "backdated_time" ,
+                                              fmtPSTwrite.print( date ) );
                 }
-
-                break;
-            }
-
-            default:
-            {
-                break;
+                else if ( date.isAfter( now ) )
+                {
+                    request.addBodyParameter( "scheduled_publish_time" ,
+                                              fmtPSTwrite.print( date ) );
+                }
             }
         }
 
@@ -381,11 +330,12 @@ public class FacebookClient
     /**
      * Read a Facebook Feed.
      *
+     * @param forcedTarget Target's ID (user or page). Could be null to use login target.
      * @return the list of Post
      * @throws IOException
      * @throws FacebookException
      */
-    public List<FB_Post> readFeed()
+    public List<FB_Post> readFeed( final String forcedTarget )
         throws IOException , FacebookException
     {
         if ( LOGGER.isTraceEnabled() )
@@ -394,16 +344,18 @@ public class FacebookClient
                 "[" + getClass().getSimpleName() + "] readFeed()" );
         }
 
-        return readFeedImpl( "https://graph.facebook.com/" + target + "/feed" );
+        return readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget ) + "/feed" );
     }
 
     /**
      * Iterator a Facebook Feed.
      *
+     * @param forcedTarget Target's ID (user or page). Could be null to use login target.
      * @param limit Maximum number of results by call
      * @return An iterator
      */
-    public Iterator<FB_Post> iteratorFeed( final int limit )
+    public Iterator<FB_Post> iteratorFeed( final String forcedTarget ,
+                                           final int limit )
     {
         return new Iterator<FB_Post>()
         {
@@ -424,12 +376,12 @@ public class FacebookClient
                         final List<FB_Post> links;
                         if ( lastTimestamp == null )
                         {
-                            links = readFeedImpl( "https://graph.facebook.com/" + target
+                            links = readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget )
                                                   + "/feed?limit=" + Integer.toString( limit ) );
                         }
                         else
                         {
-                            links = readFeedImpl( "https://graph.facebook.com/" + target
+                            links = readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget )
                                                   + "/feed?limit=" + Integer.toString( limit )
                                                   + "&until=" + Long.toString( lastTimestamp.getMillis() / 1000L - 1L ) );
                         }
@@ -519,7 +471,7 @@ public class FacebookClient
     public void deleteAllPosts()
         throws IOException , FacebookException
     {
-        List<FB_Post> posts = readFeed();
+        List<FB_Post> posts = readFeed( null );
         while ( !posts.isEmpty() )
         {
             for ( final FB_Post post : posts )
@@ -527,7 +479,7 @@ public class FacebookClient
                 deletePost( post.getID() );
             }
 
-            posts = readFeed();
+            posts = readFeed( null );
         }
     }
 
@@ -608,14 +560,6 @@ public class FacebookClient
     private final DateTimeFormatter fmtPSTread;
     private final DateTimeFormatter fmtPSTwrite;
     private String target;
-    private TargetType targetType;
-
-    private enum TargetType
-    {
-        ME,
-        OTHER,
-        PAGE
-    }
 
     private void checkErrors( final Response response ,
                               final JsonNode root )

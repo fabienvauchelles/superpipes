@@ -50,6 +50,7 @@ public class N_FB_Post
         this.client = new FacebookClient();
         this.retry = 3;
         this.delayBetweenRetry = new Duration( 5L * 1000L );
+        this.forcedTarget = null;
     }
 
     @Override
@@ -100,23 +101,12 @@ public class N_FB_Post
         final String pageName = getConfig( "pagename" );
         if ( pageName == null )
         {
-            final String userID = getConfig( "userid" );
-            if ( userID == null )
-            {
-                client.login( getConfig( "key" ) ,
-                              getConfig( "secret" ) ,
-                              tokenPath ,
-                              getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-            }
-            else
-            {
-                client.loginAsOtherUser( userID ,
-                                         getConfig( "key" ) ,
-                                         getConfig( "secret" ) ,
-                                         tokenPath ,
-                                         getDispatcher().getVCodeFactory().create(
-                    "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-            }
+            client.login( getConfig( "key" ) ,
+                          getConfig( "secret" ) ,
+                          tokenPath ,
+                          getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
+
+            forcedTarget = getConfig( "userid" );
         }
         else
         {
@@ -210,6 +200,7 @@ public class N_FB_Post
     private final FacebookClient client;
     private int retry;
     private Duration delayBetweenRetry;
+    private String forcedTarget;
 
     private String postLink( final String uriStr ,
                              final String title ,
@@ -221,7 +212,8 @@ public class N_FB_Post
     {
         try
         {
-            final String ID = client.postLink( null ,
+            final String ID = client.postLink( forcedTarget ,
+                                               null ,
                                                uriStr ,
                                                (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                                caption ,
