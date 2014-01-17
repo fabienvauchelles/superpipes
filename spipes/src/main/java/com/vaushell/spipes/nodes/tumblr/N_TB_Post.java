@@ -51,6 +51,7 @@ public class N_TB_Post
         this.client = new TumblrClient();
         this.retry = 3;
         this.delayBetweenRetry = new Duration( 5L * 1000L );
+        this.blogname = null;
     }
 
     @Override
@@ -88,6 +89,12 @@ public class N_TB_Post
                                                     ex );
             }
         }
+
+        blogname = getConfig( "blogname" );
+        if ( blogname == null )
+        {
+            throw new IllegalArgumentException( "'blogname' not found in configuration" );
+        }
     }
 
     // PROTECTED
@@ -98,8 +105,7 @@ public class N_TB_Post
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "blogname" ) ,
-                      getConfig( "key" ) ,
+        client.login( getConfig( "key" ) ,
                       getConfig( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
@@ -168,6 +174,7 @@ public class N_TB_Post
     private final TumblrClient client;
     private int retry;
     private Duration delayBetweenRetry;
+    private String blogname;
 
     private long postLink( final String uri ,
                            final String title ,
@@ -179,7 +186,8 @@ public class N_TB_Post
     {
         try
         {
-            final long ID = client.postLink( uri ,
+            final long ID = client.postLink( blogname ,
+                                             uri ,
                                              title ,
                                              description ,
                                              tags ,

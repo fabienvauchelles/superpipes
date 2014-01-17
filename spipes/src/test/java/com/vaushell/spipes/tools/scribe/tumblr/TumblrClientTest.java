@@ -24,6 +24,8 @@ import com.vaushell.spipes.dispatch.Tags;
 import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
@@ -44,6 +46,7 @@ public class TumblrClientTest
     {
         this.dispatcher = new Dispatcher();
         this.client = new TumblrClient();
+        this.blogname = null;
     }
 
     /**
@@ -78,7 +81,7 @@ public class TumblrClientTest
         // Test if parameters are set
         final Properties properties = dispatcher.getCommon( "tumblr" );
 
-        final String blogname = properties.getProperty( "blogname" );
+        blogname = properties.getProperty( "blogname" );
         assertNotNull( "Parameter 'blogname' should exist" ,
                        blogname );
 
@@ -91,8 +94,7 @@ public class TumblrClientTest
                        secret );
 
         // Create tokens & login
-        client.login( blogname ,
-                      key ,
+        client.login( key ,
                       secret ,
                       dispatcher.getDatas().resolve( "test-tokens/tumblr.token" ) ,
                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
@@ -115,7 +117,8 @@ public class TumblrClientTest
         // Force post to be post one month ago
         final DateTime dt = new DateTime().minusMonths( 1 ).withMillisOfSecond( 0 );
 
-        final long ID = client.postLink( "http://bit.ly/Ijk3of" ,
+        final long ID = client.postLink( blogname ,
+                                         "http://bit.ly/Ijk3of" ,
                                          "Blog de Fabien Vauchelles" ,
                                          "Du JAVA, du big data, et de l'entreprenariat" ,
                                          tags ,
@@ -125,7 +128,8 @@ public class TumblrClientTest
                     ID > 0 );
 
         // Read
-        final TB_Post post = client.readPost( ID );
+        final TB_Post post = client.readPost( blogname ,
+                                              ID );
 
         assertEquals( "ID should be the same" ,
                       ID ,
@@ -150,7 +154,8 @@ public class TumblrClientTest
 
         // Delete
         assertTrue( "Delete should work" ,
-                    client.deletePost( ID ) );
+                    client.deletePost( blogname ,
+                                       ID ) );
     }
 
     /**
@@ -172,7 +177,8 @@ public class TumblrClientTest
         // Force post to be post one month ago
         final DateTime dt = new DateTime().minusMonths( 1 ).withMillisOfSecond( 0 );
 
-        final long ID = client.postMessage( message ,
+        final long ID = client.postMessage( blogname ,
+                                            message ,
                                             tags ,
                                             dt );
 
@@ -180,7 +186,8 @@ public class TumblrClientTest
                     ID > 0 );
 
         // Read
-        final TB_Post post = client.readPost( ID );
+        final TB_Post post = client.readPost( blogname ,
+                                              ID );
 
         assertEquals( "ID should be the same" ,
                       ID ,
@@ -201,7 +208,8 @@ public class TumblrClientTest
 
         // Delete
         assertTrue( "Delete should work" ,
-                    client.deletePost( ID ) );
+                    client.deletePost( blogname ,
+                                       ID ) );
     }
 
     /**
@@ -218,7 +226,8 @@ public class TumblrClientTest
         throws Exception
     {
         // Post
-        final long ID = client.postMessage( "Allez voir mon blog #" + new DateTime().getMillis() ,
+        final long ID = client.postMessage( blogname ,
+                                            "Allez voir mon blog #" + new DateTime().getMillis() ,
                                             new Tags() ,
                                             null );
 
@@ -227,12 +236,154 @@ public class TumblrClientTest
 
         // Delete
         assertTrue( "Delete should work" ,
-                    client.deletePost( ID ) );
+                    client.deletePost( blogname ,
+                                       ID ) );
 
         // Read error
-        client.readPost( ID );
+        client.readPost( blogname ,
+                         ID );
+    }
+
+    /**
+     * Test testReadFeed.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testReadFeed()
+        throws Exception
+    {
+        // Post 1
+        final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
+        final Tags tags1 = new Tags( "myblog" ,
+                                     "framework" ,
+                                     "vauchelles" );
+
+        final long ID1 = client.postMessage( blogname ,
+                                             message1 ,
+                                             tags1 ,
+                                             null );
+
+        assertTrue( "ID1 should be return" ,
+                    ID1 >= 0 );
+
+        // Post 2
+        final String url2 = "http://fabien.vauchelles.com/";
+        final String urlName2 = "Blog de Fabien Vauchelles";
+        final String urlDescription2 = "du code, des infos, des trucs";
+        final Tags tags2 = new Tags( "coding" ,
+                                     "blogging" ,
+                                     "java" );
+        final long ID2 = client.postLink( blogname ,
+                                          url2 ,
+                                          urlName2 ,
+                                          urlDescription2 ,
+                                          tags2 ,
+                                          null );
+
+        assertTrue( "ID2 should be return" ,
+                    ID2 >= 0 );
+
+        // Post 3
+        final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
+        final Tags tags3 = new Tags( "cowboy" ,
+                                     "space" ,
+                                     "cosmicblog" );
+        final long ID3 = client.postMessage( blogname ,
+                                             message3 ,
+                                             tags3 ,
+                                             null );
+
+        assertTrue( "ID3 should be return" ,
+                    ID3 >= 0 );
+
+        // Retrieve post
+        final List<TB_Post> posts = client.readFeed( blogname ,
+                                                     3 );
+        assertEquals( "We should have 3 posts" ,
+                      3 ,
+                      posts.size() );
+
+        // Check Post 3
+        final TB_Post post3 = posts.get( 0 );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      post3.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message3 ,
+                      post3.getMessage() );
+        assertArrayEquals( "Tags should be the same" ,
+                           tags3.toArray() ,
+                           post3.getTags().toArray() );
+
+        // Check Post 2
+        final TB_Post post2 = posts.get( 1 );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      post2.getID() );
+        assertEquals( "URLs should be the same" ,
+                      url2 ,
+                      post2.getURL() );
+        assertEquals( "URLs names should be the same" ,
+                      urlName2 ,
+                      post2.getURLname() );
+        assertEquals( "URLs descriptions should be the same" ,
+                      urlDescription2 ,
+                      post2.getURLdescription() );
+        assertArrayEquals( "Tags should be the same" ,
+                           tags2.toArray() ,
+                           post2.getTags().toArray() );
+
+        // Check Post 1
+        final TB_Post post1 = posts.get( 2 );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      post1.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message1 ,
+                      post1.getMessage() );
+        assertArrayEquals( "Tags should be the same" ,
+                           tags1.toArray() ,
+                           post1.getTags().toArray() );
+
+        // Check iterator
+        final Iterator<TB_Post> it = client.iteratorFeed( blogname ,
+                                                          1 );
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      it.next().getID() );
+
+        // Delete Post 3
+        assertTrue( "Delete should work" ,
+                    client.deletePost( blogname ,
+                                       ID3 ) );
+
+        // Delete Post 2
+        assertTrue( "Delete should work" ,
+                    client.deletePost( blogname ,
+                                       ID2 ) );
+
+        // Delete Post 1
+        assertTrue( "Delete should work" ,
+                    client.deletePost( blogname ,
+                                       ID1 ) );
     }
     // PRIVATE
     private final Dispatcher dispatcher;
     private final TumblrClient client;
+    private String blogname;
 }

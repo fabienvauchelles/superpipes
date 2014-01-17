@@ -28,7 +28,10 @@ import com.vaushell.spipes.tools.scribe.fb.FacebookClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -56,7 +59,6 @@ public class TumblrClient
     /**
      * Log in.
      *
-     * @param blogname Blog name
      * @param key OAuth key
      * @param secret OAuth secret
      * @param tokenPath Path to save the token
@@ -64,20 +66,12 @@ public class TumblrClient
      * @throws IOException
      * @throws java.lang.InterruptedException
      */
-    public void login( final String blogname ,
-                       final String key ,
+    public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
                        final A_ValidatorCode vCode )
         throws IOException , InterruptedException
     {
-        if ( blogname == null )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        this.blogname = blogname;
-
         loginImpl( TumblrApi.class ,
                    key ,
                    secret ,
@@ -91,6 +85,7 @@ public class TumblrClient
     /**
      * Post link to Tumblr.
      *
+     * @param blogname Blog name
      * @param uri Link
      * @param uriName Link's name
      * @param uriDescription Link's description
@@ -100,14 +95,15 @@ public class TumblrClient
      * @throws IOException
      * @throws TumblrException
      */
-    public long postLink( final String uri ,
+    public long postLink( final String blogname ,
+                          final String uri ,
                           final String uriName ,
                           final String uriDescription ,
                           final Tags tags ,
                           final DateTime date )
         throws IOException , TumblrException
     {
-        if ( uri == null || uri.isEmpty() )
+        if ( blogname == null || blogname.isEmpty() || uri == null || uri.isEmpty() )
         {
             throw new IllegalArgumentException();
         }
@@ -115,7 +111,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postLink() : uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags + " / date=" + date );
+                "[" + getClass().getSimpleName() + "] postLink() : blogname=" + blogname + " / uri=" + uri + " / uriName=" + uriName + " / uriDescription=" + uriDescription + " / tags=" + tags + " / date=" + date );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -179,6 +175,7 @@ public class TumblrClient
     /**
      * Post message to Tumblr.
      *
+     * @param blogname Blog name
      * @param message Message
      * @param tags Message's tags
      * @param date Force message's date
@@ -186,12 +183,13 @@ public class TumblrClient
      * @throws IOException
      * @throws TumblrException
      */
-    public long postMessage( final String message ,
+    public long postMessage( final String blogname ,
+                             final String message ,
                              final Tags tags ,
                              final DateTime date )
         throws IOException , TumblrException
     {
-        if ( message == null || message.isEmpty() )
+        if ( blogname == null || blogname.isEmpty() || message == null || message.isEmpty() )
         {
             throw new IllegalArgumentException();
         }
@@ -199,7 +197,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] postMessage() : message=" + message + " / tags=" + tags + " / date=" + date );
+                "[" + getClass().getSimpleName() + "] postMessage() : blogname=" + blogname + " / message=" + message + " / tags=" + tags + " / date=" + date );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -252,15 +250,17 @@ public class TumblrClient
     /**
      * Read a Tumblr Post.
      *
+     * @param blogname Blog name
      * @param ID Post ID
      * @return the Post
      * @throws IOException
      * @throws TumblrException
      */
-    public TB_Post readPost( final long ID )
+    public TB_Post readPost( final String blogname ,
+                             final long ID )
         throws IOException , TumblrException
     {
-        if ( ID < 0 )
+        if ( blogname == null || blogname.isEmpty() || ID < 0 )
         {
             throw new IllegalArgumentException();
         }
@@ -268,7 +268,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] readPost() : ID=" + ID );
+                "[" + getClass().getSimpleName() + "] readPost() : blogname=" + blogname + " / ID=" + ID );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.GET ,
@@ -291,59 +291,25 @@ public class TumblrClient
         {
             return null;
         }
-        final JsonNode nodePost = nodePosts.get( 0 );
 
-        final Tags tags = new Tags();
-        final JsonNode nodeTags = nodePost.get( "tags" );
-        for ( final JsonNode nodeTag : nodeTags )
-        {
-            tags.add( nodeTag.asText() );
-        }
-
-        final String message;
-        final String urlName;
-        final String type = nodePost.get( "type" ).asText();
-        if ( "link".equalsIgnoreCase( type ) )
-        {
-            message = null;
-            urlName = convertNodeToString( nodePost.get( "title" ) );
-        }
-        else
-        {
-            message = convertNodeToString( nodePost.get( "title" ) );
-            urlName = null;
-        }
-
-        final JsonNode nodeBlog = nodeResponse.get( "blog" );
-
-        return new TB_Post( nodePost.get( "id" ).asLong() ,
-                            message ,
-
-                            convertNodeToString( nodePost.get( "url" ) ) ,
-                            urlName ,
-                            convertNodeToString( nodePost.get( "description" ) ) ,
-                            type ,
-                            nodePost.get( "slug" ).asText() ,
-                            new DateTime( nodePost.get( "timestamp" ).asLong() * 1000L ) ,
-                            tags ,
-                            new TB_Blog( nodeBlog.get( "name" ).asText() ,
-                                         convertNodeToString( nodeBlog.get( "title" ) ) ,
-                                         convertNodeToString( nodeBlog.get( "description" ) ) ,
-                                         convertNodeToString( nodeBlog.get( "url" ) ) ) );
+        return convertJsonToPost( nodePosts.get( 0 ) ,
+                                  convertJsonToBlog( nodeResponse.get( "blog" ) ) );
     }
 
     /**
      * Delete a Tumblr Post.
      *
+     * @param blogname Blog name
      * @param ID Post ID
      * @return True if successfull
      * @throws IOException
      * @throws TumblrException
      */
-    public boolean deletePost( final long ID )
+    public boolean deletePost( final String blogname ,
+                               final long ID )
         throws IOException , TumblrException
     {
-        if ( ID < 0 )
+        if ( blogname == null || blogname.isEmpty() || ID < 0 )
         {
             throw new IllegalArgumentException();
         }
@@ -351,7 +317,7 @@ public class TumblrClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] deletePost() : ID=" + ID );
+                "[" + getClass().getSimpleName() + "] deletePost() : blogname=" + blogname + " / ID=" + ID );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
@@ -364,9 +330,137 @@ public class TumblrClient
 
         return response.getCode() == 200;
     }
+
+    /**
+     * Read a Tumblr Feed.
+     *
+     * @param blogname Blog name
+     * @param limit Maximum number of results by call. Could be null to use default.
+     * @return a list of posts
+     * @throws IOException
+     * @throws TumblrException
+     */
+    public List<TB_Post> readFeed( final String blogname ,
+                                   final Integer limit )
+        throws IOException , TumblrException
+    {
+        if ( blogname == null || blogname.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readFeed() : blogname=" + blogname + " / limit=" + limit );
+        }
+
+        final Properties properties = new Properties();
+        properties.setProperty( "api_key" ,
+                                getKey() );
+        properties.setProperty( "filter" ,
+                                "raw" );
+        if ( limit != null )
+        {
+            properties.setProperty( "limit" ,
+                                    Integer.toString( limit ) );
+        }
+
+        return readFeedImpl( "http://api.tumblr.com/v2/blog/" + blogname + "/posts/" ,
+                             properties );
+    }
+
+    /**
+     * Iterate a Tumblr Feed.
+     *
+     * @param blogname Blog name
+     * @param limit Maximum number of results by call. Could be null to use default.
+     * @return a posts iterator
+     */
+    public Iterator<TB_Post> iteratorFeed( final String blogname ,
+                                           final Integer limit )
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] iteratorFeed() : blogname=" + blogname + " / limit=" + limit );
+        }
+
+        return new Iterator<TB_Post>()
+        {
+            @Override
+            public boolean hasNext()
+            {
+                try
+                {
+                    if ( bufferCursor < buffer.size() )
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        buffer.clear();
+                        bufferCursor = 0;
+
+                        final Properties properties = new Properties();
+                        properties.setProperty( "api_key" ,
+                                                getKey() );
+                        properties.setProperty( "filter" ,
+                                                "raw" );
+                        if ( limit != null )
+                        {
+                            properties.setProperty( "limit" ,
+                                                    Integer.toString( limit ) );
+                        }
+                        if ( offset > 0 )
+                        {
+                            properties.setProperty( "offset" ,
+                                                    Integer.toString( offset ) );
+                        }
+
+                        final List<TB_Post> links = readFeedImpl( "http://api.tumblr.com/v2/blog/" + blogname + "/posts/" ,
+                                                                  properties );
+                        if ( links.isEmpty() )
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            offset += links.size();
+
+                            buffer.addAll( links );
+
+                            return true;
+                        }
+                    }
+                }
+                catch( final TumblrException |
+                             IOException ex )
+                {
+                    throw new RuntimeException( ex );
+                }
+            }
+
+            @Override
+            public TB_Post next()
+            {
+                return buffer.get( bufferCursor++ );
+            }
+
+            @Override
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+
+            // PRIVATE
+            private final List<TB_Post> buffer = new ArrayList<>();
+            private int bufferCursor;
+            private int offset;
+        };
+    }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( FacebookClient.class );
-    private String blogname;
     private static final DateTimeFormatter FORMAT_DATE = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ssZ" );
 
     private void checkErrors( final Response response ,
@@ -394,5 +488,96 @@ public class TumblrClient
                                        meta.get( "msg" ).asText() ,
                                        listErrors );
         }
+    }
+
+    private List<TB_Post> readFeedImpl( final String url ,
+                                        final Properties properties )
+        throws IOException , TumblrException
+    {
+        if ( url == null || properties == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       url );
+        for ( final Entry<Object , Object> entry : properties.entrySet() )
+        {
+            request.addQuerystringParameter( (String) entry.getKey() ,
+                                             (String) entry.getValue() );
+        }
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node ,
+                     200 );
+
+        final JsonNode nodeResponse = node.get( "response" );
+
+        final List<TB_Post> posts = new ArrayList<>();
+
+        final JsonNode nodePosts = nodeResponse.get( "posts" );
+        if ( nodePosts != null && nodePosts.size() > 0 )
+        {
+            final TB_Blog blog = convertJsonToBlog( nodeResponse.get( "blog" ) );
+
+            for ( final JsonNode nodePost : nodePosts )
+            {
+                posts.add( convertJsonToPost( nodePost ,
+                                              blog ) );
+            }
+        }
+
+        return posts;
+    }
+
+    private TB_Blog convertJsonToBlog( final JsonNode nodeBlog )
+    {
+
+        return new TB_Blog( nodeBlog.get( "name" ).asText() ,
+                            convertNodeToString( nodeBlog.get( "title" ) ) ,
+                            convertNodeToString( nodeBlog.get( "description" ) ) ,
+                            convertNodeToString( nodeBlog.get( "url" ) ) );
+    }
+
+    private TB_Post convertJsonToPost( final JsonNode node ,
+                                       final TB_Blog blog )
+    {
+        final Tags tags = new Tags();
+        final JsonNode nodeTags = node.get( "tags" );
+        for ( final JsonNode nodeTag : nodeTags )
+        {
+            tags.add( nodeTag.asText() );
+        }
+
+        final String message;
+        final String urlName;
+        final String type = node.get( "type" ).asText();
+        if ( "link".equalsIgnoreCase( type ) )
+        {
+            message = null;
+            urlName = convertNodeToString( node.get( "title" ) );
+        }
+        else
+        {
+            message = convertNodeToString( node.get( "title" ) );
+            urlName = null;
+        }
+
+        return new TB_Post( node.get( "id" ).asLong() ,
+                            message ,
+
+                            convertNodeToString( node.get( "url" ) ) ,
+                            urlName ,
+                            convertNodeToString( node.get( "description" ) ) ,
+                            type ,
+                            node.get( "slug" ).asText() ,
+                            new DateTime( node.get( "timestamp" ).asLong() * 1000L ) ,
+                            tags ,
+                            blog );
     }
 }
