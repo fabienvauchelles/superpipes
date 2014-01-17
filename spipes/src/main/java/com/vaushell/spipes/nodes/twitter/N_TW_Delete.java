@@ -43,7 +43,7 @@ public class N_TW_Delete
     public N_TW_Delete()
     {
         super( null ,
-               LIGHT_ANTIBURST );
+               SECURE_ANTIBURST );
 
         this.client = new TwitterClient();
         this.retry = 3;
