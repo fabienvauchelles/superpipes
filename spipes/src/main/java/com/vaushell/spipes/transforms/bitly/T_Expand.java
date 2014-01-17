@@ -47,8 +47,10 @@ public class T_Expand
         throws Exception
     {
         // https://bitly.com/a/your_api_key
-        this.bitly = Bitly.as( getConfig( "username" ) ,
-                               getConfig( "apikey" ) );
+        this.bitly = Bitly.as( getConfig( "username" ,
+                                          false ) ,
+                               getConfig( "apikey" ,
+                                          false ) );
     }
 
     @Override

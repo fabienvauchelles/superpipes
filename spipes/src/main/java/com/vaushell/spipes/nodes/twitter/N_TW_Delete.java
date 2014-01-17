@@ -57,7 +57,8 @@ public class N_TW_Delete
         super.load( cNode );
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" );
+        final String retryStr = getConfig( "retry" ,
+                                           true );
         if ( retryStr != null )
         {
             try
@@ -72,7 +73,8 @@ public class N_TW_Delete
         }
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
+                                                       true );
         if ( delayBetweenRetryStr != null )
         {
             try
@@ -95,8 +97,10 @@ public class N_TW_Delete
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "key" ) ,
-                      getConfig( "secret" ) ,
+        client.login( getConfig( "key" ,
+                                 false ) ,
+                      getConfig( "secret" ,
+                                 false ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }

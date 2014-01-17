@@ -61,7 +61,8 @@ public class N_TB_Post
         super.load( cNode );
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" );
+        final String retryStr = getConfig( "retry" ,
+                                           true );
         if ( retryStr != null )
         {
             try
@@ -76,7 +77,8 @@ public class N_TB_Post
         }
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
+                                                       true );
         if ( delayBetweenRetryStr != null )
         {
             try
@@ -90,11 +92,8 @@ public class N_TB_Post
             }
         }
 
-        blogname = getConfig( "blogname" );
-        if ( blogname == null )
-        {
-            throw new IllegalArgumentException( "'blogname' not found in configuration" );
-        }
+        blogname = getConfig( "blogname" ,
+                              false );
     }
 
     // PROTECTED
@@ -105,8 +104,10 @@ public class N_TB_Post
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "key" ) ,
-                      getConfig( "secret" ) ,
+        client.login( getConfig( "key" ,
+                                 false ) ,
+                      getConfig( "secret" ,
+                                 false ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
@@ -133,7 +134,8 @@ public class N_TB_Post
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
 
         final DateTime date;
-        if ( "true".equals( getConfig( "backdating" ) ) )
+        if ( "true".equals( getConfig( "backdating" ,
+                                       true ) ) )
         {
             date = (DateTime) getMessage().getProperty( Message.KeyIndex.PUBLISHED_DATE );
         }

@@ -73,10 +73,17 @@ public abstract class A_Transform
      * Retrieve node's parameter.
      *
      * @param key Key of parameter
+     * @param acceptNull if false, the null value throw an IllegalArgumentException.
      * @return the value
      */
-    public String getConfig( final String key )
+    public String getConfig( final String key ,
+                             final boolean acceptNull )
     {
+        if ( key == null || key.isEmpty() )
+        {
+            throw new IllegalArgumentException();
+        }
+
         String value = properties.getProperty( key );
         if ( value != null )
         {
@@ -96,7 +103,12 @@ public abstract class A_Transform
             }
         }
 
-        return null;
+        if ( acceptNull )
+        {
+            return null;
+        }
+
+        throw new IllegalArgumentException( "Can't find property '" + key + "'" );
     }
 
     /**

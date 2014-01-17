@@ -78,7 +78,8 @@ public class N_Shaarli
         throws Exception
     {
         this.client = new ShaarliClient( templates ,
-                                         getConfig( "url" ) );
+                                         getConfig( "url" ,
+                                                    false ) );
     }
 
     @Override
@@ -90,11 +91,13 @@ public class N_Shaarli
             LOGGER.trace( "[" + getNodeID() + "] read feed " );
         }
 
-        final int max = Integer.parseInt( getConfig( "max" ) );
+        final int max = Integer.parseInt( getConfig( "max" ,
+                                                     false ) );
 
         int count = 0;
         final Iterator<ShaarliLink> it;
-        if ( "true".equals( getConfig( "reverse" ) ) )
+        if ( "true".equals( getConfig( "reverse" ,
+                                       true ) ) )
         {
             it = client.searchAllReverseIterator();
         }

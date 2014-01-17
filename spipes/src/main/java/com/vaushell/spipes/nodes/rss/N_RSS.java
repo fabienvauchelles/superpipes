@@ -66,7 +66,8 @@ public class N_RSS
     protected void loop()
         throws Exception
     {
-        final URL url = new URL( getConfig( "url" ) );
+        final URL url = new URL( getConfig( "url" ,
+                                            false ) );
 
         if ( LOGGER.isTraceEnabled() )
         {

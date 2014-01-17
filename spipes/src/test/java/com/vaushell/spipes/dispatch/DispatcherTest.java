@@ -135,36 +135,48 @@ public class DispatcherTest
         node.getProperties().setProperty( "test2" ,
                                           "montest2" );
 
+        String val = node.getConfig( "test2" ,
+                                     false );
         assertEquals( "test2 property should be found" ,
                       "montest2" ,
-                      node.getConfig( "test2" ) );
+                      val );
 
+        val = node.getConfig( "check" ,
+                              true );
         assertNull( "check property is unknown" ,
-                    node.getConfig( "check" ) );
+                    val );
 
+        val = node.getConfig( "test" ,
+                              false );
         assertEquals( "test property should be found" ,
                       "montest" ,
-                      node.getConfig( "test" ) );
+                      val );
 
         node.getProperties().setProperty( "test" ,
                                           "monautretest" );
 
+        val = node.getConfig( "test" ,
+                              false );
         assertEquals( "test property should be found" ,
                       "monautretest" ,
-                      node.getConfig( "test" ) );
+                      val );
 
         // Transform
         final A_Transform transform = node.addTransformIN( T_Done.class ,
                                                            "conf2" ,
                                                            "conf1" );
 
+        val = transform.getConfig( "check" ,
+                                   false );
         assertEquals( "check property should be found" ,
                       "moncheck" ,
-                      transform.getConfig( "check" ) );
+                      val );
 
+        val = transform.getConfig( "test" ,
+                                   false );
         assertEquals( "test property should be found" ,
                       "montest" ,
-                      transform.getConfig( "test" ) );
+                      val );
     }
 
     /**
@@ -181,7 +193,8 @@ public class DispatcherTest
                                                 "confnull" );
 
         assertNull( "confnull common is unknown" ,
-                    node.getConfig( "test2" ) );
+                    node.getConfig( "test2" ,
+                                    true ) );
 
     }
 }

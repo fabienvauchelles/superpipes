@@ -54,15 +54,11 @@ public class T_Tags
     public void prepare()
         throws Exception
     {
-        op = OpType.valueOf( getConfig( "type" ) );
+        op = OpType.valueOf( getConfig( "type" ,
+                                        false ) );
 
-        final String tagsFilter = getConfig( "tags" );
-        if ( tagsFilter == null || tagsFilter.isEmpty() )
-        {
-            throw new IllegalArgumentException( "tags parameter should be specified" );
-        }
-
-        tags = tagsFilter.split( "," );
+        tags = getConfig( "tags" ,
+                          false ).split( "," );
     }
 
     @SuppressWarnings( "unchecked" )

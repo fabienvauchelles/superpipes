@@ -58,21 +58,27 @@ public class N_FB
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        final String pageName = getConfig( "pagename" );
+        final String pageName = getConfig( "pagename" ,
+                                           true );
         if ( pageName == null )
         {
-            client.login( getConfig( "key" ) ,
-                          getConfig( "secret" ) ,
+            client.login( getConfig( "key" ,
+                                     false ) ,
+                          getConfig( "secret" ,
+                                     false ) ,
                           tokenPath ,
                           getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
 
-            forcedTarget = getConfig( "userid" );
+            forcedTarget = getConfig( "userid" ,
+                                      true );
         }
         else
         {
             client.loginAsPage( pageName ,
-                                getConfig( "key" ) ,
-                                getConfig( "secret" ) ,
+                                getConfig( "key" ,
+                                           false ) ,
+                                getConfig( "secret" ,
+                                           false ) ,
                                 tokenPath ,
                                 getDispatcher().getVCodeFactory().
                 create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
@@ -88,7 +94,8 @@ public class N_FB
             LOGGER.trace( "[" + getNodeID() + "] read feed " );
         }
 
-        final int max = Integer.parseInt( getConfig( "max" ) );
+        final int max = Integer.parseInt( getConfig( "max" ,
+                                                     false ) );
 
         int count = 0;
         final Iterator<FB_Post> it = client.iteratorFeed( forcedTarget ,

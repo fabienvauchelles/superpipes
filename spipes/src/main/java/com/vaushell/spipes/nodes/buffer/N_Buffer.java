@@ -77,7 +77,8 @@ public class N_Buffer
             }
         }
 
-        final String flowLimitStr = getConfig( "flow-limit" );
+        final String flowLimitStr = getConfig( "flow-limit" ,
+                                               true );
         if ( flowLimitStr == null )
         {
             flowLimit = null;
@@ -92,8 +93,10 @@ public class N_Buffer
             }
         }
 
-        final String waitMinStr = getConfig( "wait-min" );
-        final String waitMaxStr = getConfig( "wait-max" );
+        final String waitMinStr = getConfig( "wait-min" ,
+                                             true );
+        final String waitMaxStr = getConfig( "wait-max" ,
+                                             true );
         if ( waitMinStr == null || waitMaxStr == null )
         {
             waitMin = null;

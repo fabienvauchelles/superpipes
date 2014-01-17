@@ -63,7 +63,8 @@ public class T_CheckURI
         super.load( cNode );
 
         // Load timeout if exists.
-        final String timeoutStr = getConfig( "timeout" );
+        final String timeoutStr = getConfig( "timeout" ,
+                                             true );
         if ( timeoutStr != null )
         {
             try
@@ -78,7 +79,8 @@ public class T_CheckURI
         }
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" );
+        final String retryStr = getConfig( "retry" ,
+                                           true );
         if ( retryStr != null )
         {
             try
@@ -93,7 +95,8 @@ public class T_CheckURI
         }
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
+                                                       true );
         if ( delayBetweenRetryStr != null )
         {
             try

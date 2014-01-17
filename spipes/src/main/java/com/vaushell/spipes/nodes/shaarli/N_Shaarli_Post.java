@@ -71,7 +71,8 @@ public class N_Shaarli_Post
         }
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" );
+        final String retryStr = getConfig( "retry" ,
+                                           true );
         if ( retryStr != null )
         {
             try
@@ -86,7 +87,8 @@ public class N_Shaarli_Post
         }
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" );
+        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
+                                                       true );
         if ( delayBetweenRetryStr != null )
         {
             try
@@ -107,7 +109,8 @@ public class N_Shaarli_Post
         throws Exception
     {
         this.client = new ShaarliClient( templates ,
-                                         getConfig( "url" ) );
+                                         getConfig( "url" ,
+                                                    false ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -132,8 +135,10 @@ public class N_Shaarli_Post
 
         // Send to Shaarli
         // Log in
-        if ( !client.login( getConfig( "login" ) ,
-                            getConfig( "password" ) ) )
+        if ( !client.login( getConfig( "login" ,
+                                       false ) ,
+                            getConfig( "password" ,
+                                       false ) ) )
         {
             throw new IllegalArgumentException( "Login error" );
         }
