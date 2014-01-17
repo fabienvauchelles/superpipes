@@ -25,6 +25,8 @@ import com.vaushell.spipes.tools.scribe.code.VC_FileFactory;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
@@ -193,6 +195,104 @@ public class TwitterClientTest
         // Delete
         assertTrue( "Delete should work" ,
                     client.deleteTweet( ID ) );
+    }
+
+    /**
+     * Test readTimeline.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testReadTimeline()
+        throws Exception
+    {
+        // Tweet 1
+        final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
+        final long ID1 = client.tweet( message1 );
+
+        assertTrue( "ID1 should be return" ,
+                    ID1 >= 0 );
+
+        // Tweet 2
+        final String message2 = "Allez voir mon blog n°2" + new DateTime().getMillis();
+        final long ID2 = client.tweet( message2 );
+
+        assertTrue( "ID2 should be return" ,
+                    ID2 >= 0 );
+
+        // Tweet 3
+        final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
+        final long ID3 = client.tweet( message3 );
+
+        assertTrue( "ID3 should be return" ,
+                    ID3 >= 0 );
+
+        // Retrieve Tweet
+        final List<TW_Tweet> tweets = client.readTimeline( null ,
+                                                           3 );
+        assertEquals( "We should have 3 tweets" ,
+                      3 ,
+                      tweets.size() );
+
+        // Check Tweet 3
+        final TW_Tweet tweet3 = tweets.get( 0 );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      tweet3.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message3 ,
+                      tweet3.getMessage() );
+
+        // Check Tweet 2
+        final TW_Tweet tweet2 = tweets.get( 1 );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      tweet2.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message2 ,
+                      tweet2.getMessage() );
+
+        // Check Tweet 1
+        final TW_Tweet tweet1 = tweets.get( 2 );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      tweet1.getID() );
+        assertEquals( "Messages should be the same" ,
+                      message1 ,
+                      tweet1.getMessage() );
+
+        // Check iterator
+        final Iterator<TW_Tweet> it = client.iteratorTimeline( null ,
+                                                               1 );
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID3 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID2 ,
+                      it.next().getID() );
+
+        assertTrue( "We should have result" ,
+                    it.hasNext() );
+        assertEquals( "IDs should be the same" ,
+                      ID1 ,
+                      it.next().getID() );
+
+        // Delete Tweet 3
+        assertTrue( "Delete should work" ,
+                    client.deleteTweet( ID3 ) );
+
+        // Delete Tweet 2
+        assertTrue( "Delete should work" ,
+                    client.deleteTweet( ID2 ) );
+
+        // Delete Tweet 1
+        assertTrue( "Delete should work" ,
+                    client.deleteTweet( ID1 ) );
     }
 
     // PRIVATE

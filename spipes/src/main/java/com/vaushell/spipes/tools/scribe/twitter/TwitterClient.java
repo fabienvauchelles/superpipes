@@ -29,6 +29,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -253,32 +258,7 @@ public class TwitterClient
         checkErrors( response ,
                      node );
 
-        // Replace shorten URLs with expanded URLs
-        String text = node.get( "text" ).asText();
-
-        final JsonNode nodeEntities = node.get( "entities" );
-        if ( nodeEntities != null )
-        {
-            final JsonNode nodeUrls = nodeEntities.get( "urls" );
-            if ( nodeUrls != null )
-            {
-                for ( final JsonNode nodeUrl : nodeUrls )
-                {
-                    text = text.replace( nodeUrl.get( "url" ).asText() ,
-                                         nodeUrl.get( "expanded_url" ).asText() );
-                }
-            }
-        }
-
-        final JsonNode nodeUser = node.get( "user" );
-
-        return new TW_Tweet( node.get( "id" ).asLong() ,
-                             text ,
-                             new TW_User( nodeUser.get( "id" ).asLong() ,
-                                          nodeUser.get( "name" ).asText() ,
-                                          nodeUser.get( "screen_name" ).asText() ) ,
-                             fmt.parseDateTime( node.get( "created_at" ).asText() )
-        );
+        return convertJsonToTweet( node );
     }
 
     /**
@@ -324,6 +304,144 @@ public class TwitterClient
             return ID == nodeID.asLong();
         }
     }
+
+    /**
+     * Read a Twitter timeline.
+     *
+     * @param forcedTarget Target's ID. Could be null to use login target.
+     * @param count Max tweet. Could be null to use default.
+     * @return a list of tweets
+     * @throws IOException
+     * @throws OAuthException
+     */
+    public List<TW_Tweet> readTimeline( final Long forcedTarget ,
+                                        final Integer count )
+        throws IOException , OAuthException
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] readTimeline() : forcedTarget=" + forcedTarget + " / count=" + count );
+        }
+
+        final String url;
+        final Properties properties = new Properties();
+        if ( forcedTarget == null )
+        {
+            url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+        }
+        else
+        {
+            url = "https://api.twitter.com/1.1/statuses/user_timeline.json";
+            properties.setProperty( "user_id" ,
+                                    Long.toString( forcedTarget ) );
+        }
+        if ( count != null )
+        {
+            properties.setProperty( "count" ,
+                                    Integer.toString( count ) );
+        }
+
+        return readTimelineImpl( url ,
+                                 properties );
+    }
+
+    /**
+     * Iterate a Twitter timeline.
+     *
+     * @param forcedTarget Target's ID. Could be null to use login target.
+     * @param count Max tweet by call. Could be null to use default.
+     * @return a tweets iterator
+     */
+    public Iterator<TW_Tweet> iteratorTimeline( final Long forcedTarget ,
+                                                final Integer count )
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] iteratorTimeline() : forcedTarget=" + forcedTarget + " / count=" + count );
+        }
+
+        return new Iterator<TW_Tweet>()
+        {
+            @Override
+            public boolean hasNext()
+            {
+                try
+                {
+                    if ( bufferCursor < buffer.size() )
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        buffer.clear();
+                        bufferCursor = 0;
+
+                        final String url;
+                        final Properties properties = new Properties();
+                        if ( forcedTarget == null )
+                        {
+                            url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+                        }
+                        else
+                        {
+                            url = "https://api.twitter.com/1.1/statuses/user_timeline.json";
+                            properties.setProperty( "user_id" ,
+                                                    Long.toString( forcedTarget ) );
+                        }
+                        if ( count != null )
+                        {
+                            properties.setProperty( "count" ,
+                                                    Integer.toString( count ) );
+                        }
+                        if ( maxID != null )
+                        {
+                            properties.setProperty( "max_id" ,
+                                                    Long.toString( maxID - 1L ) );
+                        }
+
+                        final List<TW_Tweet> tweets = readTimelineImpl( url ,
+                                                                        properties );
+                        if ( tweets.isEmpty() )
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            maxID = tweets.get( tweets.size() - 1 ).getID();
+
+                            buffer.addAll( tweets );
+
+                            return true;
+                        }
+                    }
+                }
+                catch( final OAuthException |
+                             IOException ex )
+                {
+                    throw new RuntimeException( ex );
+                }
+            }
+
+            @Override
+            public TW_Tweet next()
+            {
+                return buffer.get( bufferCursor++ );
+            }
+
+            @Override
+            public void remove()
+            {
+                throw new UnsupportedOperationException();
+            }
+
+            // PRIVATE
+            private final List<TW_Tweet> buffer = new ArrayList<>();
+            private int bufferCursor;
+            private Long maxID;
+        };
+    }
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( TwitterClient.class );
     private final DateTimeFormatter fmt;
@@ -341,5 +459,69 @@ public class TwitterClient
                                       first.get( "code" ).asInt() ,
                                       first.get( "message" ).asText() );
         }
+    }
+
+    private List<TW_Tweet> readTimelineImpl( final String url ,
+                                             final Properties properties )
+        throws IOException , OAuthException
+    {
+        if ( url == null || properties == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       url );
+        for ( final Entry<Object , Object> entry : properties.entrySet() )
+        {
+            request.addQuerystringParameter( (String) entry.getKey() ,
+                                             (String) entry.getValue() );
+        }
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode nodes = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     nodes );
+
+        final List<TW_Tweet> tweets = new ArrayList<>();
+        for ( final JsonNode node : nodes )
+        {
+            tweets.add( convertJsonToTweet( node ) );
+        }
+
+        return tweets;
+    }
+
+    private TW_Tweet convertJsonToTweet( final JsonNode node )
+    {
+        // Replace shorten URLs with expanded URLs
+        String text = node.get( "text" ).asText();
+
+        final JsonNode nodeEntities = node.get( "entities" );
+        if ( nodeEntities != null )
+        {
+            final JsonNode nodeUrls = nodeEntities.get( "urls" );
+            if ( nodeUrls != null )
+            {
+                for ( final JsonNode nodeUrl : nodeUrls )
+                {
+                    text = text.replace( nodeUrl.get( "url" ).asText() ,
+                                         nodeUrl.get( "expanded_url" ).asText() );
+                }
+            }
+        }
+
+        final JsonNode nodeUser = node.get( "user" );
+
+        return new TW_Tweet( node.get( "id" ).asLong() ,
+                             text ,
+                             new TW_User( nodeUser.get( "id" ).asLong() ,
+                                          nodeUser.get( "name" ).asText() ,
+                                          nodeUser.get( "screen_name" ).asText() ) ,
+                             fmt.parseDateTime( node.get( "created_at" ).asText() )
+        );
     }
 }
