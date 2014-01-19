@@ -172,8 +172,7 @@ public class N_TW_Delete
                 }
             }
         }
-        catch( final IOException |
-                     OAuthException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

@@ -241,8 +241,7 @@ public class N_FB_Post
                 return ID;
             }
         }
-        catch( final FacebookException |
-                     IOException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

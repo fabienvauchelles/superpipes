@@ -188,8 +188,7 @@ public class N_FB_Delete
                 }
             }
         }
-        catch( final FacebookException |
-                     IOException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

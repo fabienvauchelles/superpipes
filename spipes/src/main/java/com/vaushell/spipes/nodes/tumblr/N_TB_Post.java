@@ -207,8 +207,7 @@ public class N_TB_Post
                 }
             }
         }
-        catch( final IOException |
-                     TumblrException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

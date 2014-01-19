@@ -190,8 +190,7 @@ public class N_LNK_Post
                 return ID;
             }
         }
-        catch( final IOException |
-                     OAuthException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

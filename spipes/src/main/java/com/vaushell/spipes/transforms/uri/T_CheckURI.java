@@ -198,7 +198,7 @@ public class T_CheckURI
                 }
             }
         }
-        catch( final IOException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

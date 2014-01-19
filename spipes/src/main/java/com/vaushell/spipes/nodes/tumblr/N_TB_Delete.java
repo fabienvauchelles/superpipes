@@ -179,8 +179,7 @@ public class N_TB_Delete
                 }
             }
         }
-        catch( final IOException |
-                     TumblrException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {

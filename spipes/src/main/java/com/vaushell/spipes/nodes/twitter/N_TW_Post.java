@@ -308,8 +308,7 @@ public class N_TW_Post
                 }
             }
         }
-        catch( final IOException |
-                     OAuthException ex )
+        catch( final Throwable ex )
         {
             if ( remainingRetry <= 0 )
             {
