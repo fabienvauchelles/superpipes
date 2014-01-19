@@ -125,10 +125,10 @@ public class N_TW_Post
         {
             final byte[] picture = (byte[]) getMessage().getProperty( Message.KeyIndex.PICTURE );
 
-            ID = tweetPicture( createContent( getMessage() ,
-                                              TwitterClient.TWEET_IMAGE_SIZE ) ,
-                               picture ,
-                               retry - 1 );
+            ID = tweetPictureFailsafe( createContent( getMessage() ,
+                                                      TwitterClient.TWEET_IMAGE_SIZE ) ,
+                                       picture ,
+                                       retry );
         }
         else
         {
@@ -331,5 +331,44 @@ public class N_TW_Post
         return tweetPicture( message ,
                              picture ,
                              remainingRetry - 1 );
+    }
+
+    private long tweetPictureFailsafe( final String message ,
+                                       final byte[] picture ,
+                                       final int remainingRetry )
+        throws IOException , OAuthException
+    {
+        try
+        {
+            final long ID = tweetPicture( message ,
+                                          picture ,
+                                          remainingRetry );
+            if ( ID >= 0 )
+            {
+                return ID;
+            }
+        }
+        catch( final Throwable ex )
+        {
+            // Ignore but log error
+            LOGGER.error( "Cannot send picture+tweet. Send only tweet" ,
+                          ex );
+        }
+
+        // Cannot send tweet+picture. Send only tweet.
+        if ( delayBetweenRetry.getMillis() > 0L )
+        {
+            try
+            {
+                Thread.sleep( delayBetweenRetry.getMillis() );
+            }
+            catch( final InterruptedException ex )
+            {
+                // Ignore
+            }
+        }
+
+        return tweet( message ,
+                      remainingRetry );
     }
 }
