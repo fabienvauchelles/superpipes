@@ -21,6 +21,7 @@ package com.vaushell.spipes.dispatch;
 
 import java.io.Serializable;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -135,6 +136,35 @@ public class Tags
     public String[] toArray()
     {
         return mtags.toArray( new String[ mtags.size() ] );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return 185 + Objects.hashCode( this.mtags );
+    }
+
+    @Override
+    public boolean equals( final Object obj )
+    {
+        if ( obj == null )
+        {
+            return false;
+        }
+
+        if ( getClass() != obj.getClass() )
+        {
+            return false;
+        }
+
+        final Tags other = (Tags) obj;
+        if ( !Objects.equals( this.mtags ,
+                              other.mtags ) )
+        {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
