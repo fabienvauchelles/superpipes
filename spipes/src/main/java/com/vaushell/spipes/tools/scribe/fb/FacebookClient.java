@@ -755,6 +755,7 @@ public class FacebookClient
                             count == 2 );
     }
 
+    @SuppressWarnings( "PMD.UselessParentheses" )
     private List<FB_Post> filter( final List<FB_Post> posts ,
                                   final String fromID )
     {
@@ -767,16 +768,12 @@ public class FacebookClient
 
         for ( final FB_Post post : posts )
         {
-            if ( post.getFrom() != null && fromID.equals( post.getFrom().getID() ) )
+            if ( post.getFrom() != null && fromID.equals( post.getFrom().getID() )
+                 && post.isUsable()
+                 && ( ( post.getMessage() != null && !post.getMessage().isEmpty() )
+                      || ( post.getURL() != null && !post.getURL().isEmpty() ) ) )
             {
-                if ( post.isUsable() )
-                {
-                    if ( ( post.getMessage() != null && !post.getMessage().isEmpty() )
-                         || ( post.getURL() != null && !post.getURL().isEmpty() ) )
-                    {
-                        filtered.add( post );
-                    }
-                }
+                filtered.add( post );
             }
         }
 
