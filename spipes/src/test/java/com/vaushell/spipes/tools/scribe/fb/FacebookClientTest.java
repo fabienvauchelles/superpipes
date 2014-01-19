@@ -161,6 +161,8 @@ public class FacebookClientTest
         assertTrue( "Post should have been created less than 1 minute" ,
                     new Duration( post.getCreatedTime() ,
                                   null ).getMillis() < 60000L );
+        assertTrue( "Post is usable" ,
+                    post.isUsable() );
 
         // Like/Unlike
         assertTrue( "Like should work" ,
@@ -207,6 +209,8 @@ public class FacebookClientTest
         assertTrue( "Post should have been created less than 1 minute" ,
                     new Duration( post.getCreatedTime() ,
                                   null ).getMillis() < 60000L );
+        assertTrue( "Post is usable" ,
+                    post.isUsable() );
 
         // Delete
         assertTrue( "Delete should work" ,

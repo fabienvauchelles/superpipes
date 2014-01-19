@@ -61,6 +61,7 @@ public class FacebookClient
         this.fmtPSTwrite = DateTimeFormat.forPattern( "yyyy-MM-dd'T'HH:mm:ss-0800" );
 
         this.target = null;
+        this.page = false;
     }
 
     /**
@@ -72,12 +73,13 @@ public class FacebookClient
      * @param vCode How to get the verification code
      * @throws IOException
      * @throws InterruptedException
+     * @throws com.vaushell.spipes.tools.scribe.fb.FacebookException
      */
     public void login( final String key ,
                        final String secret ,
                        final Path tokenPath ,
                        final A_ValidatorCode vCode )
-        throws IOException , InterruptedException
+        throws IOException , InterruptedException , FacebookException
     {
         loginImpl( FacebookApi.class ,
                    key ,
@@ -88,7 +90,8 @@ public class FacebookClient
                    tokenPath ,
                    vCode );
 
-        target = "me";
+        target = getMeID();
+        page = false;
     }
 
     /**
@@ -119,7 +122,8 @@ public class FacebookClient
                    tokenPath ,
                    vCode );
 
-        updateTarget( pageName );
+        target = getPageIDandChangeToken( pageName );
+        page = true;
     }
 
     /**
@@ -153,28 +157,31 @@ public class FacebookClient
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
                                                        "https://graph.facebook.com/" + realTarget + "/feed" );
 
-        if ( "me".equals( realTarget ) )
+        if ( forcedTarget == null )
         {
-            // Me only
-            request.addBodyParameter( "privacy" ,
-                                      "{'value':'EVERYONE'}" );
-        }
-        else
-        {
-            if ( date != null )
+            if ( page )
             {
-                final DateTime now = new DateTime();
+                if ( date != null )
+                {
+                    final DateTime now = new DateTime();
 
-                if ( date.isBefore( now ) )
-                {
-                    request.addBodyParameter( "backdated_time" ,
-                                              fmtPSTwrite.print( date ) );
+                    if ( date.isBefore( now ) )
+                    {
+                        request.addBodyParameter( "backdated_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
+                    else if ( date.isAfter( now ) )
+                    {
+                        request.addBodyParameter( "scheduled_publish_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
                 }
-                else if ( date.isAfter( now ) )
-                {
-                    request.addBodyParameter( "scheduled_publish_time" ,
-                                              fmtPSTwrite.print( date ) );
-                }
+            }
+            else
+            {
+                // Me only
+                request.addBodyParameter( "privacy" ,
+                                          "{'value':'EVERYONE'}" );
             }
         }
 
@@ -231,27 +238,31 @@ public class FacebookClient
         final OAuthRequest request = new OAuthRequest( Verb.POST ,
                                                        "https://graph.facebook.com/" + realTarget + "/feed" );
 
-        if ( "me".equals( realTarget ) )
+        if ( forcedTarget == null )
         {
-            request.addBodyParameter( "privacy" ,
-                                      "{'value':'EVERYONE'}" );
-        }
-        else
-        {
-            if ( date != null )
+            if ( page )
             {
-                final DateTime now = new DateTime();
+                if ( date != null )
+                {
+                    final DateTime now = new DateTime();
 
-                if ( date.isBefore( now ) )
-                {
-                    request.addBodyParameter( "backdated_time" ,
-                                              fmtPSTwrite.print( date ) );
+                    if ( date.isBefore( now ) )
+                    {
+                        request.addBodyParameter( "backdated_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
+                    else if ( date.isAfter( now ) )
+                    {
+                        request.addBodyParameter( "scheduled_publish_time" ,
+                                                  fmtPSTwrite.print( date ) );
+                    }
                 }
-                else if ( date.isAfter( now ) )
-                {
-                    request.addBodyParameter( "scheduled_publish_time" ,
-                                              fmtPSTwrite.print( date ) );
-                }
+            }
+            else
+            {
+                // Me only
+                request.addBodyParameter( "privacy" ,
+                                          "{'value':'EVERYONE'}" );
             }
         }
 
@@ -355,8 +366,11 @@ public class FacebookClient
                                     Integer.toString( limit ) );
         }
 
-        return readFeedImpl( "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget ) + "/feed" ,
-                             properties );
+        final String realTarget = forcedTarget == null ? target : forcedTarget;
+        return filter( readFeedImpl(
+            "https://graph.facebook.com/" + realTarget + "/feed" ,
+            properties ) ,
+                       realTarget );
     }
 
     /**
@@ -391,33 +405,40 @@ public class FacebookClient
                         buffer.clear();
                         bufferCursor = 0;
 
-                        final Properties properties = new Properties();
-                        if ( limit != null )
+                        List<FB_Post> linksFiltered;
+                        do
                         {
-                            properties.setProperty( "limit" ,
-                                                    Integer.toString( limit ) );
-                        }
-                        if ( lastTimestamp != null )
-                        {
-                            properties.setProperty( "until" ,
-                                                    Long.toString( lastTimestamp.getMillis() / 1000L - 1L ) );
-                        }
+                            final Properties properties = new Properties();
+                            if ( limit != null )
+                            {
+                                properties.setProperty( "limit" ,
+                                                        Integer.toString( limit ) );
+                            }
+                            if ( lastTimestamp != null )
+                            {
+                                properties.setProperty( "until" ,
+                                                        Long.toString( lastTimestamp.getMillis() / 1000L - 1L ) );
+                            }
 
-                        final List<FB_Post> links = readFeedImpl(
-                            "https://graph.facebook.com/" + ( forcedTarget == null ? target : forcedTarget ) + "/feed" ,
-                            properties );
-                        if ( links.isEmpty() )
-                        {
-                            return false;
-                        }
-                        else
-                        {
+                            final String realTarget = forcedTarget == null ? target : forcedTarget;
+                            final List<FB_Post> links = readFeedImpl(
+                                "https://graph.facebook.com/" + realTarget + "/feed" ,
+                                properties );
+                            if ( links.isEmpty() )
+                            {
+                                return false;
+                            }
+
                             lastTimestamp = links.get( links.size() - 1 ).getCreatedTime();
 
-                            buffer.addAll( links );
-
-                            return true;
+                            linksFiltered = filter( links ,
+                                                    realTarget );
                         }
+                        while ( linksFiltered.isEmpty() );
+
+                        buffer.addAll( linksFiltered );
+
+                        return true;
                     }
                 }
                 catch( final FacebookException |
@@ -582,6 +603,7 @@ public class FacebookClient
     private final DateTimeFormatter fmtPSTread;
     private final DateTimeFormatter fmtPSTwrite;
     private String target;
+    private boolean page;
 
     private void checkErrors( final Response response ,
                               final JsonNode root )
@@ -597,7 +619,7 @@ public class FacebookClient
         }
     }
 
-    private void updateTarget( final String pageName )
+    private String getPageIDandChangeToken( final String pageName )
         throws IOException , FacebookException
     {
         if ( pageName == null )
@@ -608,7 +630,7 @@ public class FacebookClient
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] updateTarget() : pageName=" + pageName );
+                "[" + getClass().getSimpleName() + "] getPageIDandChangeToken() : pageName=" + pageName );
         }
 
         final OAuthRequest request = new OAuthRequest( Verb.GET ,
@@ -630,17 +652,38 @@ public class FacebookClient
                 final String name = data.get( "name" ).asText();
                 if ( pageName.equalsIgnoreCase( name ) )
                 {
-                    target = data.get( "id" ).asText();
-
                     changeAccessToken( new Token( data.get( "access_token" ).asText() ,
                                                   "" ) );
 
-                    return;
+                    return data.get( "id" ).asText();
                 }
             }
         }
 
         throw new IllegalArgumentException( "Page '" + pageName + "' is not accessible" );
+    }
+
+    private String getMeID()
+        throws IOException , FacebookException
+    {
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] getMeID()" );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.GET ,
+                                                       "https://graph.facebook.com/me" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.get( "id" ).asText();
     }
 
     private List<FB_Post> readFeedImpl( final String url ,
@@ -686,6 +729,20 @@ public class FacebookClient
     {
         final JsonNode nodeFrom = node.get( "from" );
 
+        int count = 0;
+        final JsonNode nodeActions = node.get( "actions" );
+        if ( nodeActions != null && nodeActions.size() >= 2 )
+        {
+            for ( final JsonNode nodeAction : nodeActions )
+            {
+                final String name = nodeAction.get( "name" ).asText();
+                if ( "Comment".equalsIgnoreCase( name ) || "Like".equalsIgnoreCase( name ) )
+                {
+                    ++count;
+                }
+            }
+        }
+
         return new FB_Post( node.get( "id" ).asText() ,
                             convertNodeToString( node.get( "message" ) ) ,
                             convertNodeToString( node.get( "link" ) ) ,
@@ -694,6 +751,35 @@ public class FacebookClient
                             convertNodeToString( node.get( "description" ) ) ,
                             new FB_User( nodeFrom.get( "id" ).asText() ,
                                          nodeFrom.get( "name" ).asText() ) ,
-                            fmtPSTread.parseDateTime( node.get( "created_time" ).asText() ) );
+                            fmtPSTread.parseDateTime( node.get( "created_time" ).asText() ) ,
+                            count == 2 );
+    }
+
+    private List<FB_Post> filter( final List<FB_Post> posts ,
+                                  final String fromID )
+    {
+        if ( posts == null || fromID == null )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        final List<FB_Post> filtered = new ArrayList<>();
+
+        for ( final FB_Post post : posts )
+        {
+            if ( post.getFrom() != null && fromID.equals( post.getFrom().getID() ) )
+            {
+                if ( post.isUsable() )
+                {
+                    if ( ( post.getMessage() != null && !post.getMessage().isEmpty() )
+                         || ( post.getURL() != null && !post.getURL().isEmpty() ) )
+                    {
+                        filtered.add( post );
+                    }
+                }
+            }
+        }
+
+        return filtered;
     }
 }

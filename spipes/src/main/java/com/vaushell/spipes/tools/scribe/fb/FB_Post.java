@@ -37,7 +37,8 @@ public class FB_Post
                     final String urlCaption ,
                     final String urlDescription ,
                     final FB_User from ,
-                    final DateTime createdTime )
+                    final DateTime createdTime ,
+                    final boolean usable )
     {
         this.ID = ID;
         this.message = message;
@@ -47,6 +48,7 @@ public class FB_Post
         this.urlDescription = urlDescription;
         this.from = from;
         this.createdTime = createdTime;
+        this.usable = usable;
     }
 
     public String getID()
@@ -129,19 +131,30 @@ public class FB_Post
         this.createdTime = createdTime;
     }
 
+    public boolean isUsable()
+    {
+        return usable;
+    }
+
+    public void setUsable( final boolean usable )
+    {
+        this.usable = usable;
+    }
+
     @Override
     public int hashCode()
     {
         int hash = 3;
 
-        hash = 67 * hash + Objects.hashCode( this.ID );
-        hash = 67 * hash + Objects.hashCode( this.message );
-        hash = 67 * hash + Objects.hashCode( this.url );
-        hash = 67 * hash + Objects.hashCode( this.urlName );
-        hash = 67 * hash + Objects.hashCode( this.urlCaption );
-        hash = 67 * hash + Objects.hashCode( this.urlDescription );
-        hash = 67 * hash + Objects.hashCode( this.from );
-        hash = 67 * hash + Objects.hashCode( this.createdTime );
+        hash = 59 * hash + Objects.hashCode( this.ID );
+        hash = 59 * hash + Objects.hashCode( this.message );
+        hash = 59 * hash + Objects.hashCode( this.url );
+        hash = 59 * hash + Objects.hashCode( this.urlName );
+        hash = 59 * hash + Objects.hashCode( this.urlCaption );
+        hash = 59 * hash + Objects.hashCode( this.urlDescription );
+        hash = 59 * hash + Objects.hashCode( this.from );
+        hash = 59 * hash + Objects.hashCode( this.createdTime );
+        hash = 59 * hash + ( this.usable ? 1 : 0 );
 
         return hash;
     }
@@ -207,13 +220,18 @@ public class FB_Post
             return false;
         }
 
+        if ( this.usable != other.usable )
+        {
+            return false;
+        }
+
         return true;
     }
 
     @Override
     public String toString()
     {
-        return "FB_Post{" + "ID=" + ID + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlCaption=" + urlCaption + ", urlDescription=" + urlDescription + ", from=" + from + ", createdTime=" + createdTime + '}';
+        return "FB_Post{" + "ID=" + ID + ", message=" + message + ", url=" + url + ", urlName=" + urlName + ", urlCaption=" + urlCaption + ", urlDescription=" + urlDescription + ", from=" + from + ", createdTime=" + createdTime + ", usable=" + usable + '}';
     }
 
     // PRIVATE
@@ -225,4 +243,5 @@ public class FB_Post
     private String urlDescription;
     private FB_User from;
     private DateTime createdTime;
+    private boolean usable;
 }

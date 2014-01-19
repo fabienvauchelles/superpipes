@@ -172,6 +172,9 @@ public class FacebookClientPageTest
 //        assertEquals( "Create date should be the same" ,
 //                      dt.getMillis() ,
 //                      post.getCreatedTime().getMillis() );
+        assertTrue( "Post is usable" ,
+                    post.isUsable() );
+
         // Like/Unlike
         assertTrue( "Like should work" ,
                     client.likePost( ID ) );
@@ -222,6 +225,9 @@ public class FacebookClientPageTest
 //        assertEquals( "Create date should be the same" ,
 //                      dt.getMillis() ,
 //                      post.getCreatedTime().getMillis() );
+        assertTrue( "Post is usable" ,
+                    post.isUsable() );
+
         // Delete
         assertTrue( "Delete should work" ,
                     client.deletePost( ID ) );
