@@ -48,10 +48,17 @@ public final class FacebookException
     }
 
     @Override
+    public String getMessage()
+    {
+        return super.getMessage() + ", type=" + getType();
+    }
+
+    @Override
     public String toString()
     {
         return "FacebookException{" + super.toString() + ", type=" + type + '}';
     }
+
     // PRIVATE
     private final String type;
 }

@@ -63,6 +63,12 @@ public final class TumblrException
     {
         return super.getMessage() + " / errors=" + errors;
     }
+
+    @Override
+    public String toString()
+    {
+        return "TumblrException{" + super.toString() + ", errors=" + errors + '}';
+    }
     // PRIVATE
     private final List<String> errors;
 }

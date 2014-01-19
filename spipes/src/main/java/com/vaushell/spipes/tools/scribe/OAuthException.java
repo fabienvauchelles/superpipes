@@ -49,6 +49,12 @@ public class OAuthException
     }
 
     @Override
+    public String getMessage()
+    {
+        return super.getMessage() + ", apiCode=" + getApiCode() + ", httpCode=" + getHttpCode();
+    }
+
+    @Override
     public String toString()
     {
         return "A_OAuthException{" + super.toString() + ", apiCode=" + apiCode + ", httpCode=" + httpCode + '}';

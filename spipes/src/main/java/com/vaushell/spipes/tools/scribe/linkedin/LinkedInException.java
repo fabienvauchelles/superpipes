@@ -48,6 +48,12 @@ public final class LinkedInException
     }
 
     @Override
+    public String getMessage()
+    {
+        return super.getMessage() + ", status=" + getStatus();
+    }
+
+    @Override
     public String toString()
     {
         return "FacebookException{" + super.toString() + ", status=" + status + '}';
