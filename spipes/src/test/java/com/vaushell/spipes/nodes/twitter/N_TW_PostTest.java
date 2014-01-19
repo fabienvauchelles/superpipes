@@ -64,13 +64,13 @@ public class N_TW_PostTest
         String conf = System.getProperty( "conf" );
         if ( conf == null )
         {
-            conf = "conf-local/twitter/configuration.xml";
+            conf = "conf-local/test/configuration.xml";
         }
 
         String datas = System.getProperty( "datas" );
         if ( datas == null )
         {
-            datas = "conf-local/twitter/datas";
+            datas = "conf-local/test/datas";
         }
 
         final XMLConfiguration config = new XMLConfiguration( conf );

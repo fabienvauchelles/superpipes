@@ -62,13 +62,13 @@ public class TumblrClientTest
         String conf = System.getProperty( "conf" );
         if ( conf == null )
         {
-            conf = "conf-local/configuration.xml";
+            conf = "conf-local/test/configuration.xml";
         }
 
         String datas = System.getProperty( "datas" );
         if ( datas == null )
         {
-            datas = "conf-local/datas";
+            datas = "conf-local/test/datas";
         }
 
         final XMLConfiguration config = new XMLConfiguration( conf );
