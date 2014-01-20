@@ -1,6 +1,6 @@
-# SPipes
+# SuperPipes
 
-SPipes rules flows between sources and destinations. It's like Yahoo Pipes, IFTTT, etc.
+SuperPipes rules flows between sources and destinations. It's like Yahoo Pipes, IFTTT, etc.
 
 Copyright (C) 2013 - Fabien VAUCHELLES - fabien AT vauchelles DOT com
 
