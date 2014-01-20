@@ -253,7 +253,7 @@ public class LinkedInClient
     /**
      * Read a LinkedIn Feed.
      *
-     * @@param forcedTarget Target's ID. Could be null to use login target.
+     * @param forcedTarget Target's ID. Could be null to use login target.
      * @param count Max status by call. Could be null to use default.
      * @return a list of status.
      * @throws IOException
