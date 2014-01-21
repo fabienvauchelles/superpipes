@@ -1,6 +1,6 @@
-SuperPipes rules flows between sources and destinations. It's like Yahoo Pipes, IFTTT, etc.
+SuperPipes distributes messages between actors according to rules.
 
-Copyright (C) 2013 - Fabien VAUCHELLES - fabien AT vauchelles DOT com
+Copyright (C) 2014 - Fabien VAUCHELLES - fabien AT vauchelles DOT com
 
 --------------------------------------------------------------------------------------
 
