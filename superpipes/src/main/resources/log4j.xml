@@ -34,7 +34,7 @@ page at http://checkstyle.sourceforge.net/config.html
     </appender>
 
     <logger name="com.vaushell">
-        <level value="info" />
+        <level value="debug" />
     </logger>
 
     <root>
