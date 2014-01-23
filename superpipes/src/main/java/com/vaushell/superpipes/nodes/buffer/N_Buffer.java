@@ -139,9 +139,9 @@ public class N_Buffer
         final Duration time2wait = getTimeToWait( now );
         if ( time2wait.getMillis() > 0L )
         {
-            if ( LOGGER.isTraceEnabled() )
+            if ( LOGGER.isDebugEnabled() )
             {
-                LOGGER.trace(
+                LOGGER.debug(
                     "[" + getNodeID() + "] time to wait : " + time2wait + ". During this time, we're trying to catch an incoming message." );
             }
 
@@ -159,9 +159,9 @@ public class N_Buffer
             setMessage( popMessage() );
             if ( getMessage() == null )
             {
-                if ( LOGGER.isTraceEnabled() )
+                if ( LOGGER.isDebugEnabled() )
                 {
-                    LOGGER.trace(
+                    LOGGER.debug(
                         "[" + getNodeID() + "] no time to wait and not message in buffer. We're waiting an incoming message" );
                 }
 
@@ -176,9 +176,9 @@ public class N_Buffer
             else
             {
                 // 3. We published
-                if ( LOGGER.isTraceEnabled() )
+                if ( LOGGER.isDebugEnabled() )
                 {
-                    LOGGER.trace(
+                    LOGGER.debug(
                         "[" + getNodeID() + "] no time to wait and we found a message in the buffer. We're sending it." );
                 }
 
