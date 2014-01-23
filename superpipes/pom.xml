@@ -35,7 +35,7 @@ page at http://checkstyle.sourceforge.net/config.html
 
     <groupId>com.vaushell</groupId>
     <artifactId>superpipes</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>superpipes</name>
@@ -75,7 +75,7 @@ page at http://checkstyle.sourceforge.net/config.html
         <connection>scm:git:${project.url}.git</connection>
         <developerConnection>scm:git:${project.url}.git</developerConnection>
         <url>${project.url}</url>
-        <tag>superpipes-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <build>
