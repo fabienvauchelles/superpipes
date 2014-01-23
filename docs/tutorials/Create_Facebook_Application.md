@@ -80,3 +80,5 @@ Get application key and secret
 
 
 __It's over !__
+
+Now, [how to link our Facebook application with SuperPipes ?](Link_Facebook_Application.md)

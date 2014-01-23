@@ -29,6 +29,8 @@ flow-limit | Wait for X millisecond before sending another message. I select the
 wait-min | Wait a random time (between `wait-min` and `wait-max` milliseconds) before processing another message. For example, I like a Facebook message in 5 minutes or in 4 hours! | integer | no | N/A | 300000
 wait-max | See wait-min. | integer | no | N/A | 14400000
 
+__Tips:__ to avoid side effects, `flow-limit` must not match to a time slot. It must be smaller or larger.
+
 
 ## Slot parameters
 

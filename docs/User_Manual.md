@@ -1,6 +1,6 @@
 ![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
-# Reference manual
+# User manual
 
 ## Table of Contents
 
@@ -680,6 +680,7 @@ I can add these transforms:
 
 __More examples to come!__
 
+
 ## How to go further ?
 
-See [Developer Manual](Developer_Manual.md)
+See [Developer Manual](Developer_Manual.md).

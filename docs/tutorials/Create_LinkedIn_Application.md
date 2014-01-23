@@ -62,3 +62,5 @@ Get application key and secret
 
 
 __It's over !__
+
+Now, [how to link our LinkedIn application with SuperPipes ?](Link_LinkedIn_Application.md)

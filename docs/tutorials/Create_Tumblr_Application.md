@@ -46,3 +46,5 @@ Get application key and secret
 
 
 __It's over !__
+
+Now, [how to link our Tumblr application with SuperPipes ?](Link_Tumblr_Application.md)

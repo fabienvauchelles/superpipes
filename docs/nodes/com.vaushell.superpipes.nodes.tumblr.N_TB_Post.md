@@ -12,7 +12,7 @@ This node posts a message to a Tumblr blog.
 
 To use the node, I create a Tumblr application and get my credentials (key and secret).
 
-See [How to create a Tumblr application and get credentials](../tutorials/Create_Tumblr_Application.md).
+See [How to create a Tumblr application and get credentials](../tutorials/Create_Tumblr_Application.md) and [How to link a Tumblr application with SuperPipes](../tutorials/Link_Tumblr_Application.md).
 
 
 ## Default parameters

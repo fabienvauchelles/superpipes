@@ -14,7 +14,7 @@ __Warning!__ LinkedIn API disallows to delete a status.
 
 To use the node, I create a LinkedIn application and get my credentials (key and secret).
 
-See [How to create a LinkedIn application and get credentials](../tutorials/Create_LinkedIn_Application.md).
+See [How to create a LinkedIn application and get credentials](../tutorials/Create_LinkedIn_Application.md) and [How to link a LinkedIn application with SuperPipes](../tutorials/Link_LinkedIn_Application.md).
 
 
 ## Default parameters

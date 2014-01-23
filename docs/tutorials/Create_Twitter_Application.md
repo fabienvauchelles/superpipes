@@ -75,3 +75,5 @@ Change access type to "Read and Write"
 
 
 __It's over !__
+
+Now, [how to link our Twitter application with SuperPipes ?](Link_Twitter_Application.md)

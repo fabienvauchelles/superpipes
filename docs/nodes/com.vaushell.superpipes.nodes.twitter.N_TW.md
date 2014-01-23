@@ -12,7 +12,7 @@ This node reads a Twitter wall.
 
 To use the node, I create a Twitter application and get my credentials (key and secret).
 
-See [How to create a Twitter application and get credentials](../tutorials/Create_Twitter_Application.md).
+See [How to create a Twitter application and get credentials](../tutorials/Create_Twitter_Application.md) and [How to link a Twitter application with SuperPipes](../tutorials/Link_Twitter_Application.md).
 
 
 ## Default parameters

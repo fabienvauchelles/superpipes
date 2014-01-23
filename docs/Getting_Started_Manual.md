@@ -10,7 +10,7 @@
 
 A JAVA JRE 7 is a requirement.
 
-I could find more info [here](http://...).
+I could find more info [here](https://help.ubuntu.com/community/Java).
 
 
 #### Step 2: Install JSVC
@@ -26,10 +26,10 @@ JSVC is used to daemonize SuperPipes (more info [here](http://commons.apache.org
 
 #### Step 3: Download and install the Debian package
 
-The latest package is available [here](http://...).
+The latest package is available [here](http://fabien.vauchelles.com/superpipes/1.0.0/superpipes_1.0.0_all.deb).
 
 ```sh
-$ wget http://...
+$ wget http://fabien.vauchelles.com/superpipes/1.0.0/superpipes_1.0.0_all.deb
 $ sudo dpkg -i superpipes_1.0.0_all.deb
 ```
 
@@ -71,7 +71,7 @@ For example, I could write:
 
 Superpipes reads the RSS feed and show all messages.
 
-More details could be found [here](http://...).
+More details could be found [here](User_Manual.md).
 
 
 #### Step 2: Control the flow
@@ -79,7 +79,7 @@ More details could be found [here](http://...).
 I start the flow with:
 
 ```sh
-$ cd /usr/local/superpipes
+$ sudo su - superpipes
 $ java -jar superpipes.jar
 ```
 
@@ -107,8 +107,9 @@ It's coming!
 
 SuperPipes is a JAR file. I can manually install it on each platform:)
 
-Just [download the dist file](http://...), unzip it, and run it.
+Just [download the dist file](http://fabien.vauchelles.com/superpipes/1.0.0/superpipes-1.0.0-dist.tar.gz), unzip it, and run it.
+
 
 ## How to go further ?
 
-See [User Manual](User_Manual.md)
+See [User Manual](User_Manual.md).

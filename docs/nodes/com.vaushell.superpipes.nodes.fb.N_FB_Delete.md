@@ -12,7 +12,7 @@ This node deletes a Facebook message.
 
 To use the node, I create a Facebook application and get my credentials (key and secret).
 
-See [How to create a Facebook application and get credentials](../tutorials/Create_Facebook_Application.md).
+See [How to create a Facebook application and get credentials](../tutorials/Create_Facebook_Application.md) and [How to link a Facebook application with SuperPipes](../tutorials/Link_Facebook_Application.md).
 
 
 ## Default parameters

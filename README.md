@@ -46,6 +46,7 @@ Look at the manuals :
 Or the tutorials :
 
 * How to create an application and get credentials [for Facebook](docs/tutorials/Create_Facebook_Application.md), [for Twitter](docs/tutorials/Create_Twitter_Application.md), [for LinkedIn](docs/tutorials/Create_LinkedIn_Application.md) or [Tumblr](docs/tutorials/Create_Tumblr_Application.md) ?
+* How to link an application with SuperPipes [for Facebook](docs/tutorials/Link_Facebook_Application.md), [for Twitter](docs/tutorials/Link_Twitter_Application.md), [for LinkedIn](docs/tutorials/Link_LinkedIn_Application.md) or [Tumblr](docs/tutorials/Link_Tumblr_Application.md) ?
 
 # What is the product license?
 
