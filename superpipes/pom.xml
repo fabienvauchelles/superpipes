@@ -23,8 +23,7 @@ what the following rules do, please see the checkstyle configuration
 page at http://checkstyle.sourceforge.net/config.html
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -36,7 +35,7 @@ page at http://checkstyle.sourceforge.net/config.html
 
     <groupId>com.vaushell</groupId>
     <artifactId>superpipes</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>superpipes</name>
@@ -76,7 +75,7 @@ page at http://checkstyle.sourceforge.net/config.html
         <connection>scm:git:${project.url}.git</connection>
         <developerConnection>scm:git:${project.url}.git</developerConnection>
         <url>${project.url}</url>
-        <tag>HEAD</tag>
+        <tag>superpipes-1.0.0</tag>
     </scm>
 
     <build>
