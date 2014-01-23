@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.configuration.HierarchicalConfiguration;
+import org.apache.commons.lang3.SerializationUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -482,7 +483,7 @@ public abstract class A_Node
             LOGGER.trace( "[" + getNodeID() + "] receiveMessage : message=" + Message.formatSimple( message ) );
         }
 
-        Message result = message;
+        Message result = SerializationUtils.clone( message );
         for ( final A_Transform transform : transformsIN )
         {
             result = transform.transform( result );
@@ -495,6 +496,10 @@ public abstract class A_Node
                 }
 
                 return;
+            }
+            else
+            {
+                result = SerializationUtils.clone( result );
             }
         }
 
@@ -585,6 +590,10 @@ public abstract class A_Node
                 }
 
                 return;
+            }
+            else
+            {
+                result = SerializationUtils.clone( result );
             }
         }
 
