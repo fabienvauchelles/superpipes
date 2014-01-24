@@ -144,9 +144,19 @@ public class N_TB_Post
             date = null;
         }
 
+        final String desc;
+        if ( getMessage().contains( Message.KeyIndex.CONTENT ) )
+        {
+            desc = (String) getMessage().getProperty( Message.KeyIndex.CONTENT );
+        }
+        else
+        {
+            desc = (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION );
+        }
+
         final long ID = postLink( uri == null ? null : uri.toString() ,
                                   (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
-                                  (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                  desc ,
                                   (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
                                   date ,
                                   retry );

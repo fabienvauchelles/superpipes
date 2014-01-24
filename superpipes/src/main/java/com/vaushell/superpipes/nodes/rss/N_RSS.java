@@ -20,7 +20,6 @@
 package com.vaushell.superpipes.nodes.rss;
 
 import com.sun.syndication.feed.synd.SyndCategory;
-import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.SyndFeedInput;
@@ -133,28 +132,14 @@ public class N_RSS
                                               new DateTime( entry.getPublishedDate() ) );
                 }
 
-                // Content
-                final List<SyndContent> scontents = entry.getContents();
-                if ( scontents != null )
-                {
-                    final StringBuilder sb = new StringBuilder();
-                    for ( final SyndContent scontent : scontents )
-                    {
-                        sb.append( scontent.getValue() );
-                    }
+                sendMessage();
+            }
 
             ++count;
-                    if ( sb.length() > 0 )
-                    {
-                        getMessage().setProperty( Message.KeyIndex.CONTENT ,
-                                                  sb.toString() );
-                    }
-                }
 
             if ( count >= max )
             {
                 break;
-                sendMessage();
             }
         }
     }

@@ -177,7 +177,8 @@ public class N_FB_Post
             date = null;
         }
 
-        final String ID = postLink( uriStr ,
+        final String ID = postLink( (String) getMessage().getProperty( Message.KeyIndex.CONTENT ) ,
+                                    uriStr ,
                                     (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                     caption ,
                                     (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
@@ -211,7 +212,8 @@ public class N_FB_Post
     private Duration delayBetweenRetry;
     private String forcedTarget;
 
-    private String postLink( final String uriStr ,
+    private String postLink( final String message ,
+                             final String uriStr ,
                              final String title ,
                              final String caption ,
                              final String description ,
@@ -222,11 +224,11 @@ public class N_FB_Post
         try
         {
             final String ID = client.postLink( forcedTarget ,
-                                               null ,
+                                               message ,
                                                uriStr ,
-                                               (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                               title ,
                                                caption ,
-                                               (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                               description ,
                                                date );
 
             if ( ID == null || ID.isEmpty() )
@@ -261,7 +263,8 @@ public class N_FB_Post
             }
         }
 
-        return postLink( uriStr ,
+        return postLink( message ,
+                         uriStr ,
                          title ,
                          caption ,
                          description ,

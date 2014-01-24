@@ -126,7 +126,7 @@ public class N_Shaarli
                     new URI( sl.getUrl() ) ,
                     Message.KeyIndex.TITLE ,
                     sl.getTitle() ,
-                    Message.KeyIndex.DESCRIPTION ,
+                    Message.KeyIndex.CONTENT ,
                     sl.getDescription() ,
                     "id-shaarli" ,
                     sl.getID() ,

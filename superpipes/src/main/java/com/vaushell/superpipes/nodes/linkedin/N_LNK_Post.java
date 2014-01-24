@@ -136,7 +136,8 @@ public class N_LNK_Post
             uriStr = uri.toString();
         }
 
-        final String ID = postLink( uriStr ,
+        final String ID = postLink( (String) getMessage().getProperty( Message.KeyIndex.CONTENT ) ,
+                                    uriStr ,
                                     (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
                                     retry );
 
@@ -166,16 +167,17 @@ public class N_LNK_Post
     private int retry;
     private Duration delayBetweenRetry;
 
-    private String postLink( final String uriStr ,
+    private String postLink( final String message ,
+                             final String uriStr ,
                              final String title ,
                              final int remainingRetry )
         throws IOException , OAuthException
     {
         try
         {
-            final String ID = client.postLink( null ,
+            final String ID = client.postLink( message ,
                                                uriStr ,
-                                               (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
+                                               title ,
                                                null );
 
             if ( ID == null || ID.isEmpty() )
@@ -210,7 +212,8 @@ public class N_LNK_Post
             }
         }
 
-        return postLink( uriStr ,
+        return postLink( message ,
+                         uriStr ,
                          title ,
                          remainingRetry - 1 );
     }
