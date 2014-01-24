@@ -69,14 +69,18 @@ public class N_RSS
         final URL url = new URL( getConfig( "url" ,
                                             false ) );
 
+        final int max = Integer.parseInt( getConfig( "max" ,
+                                                     false ) );
+
         if ( LOGGER.isTraceEnabled() )
         {
-            LOGGER.trace( "[" + getNodeID() + "] read feed : " + url );
+            LOGGER.trace( "[" + getNodeID() + "] read feed : " + url + " with max " + max + " elements" );
         }
 
         final SyndFeedInput input = new SyndFeedInput();
         final SyndFeed feed = input.build( new XmlReader( url ) );
 
+        int count = 0;
         final List<SyndEntry> entries = feed.getEntries();
         for ( final SyndEntry entry : entries )
         {
@@ -139,6 +143,7 @@ public class N_RSS
                         sb.append( scontent.getValue() );
                     }
 
+            ++count;
                     if ( sb.length() > 0 )
                     {
                         getMessage().setProperty( Message.KeyIndex.CONTENT ,
@@ -146,6 +151,9 @@ public class N_RSS
                     }
                 }
 
+            if ( count >= max )
+            {
+                break;
                 sendMessage();
             }
         }

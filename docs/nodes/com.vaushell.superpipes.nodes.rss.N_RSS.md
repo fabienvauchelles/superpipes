@@ -22,6 +22,7 @@ This node reads a RSS feed.
 Key | Description | Type | Required | Default value | Example value
  --- | --- | --- | --- | --- | --- 
 url | URI of the RSS feed | string | yes | N/A | http://feeds.feedburner.com/fabienvauchelles
+max | Number of messages to read. | integer | yes | N/A | 50
 
 ## Use example
 
