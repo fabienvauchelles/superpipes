@@ -29,7 +29,7 @@ fields | A list of fields, separated by commas, to generate the ID. Could be nul
 ```xml
 <transform type="com.vaushell.superpipes.transforms.done.T_Done">
     <params>
-        <param key="field" value="title,url" />
+        <param key="fields" value="title,url" />
     </params>
 </transform>
 ```
