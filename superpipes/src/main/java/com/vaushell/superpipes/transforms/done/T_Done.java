@@ -68,7 +68,16 @@ public class T_Done
                 String line = bfr.readLine();
                 while ( line != null )
                 {
-                    ids.add( line );
+                    final int ind = line.indexOf( ' ' );
+                    if ( ind < 0 )
+                    {
+                        ids.add( line );
+                    }
+                    else
+                    {
+                        ids.add( line.substring( 0 ,
+                                                 ind ) );
+                    }
 
                     line = bfr.readLine();
                 }
@@ -100,6 +109,8 @@ public class T_Done
                                                                  StandardOpenOption.CREATE ) )
         {
             bfw.write( message.getID() );
+            bfw.write( ' ' );
+            bfw.write( Message.formatSimple( message ) );
             bfw.newLine();
         }
 
