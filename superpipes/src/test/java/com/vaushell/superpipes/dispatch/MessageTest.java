@@ -116,11 +116,6 @@ public class MessageTest
         assertNotNull( "Not null" ,
                        actual );
 
-        // ID
-        assertEquals( "Messages must have the same ID" ,
-                      expected.getID() ,
-                      actual.getID() );
-
         // Keys
         assertArrayEquals( "Message must have the same properties key" ,
                            expected.getKeys().toArray( new String[]

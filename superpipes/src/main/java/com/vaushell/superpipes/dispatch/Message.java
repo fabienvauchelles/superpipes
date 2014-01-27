@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -111,23 +110,6 @@ public final class Message
     }
 
     /**
-     * Return the message ID. Generate lazy initialization.
-     *
-     * @return the ID
-     */
-    public String getID()
-    {
-        if ( hasToRebuildID )
-        {
-            rebuildID();
-
-            hasToRebuildID = false;
-        }
-
-        return ID;
-    }
-
-    /**
      * Does the message contain this property ?
      *
      * @param key Property index
@@ -189,8 +171,6 @@ public final class Message
     public void removeProperty( final String key )
     {
         properties.remove( key );
-
-        hasToRebuildID = true;
     }
 
     /**
@@ -224,8 +204,6 @@ public final class Message
             properties.put( key ,
                             value );
         }
-
-        hasToRebuildID = true;
     }
 
     /**
@@ -238,11 +216,20 @@ public final class Message
         return properties.keySet();
     }
 
+    /**
+     * Return the properties count.
+     *
+     * @return Properties count.
+     */
+    public int getPropertyCount()
+    {
+        return properties.size();
+    }
+
     @Override
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder( "Message{ID=" );
-        sb.append( getID() );
+        final StringBuilder sb = new StringBuilder( "Message{" );
 
         for ( final Entry<String , Serializable> entry : properties.entrySet() )
         {
@@ -288,7 +275,17 @@ public final class Message
         }
         else
         {
-            return "{ID=" + m.getID() + "}";
+            if ( m.getPropertyCount() <= 0 )
+            {
+                return "{}";
+            }
+            else
+            {
+                final String key = m.getKeys().iterator().next();
+
+                return "{" + key + "=" + m.getProperty( key ) + "}";
+            }
+
         }
     }
 
@@ -509,28 +506,11 @@ public final class Message
     // PRIVATE
     private static final long serialVersionUID = 944934823467345234L;
     private static final DateTimeFormatter PUBLISHED_DATE_FORMAT = DateTimeFormat.forPattern( "dd/MM/yyyy HH:mm:ss" );
-    private transient String ID;
     private TreeMap<String , Serializable> properties;
-    private transient boolean hasToRebuildID;
 
     private Message()
     {
-        this.ID = null;
         this.properties = new TreeMap<>();
-        this.hasToRebuildID = true;
-    }
-
-    private void rebuildID()
-    {
-        final StringBuilder sb = new StringBuilder();
-        for ( final Entry<String , Serializable> entry : properties.entrySet() )
-        {
-            sb.append( entry.getKey() )
-                .append( '#' )
-                .append( entry.getValue().toString() );
-        }
-
-        ID = DigestUtils.md5Hex( sb.toString() );
     }
 
     private void writeObject( final ObjectOutputStream os )
@@ -544,8 +524,6 @@ public final class Message
     private void readObject( final ObjectInputStream is )
         throws IOException , ClassNotFoundException
     {
-        this.ID = null;
         properties = (TreeMap<String , Serializable>) is.readObject();
-        hasToRebuildID = true;
     }
 }

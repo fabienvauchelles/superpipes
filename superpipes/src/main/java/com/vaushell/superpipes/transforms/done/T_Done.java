@@ -24,12 +24,17 @@ import com.vaushell.superpipes.transforms.A_Transform;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,6 +52,7 @@ public class T_Done
         super();
 
         this.ids = new HashSet<>();
+        this.fields = new ArrayList<>();
     }
 
     @Override
@@ -83,6 +89,21 @@ public class T_Done
                 }
             }
         }
+
+        // Load fields list
+        final String fieldsStr = getConfig( "fields" ,
+                                            true );
+        if ( fieldsStr != null )
+        {
+            for ( final String field : fieldsStr.split( "," ) )
+            {
+                final String cleanField = field.trim();
+                if ( !cleanField.isEmpty() )
+                {
+                    fields.add( cleanField );
+                }
+            }
+        }
     }
 
     @Override
@@ -95,20 +116,22 @@ public class T_Done
                 formatSimple( message ) );
         }
 
-        if ( ids.contains( message.getID() ) )
+        final String ID = buildID( message ,
+                                   fields );
+        if ( ids.contains( ID ) )
         {
             return null;
         }
 
         // Save message ID. Won't be replay
-        ids.add( message.getID() );
+        ids.add( ID );
 
         try( final BufferedWriter bfw = Files.newBufferedWriter( path ,
                                                                  Charset.forName( "utf-8" ) ,
                                                                  StandardOpenOption.APPEND ,
                                                                  StandardOpenOption.CREATE ) )
         {
-            bfw.write( message.getID() );
+            bfw.write( ID );
             bfw.write( ' ' );
             bfw.write( Message.formatSimple( message ) );
             bfw.newLine();
@@ -127,4 +150,38 @@ public class T_Done
     private static final Logger LOGGER = LoggerFactory.getLogger( T_Done.class );
     private final HashSet<String> ids;
     private Path path;
+    private final List<String> fields;
+
+    private String buildID( final Message message ,
+                            final Collection<String> keys )
+    {
+        if ( message.getPropertyCount() == 0 )
+        {
+            return null;
+        }
+
+        final StringBuilder sb = new StringBuilder();
+
+        for ( final String key : keys )
+        {
+            final Serializable value = message.getProperty( key );
+            if ( value != null )
+            {
+                sb.append( '$' )
+                    .append( key )
+                    .append( '#' )
+                    .append( value );
+            }
+        }
+
+        if ( sb.length() <= 0 )
+        {
+            return buildID( message ,
+                            message.getKeys() );
+        }
+        else
+        {
+            return DigestUtils.md5Hex( sb.toString() );
+        }
+    }
 }

@@ -78,7 +78,7 @@ public class T_DoneTest
     }
 
     /**
-     * Test INCLUDE_ONE.
+     * Test duplicate
      *
      * @throws java.lang.Exception
      */
@@ -116,6 +116,47 @@ public class T_DoneTest
         assertNull( "Message is not duplicated" ,
                     t.transform( mLearn ) );
         assertNull( "Message 2 is not duplicated" ,
+                    t.transform( mLearn2 ) );
+
+        // Terminate
+        n.terminate();
+    }
+
+    /**
+     * Test duplicate with fields
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testDuplicate2()
+        throws Exception
+    {
+        final A_Node n = dispatcher.addNode( "dummy2" ,
+                                             N_Dummy.class );
+        final A_Transform t = n.addTransformIN( T_Done.class ,
+                                                "id" );
+
+        final Path p = dispatcher.getDatas().resolve( Paths.get( n.getNodeID() ,
+                                                                 "done.dat" ) );
+
+        Files.deleteIfExists( p );
+
+        // Prepare
+        n.prepare();
+
+        // Transform
+        final Message mLearn = Message.create( Message.KeyIndex.TITLE ,
+                                               "mon titre" ,
+                                               Message.KeyIndex.DESCRIPTION ,
+                                               "ma description" );
+        final Message mLearn2 = Message.create( Message.KeyIndex.TITLE ,
+                                                "mon titre" ,
+                                                Message.KeyIndex.DESCRIPTION ,
+                                                "ma description2" );
+
+        assertNotNull( "Message is learned" ,
+                       t.transform( mLearn ) );
+        assertNull( "Message 2 is not learned" ,
                     t.transform( mLearn2 ) );
 
         // Terminate
