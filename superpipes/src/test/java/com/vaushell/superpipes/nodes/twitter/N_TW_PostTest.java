@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.nodes.twitter;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.dispatch.Tags;
@@ -30,6 +31,7 @@ import com.vaushell.superpipes.transforms.image.T_FindBiggest;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -95,17 +97,19 @@ public class N_TW_PostTest
         // Construct path
         final A_Node nTwitter = dispatcher.addNode( "twitter" ,
                                                     N_TW_Post.class ,
-                                                    "twitter" );
-        nTwitter.addTransformIN( T_FindBiggest.class );
+                                                    Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
+        nTwitter.addTransformIN( T_FindBiggest.class ,
+                                 ConfigProperties.EMPTY_COMMONS );
         nTwitter.addTransformIN( T_Shorten.class ,
-                                 "bitly" );
+                                 Arrays.asList( dispatcher.getCommon( "bitly" ) ) );
 
         final N_ReceiveBlocking nReceive = (N_ReceiveBlocking) dispatcher.addNode( "receive" ,
-                                                                                   N_ReceiveBlocking.class );
+                                                                                   N_ReceiveBlocking.class ,
+                                                                                   ConfigProperties.EMPTY_COMMONS );
 
         dispatcher.addNode( "delete" ,
                             N_TW_Delete.class ,
-                            "twitter" );
+                            Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
 
         dispatcher.addRoute( "twitter" ,
                              "delete" );
@@ -169,17 +173,19 @@ public class N_TW_PostTest
         // Construct path
         final A_Node nTwitter = dispatcher.addNode( "twitter" ,
                                                     N_TW_Post.class ,
-                                                    "twitter" );
-        nTwitter.addTransformIN( T_FindBiggest.class );
+                                                    Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
+        nTwitter.addTransformIN( T_FindBiggest.class ,
+                                 ConfigProperties.EMPTY_COMMONS );
         nTwitter.addTransformIN( T_Shorten.class ,
-                                 "bitly" );
+                                 Arrays.asList( dispatcher.getCommon( "bitly" ) ) );
 
         final N_ReceiveBlocking nReceive = (N_ReceiveBlocking) dispatcher.addNode( "receive" ,
-                                                                                   N_ReceiveBlocking.class );
+                                                                                   N_ReceiveBlocking.class ,
+                                                                                   ConfigProperties.EMPTY_COMMONS );
 
         dispatcher.addNode( "delete" ,
                             N_TW_Delete.class ,
-                            "twitter" );
+                            Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
 
         dispatcher.addRoute( "twitter" ,
                              "delete" );

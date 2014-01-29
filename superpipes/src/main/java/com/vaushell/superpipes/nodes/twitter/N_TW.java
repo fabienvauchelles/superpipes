@@ -57,27 +57,13 @@ public class N_TW
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "key" ,
-                                 false ) ,
-                      getConfig( "secret" ,
-                                 false ) ,
+        client.login( getProperties().getConfigString( "key" ) ,
+                      getProperties().getConfigString( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
 
-        final String userIDstr = getConfig( "userid" ,
-                                            true );
-        if ( userIDstr != null )
-        {
-            try
-            {
-                forcedTarget = Long.parseLong( userIDstr );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'userid' is not a long" ,
-                                                    ex );
-            }
-        }
+        forcedTarget = getProperties().getConfigLong( "userid" ,
+                                                      null );
     }
 
     @Override
@@ -89,8 +75,7 @@ public class N_TW
             LOGGER.trace( "[" + getNodeID() + "] read timeline " );
         }
 
-        final int max = Integer.parseInt( getConfig( "max" ,
-                                                     false ) );
+        final int max = getProperties().getConfigInteger( "max" );
 
         int count = 0;
         final Iterator<TW_Tweet> it = client.iteratorTimeline( forcedTarget ,

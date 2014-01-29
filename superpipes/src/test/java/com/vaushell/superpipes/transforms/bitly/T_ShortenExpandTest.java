@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.transforms.bitly;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
@@ -28,7 +29,7 @@ import com.vaushell.superpipes.transforms.A_Transform;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Properties;
+import java.util.Arrays;
 import org.apache.commons.configuration.XMLConfiguration;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
@@ -79,7 +80,7 @@ public class T_ShortenExpandTest
                          new VC_FileFactory( pDatas ) );
 
         // Test if parameters are set.
-        final Properties properties = dispatcher.getCommon( "bitly" );
+        final ConfigProperties properties = dispatcher.getCommon( "bitly" );
 
         assertTrue( "Parameter 'username' should exist" ,
                     properties.containsKey( "username" ) );
@@ -97,11 +98,15 @@ public class T_ShortenExpandTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy" ,
-                                             N_Dummy.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+
+        final ConfigProperties common = dispatcher.getCommon( "bitly" );
+
         final A_Transform tShorten = n.addTransformIN( T_Shorten.class ,
-                                                       "bitly" );
+                                                       Arrays.asList( common ) );
         final A_Transform tExpand = n.addTransformIN( T_Expand.class ,
-                                                      "bitly" );
+                                                      Arrays.asList( common ) );
 
         // Prepare node
         n.prepare();

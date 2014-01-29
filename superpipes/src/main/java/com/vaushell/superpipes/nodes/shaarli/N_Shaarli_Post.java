@@ -48,8 +48,6 @@ public class N_Shaarli_Post
                DEFAULT_ANTIBURST );
 
         this.templates = new ShaarliTemplates();
-        this.retry = 3;
-        this.delayBetweenRetry = new Duration( 5L * 1000L );
     }
 
     @Override
@@ -71,36 +69,12 @@ public class N_Shaarli_Post
         }
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" ,
-                                           true );
-        if ( retryStr != null )
-        {
-            try
-            {
-                retry = Integer.parseInt( retryStr );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'retry' must be an integer" ,
-                                                    ex );
-            }
-        }
+        retry = getProperties().getConfigInteger( "retry" ,
+                                                  3 );
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
-                                                       true );
-        if ( delayBetweenRetryStr != null )
-        {
-            try
-            {
-                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
-                                                    ex );
-            }
-        }
+        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
+                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -109,8 +83,7 @@ public class N_Shaarli_Post
         throws Exception
     {
         this.client = new ShaarliClient( templates ,
-                                         getConfig( "url" ,
-                                                    false ) );
+                                         getProperties().getConfigString( "url" ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -135,10 +108,8 @@ public class N_Shaarli_Post
 
         // Send to Shaarli
         // Log in
-        if ( !client.login( getConfig( "login" ,
-                                       false ) ,
-                            getConfig( "password" ,
-                                       false ) ) )
+        if ( !client.login( getProperties().getConfigString( "login" ) ,
+                            getProperties().getConfigString( "password" ) ) )
         {
             throw new IllegalArgumentException( "Login error" );
         }

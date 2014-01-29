@@ -77,36 +77,12 @@ public class N_Buffer
             }
         }
 
-        final String flowLimitStr = getConfig( "flow-limit" ,
-                                               true );
-        if ( flowLimitStr == null )
-        {
-            flowLimit = null;
-        }
-        else
-        {
-            flowLimit = new Duration( Long.parseLong( flowLimitStr ) );
-
-            if ( flowLimit.getMillis() <= 0L )
-            {
-                throw new IllegalArgumentException( "flow-limit can't be <=0. Should be null or empty" );
-            }
-        }
-
-        final String waitMinStr = getConfig( "wait-min" ,
-                                             true );
-        final String waitMaxStr = getConfig( "wait-max" ,
-                                             true );
-        if ( waitMinStr == null || waitMaxStr == null )
-        {
-            waitMin = null;
-            waitMax = null;
-        }
-        else
-        {
-            waitMin = Integer.parseInt( waitMinStr );
-            waitMax = Integer.parseInt( waitMaxStr );
-        }
+        flowLimit = getProperties().getConfigDuration( "flow-limit" ,
+                                                       null );
+        waitMin = getProperties().getConfigInteger( "wait-min" ,
+                                                    null );
+        waitMax = getProperties().getConfigInteger( "wait-max" ,
+                                                    null );
     }
 
     // PROTECTED

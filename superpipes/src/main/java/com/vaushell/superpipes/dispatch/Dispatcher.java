@@ -24,10 +24,10 @@ import com.vaushell.superpipes.tools.ThrowableHelper;
 import com.vaushell.superpipes.tools.scribe.code.A_ValidatorCode;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.configuration.XMLConfiguration;
@@ -68,7 +68,7 @@ public final class Dispatcher
      * @param ID Common ID
      * @return Common properties set
      */
-    public Properties getCommon( final String ID )
+    public ConfigProperties getCommon( final String ID )
     {
         return commonsProperties.get( ID );
     }
@@ -78,16 +78,16 @@ public final class Dispatcher
      *
      * @param nodeID Node's ID
      * @param clazz Node's type class
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties set reference
      * @return the node
      */
     public A_Node addNode( final String nodeID ,
                            final Class<?> clazz ,
-                           final String... commonsPropertiesID )
+                           final List<ConfigProperties> commons )
     {
         return addNode( nodeID ,
                         clazz.getName() ,
-                        commonsPropertiesID );
+                        commons );
     }
 
     /**
@@ -95,14 +95,14 @@ public final class Dispatcher
      *
      * @param nodeID Node's ID
      * @param type Node's type
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties set reference
      * @return the node
      */
     public A_Node addNode( final String nodeID ,
                            final String type ,
-                           final String... commonsPropertiesID )
+                           final List<ConfigProperties> commons )
     {
-        if ( nodeID == null || type == null || commonsPropertiesID == null )
+        if ( nodeID == null || type == null || commons == null )
         {
             throw new IllegalArgumentException();
         }
@@ -115,7 +115,8 @@ public final class Dispatcher
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace(
-                "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / commonsPropertiesID.length=" + commonsPropertiesID.length );
+                "[" + getClass().getSimpleName() + "] addNode : nodeID=" + nodeID + " / type=" + type + " / commons.length=" + commons.
+                size() );
         }
 
         try
@@ -123,7 +124,7 @@ public final class Dispatcher
             final A_Node node = (A_Node) Class.forName( type ).newInstance();
             node.setParameters( nodeID ,
                                 this ,
-                                commonsPropertiesID );
+                                commons );
 
             nodes.put( nodeID ,
                        node );
@@ -186,7 +187,7 @@ public final class Dispatcher
      * @param properties The properties
      */
     public void addCommon( final String ID ,
-                           final Properties properties )
+                           final ConfigProperties properties )
     {
         if ( ID == null || properties == null || properties.isEmpty() )
         {
@@ -396,9 +397,8 @@ public final class Dispatcher
         {
             for ( final HierarchicalConfiguration cCommon : cCommons )
             {
-                final Properties cProperties = new Properties();
-                readProperties( cProperties ,
-                                cCommon );
+                final ConfigProperties cProperties = new ConfigProperties();
+                cProperties.readProperties( cCommon );
 
                 addCommon( cCommon.getString( "[@id]" ) ,
                            cProperties );
@@ -412,18 +412,19 @@ public final class Dispatcher
         {
             for ( final HierarchicalConfiguration cNode : cNodes )
             {
-                final String[] commons;
+                final List<ConfigProperties> commons = new ArrayList<>();
 
-                final String commonsStr = cNode.getString( "[@commons]" );
-                if ( commonsStr == null )
+                final String commonsID = cNode.getString( "[@commons]" );
+                if ( commonsID != null )
                 {
-                    commons = new String[]
+                    for ( final String commonID : commonsID.split( "," ) )
                     {
-                    };
-                }
-                else
-                {
-                    commons = commonsStr.split( "," );
+                        final ConfigProperties common = getCommon( commonID );
+                        if ( common != null )
+                        {
+                            commons.add( common );
+                        }
+                    }
                 }
 
                 final A_Node node = addNode( cNode.getString( "[@id]" ) ,
@@ -450,37 +451,6 @@ public final class Dispatcher
         }
     }
 
-    /**
-     * Read configurations properties. Must inside tags 'params' with 'param'
-     *
-     * @param props Properties to fill
-     * @param cNode Configuration
-     */
-    public static void readProperties( final Properties props ,
-                                       final HierarchicalConfiguration cNode )
-    {
-        props.clear();
-
-        if ( cNode != null )
-        {
-            final List<HierarchicalConfiguration> hConfs = cNode.configurationsAt( "params.param" );
-            if ( hConfs != null )
-            {
-                for ( final HierarchicalConfiguration hConf : hConfs )
-                {
-                    final String name = hConf.getString( "[@name]" );
-                    final String value = hConf.getString( "[@value]" );
-
-                    if ( name != null && name.length() > 0 && value != null && value.length() > 0 )
-                    {
-                        props.put( name ,
-                                   value );
-                    }
-                }
-            }
-        }
-    }
-
     // DEFAULT
     final HashMap<String , A_Node> nodes;
     final HashMap<String , Set<String>> routes;
@@ -488,7 +458,7 @@ public final class Dispatcher
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( Dispatcher.class );
-    private final HashMap<String , Properties> commonsProperties;
+    private final HashMap<String , ConfigProperties> commonsProperties;
     private Path datas;
     private A_ValidatorCode.I_Factory vCodeFactory;
 }

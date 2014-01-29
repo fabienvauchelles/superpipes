@@ -19,13 +19,13 @@
 
 package com.vaushell.superpipes.tools.scribe.fb;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.tools.scribe.code.VC_FileFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -78,19 +78,11 @@ public class FacebookClientTest
                          new VC_FileFactory( pDatas ) );
 
         // Test if parameters are set
-        final Properties properties = dispatcher.getCommon( "facebook" );
-
-        final String key = properties.getProperty( "key" );
-        assertNotNull( "Parameter 'key' should exist" ,
-                       key );
-
-        final String secret = properties.getProperty( "secret" );
-        assertNotNull( "Parameter 'secret' should exist" ,
-                       secret );
+        final ConfigProperties properties = dispatcher.getCommon( "facebook" );
 
         // Create tokens & login
-        client.login( key ,
-                      secret ,
+        client.login( properties.getConfigString( "key" ) ,
+                      properties.getConfigString( "secret" ) ,
                       dispatcher.getDatas().resolve( "test-tokens/facebook.token" ) ,
                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }

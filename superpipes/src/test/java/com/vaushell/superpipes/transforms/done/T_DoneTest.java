@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.transforms.done;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
@@ -28,6 +29,7 @@ import com.vaushell.superpipes.transforms.A_Transform;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.apache.commons.configuration.XMLConfiguration;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.BeforeClass;
@@ -78,7 +80,7 @@ public class T_DoneTest
     }
 
     /**
-     * Test duplicate
+     * Test duplicate.
      *
      * @throws java.lang.Exception
      */
@@ -87,8 +89,10 @@ public class T_DoneTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy" ,
-                                             N_Dummy.class );
-        final A_Transform t = n.addTransformIN( T_Done.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+        final A_Transform t = n.addTransformIN( T_Done.class ,
+                                                ConfigProperties.EMPTY_COMMONS );
 
         final Path p = dispatcher.getDatas().resolve( Paths.get( n.getNodeID() ,
                                                                  "done.dat" ) );
@@ -123,7 +127,7 @@ public class T_DoneTest
     }
 
     /**
-     * Test duplicate with fields
+     * Test duplicate with fields.
      *
      * @throws java.lang.Exception
      */
@@ -132,9 +136,10 @@ public class T_DoneTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy2" ,
-                                             N_Dummy.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
         final A_Transform t = n.addTransformIN( T_Done.class ,
-                                                "id" );
+                                                Arrays.asList( dispatcher.getCommon( "id" ) ) );
 
         final Path p = dispatcher.getDatas().resolve( Paths.get( n.getNodeID() ,
                                                                  "done.dat" ) );

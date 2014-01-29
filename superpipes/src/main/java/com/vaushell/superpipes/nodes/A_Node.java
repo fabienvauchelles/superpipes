@@ -19,13 +19,13 @@
 
 package com.vaushell.superpipes.nodes;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.transforms.A_Transform;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.commons.lang3.SerializationUtils;
 import org.joda.time.DateTime;
@@ -56,8 +56,7 @@ public abstract class A_Node
         this.internalStack = new LinkedList<>();
         this.transformsIN = new ArrayList<>();
         this.transformsOUT = new ArrayList<>();
-        this.properties = new Properties();
-        this.commonsPropertiesID = new ArrayList<>();
+        this.properties = new ConfigProperties();
         this.lastPop = null;
         this.message = null;
 
@@ -79,19 +78,15 @@ public abstract class A_Node
      *
      * @param nodeID Node's identifier
      * @param dispatcher Main dispatcher
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties
      */
     public void setParameters( final String nodeID ,
                                final Dispatcher dispatcher ,
-                               final String[] commonsPropertiesID )
+                               final List<ConfigProperties> commons )
     {
         this.nodeID = nodeID;
         this.dispatcher = dispatcher;
-
-        for ( final String cpID : commonsPropertiesID )
-        {
-            this.commonsPropertiesID.add( cpID );
-        }
+        this.properties.addCommons( commons );
     }
 
     public String getNodeID()
@@ -99,7 +94,7 @@ public abstract class A_Node
         return nodeID;
     }
 
-    public Properties getProperties()
+    public ConfigProperties getProperties()
     {
         return properties;
     }
@@ -107,48 +102,6 @@ public abstract class A_Node
     public Dispatcher getDispatcher()
     {
         return dispatcher;
-    }
-
-    /**
-     * Retrieve node's parameter.
-     *
-     * @param key Key of parameter
-     * @param acceptNull if false, the null value throw an IllegalArgumentException.
-     * @return the value
-     */
-    public String getConfig( final String key ,
-                             final boolean acceptNull )
-    {
-        if ( key == null || key.isEmpty() )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        String value = properties.getProperty( key );
-        if ( value != null )
-        {
-            return value;
-        }
-
-        for ( final String commonPropertiesID : commonsPropertiesID )
-        {
-            final Properties commonsProperties = dispatcher.getCommon( commonPropertiesID );
-            if ( commonsProperties != null )
-            {
-                value = commonsProperties.getProperty( key );
-                if ( value != null )
-                {
-                    return value;
-                }
-            }
-        }
-
-        if ( acceptNull )
-        {
-            return null;
-        }
-
-        throw new IllegalArgumentException( "Can't find property '" + key + "'" );
     }
 
     /**
@@ -160,27 +113,12 @@ public abstract class A_Node
     public void load( final HierarchicalConfiguration cNode )
         throws Exception
     {
-        Dispatcher.readProperties( properties ,
-                                   cNode );
+        getProperties().readProperties( cNode );
 
-        if ( properties.containsKey( "anti-burst" ) )
-        {
-            antiBurst = new Duration( Long.parseLong( properties.getProperty( "anti-burst" ) ) );
-
-            if ( antiBurst.getMillis() <= 0L )
-            {
-                throw new IllegalArgumentException( "antiBurst can't be <=0. Should be null or empty." );
-            }
-        }
-        if ( properties.containsKey( "delay" ) )
-        {
-            delay = new Duration( Long.parseLong( properties.getProperty( "delay" ) ) );
-
-            if ( delay.getMillis() <= 0L )
-            {
-                throw new IllegalArgumentException( "delay can't be <=0. Should be null or empty." );
-            }
-        }
+        antiBurst = getProperties().getConfigDuration( "anti-burst" ,
+                                                       antiBurst );
+        delay = getProperties().getConfigDuration( "delay" ,
+                                                   delay );
 
         // Load transforms IN
         transformsIN.clear();
@@ -189,18 +127,19 @@ public abstract class A_Node
         {
             for ( final HierarchicalConfiguration cTransform : cTransformsIN )
             {
-                final String[] commons;
+                final List<ConfigProperties> commons = new ArrayList<>();
 
-                final String commonsStr = cTransform.getString( "[@commons]" );
-                if ( commonsStr == null )
+                final String commonsID = cTransform.getString( "[@commons]" );
+                if ( commonsID != null )
                 {
-                    commons = new String[]
+                    for ( final String commonID : commonsID.split( "," ) )
                     {
-                    };
-                }
-                else
-                {
-                    commons = commonsStr.split( "," );
+                        final ConfigProperties common = getDispatcher().getCommon( commonID );
+                        if ( common != null )
+                        {
+                            commons.add( common );
+                        }
+                    }
                 }
 
                 final A_Transform transform = addTransformIN( cTransform.getString( "[@type]" ) ,
@@ -217,18 +156,19 @@ public abstract class A_Node
         {
             for ( final HierarchicalConfiguration cTransform : cTransformsOUT )
             {
-                final String[] commons;
+                final List<ConfigProperties> commons = new ArrayList<>();
 
-                final String commonsStr = cTransform.getString( "[@commons]" );
-                if ( commonsStr == null )
+                final String commonsID = cTransform.getString( "[@commons]" );
+                if ( commonsID != null )
                 {
-                    commons = new String[]
+                    for ( final String commonID : commonsID.split( "," ) )
                     {
-                    };
-                }
-                else
-                {
-                    commons = commonsStr.split( "," );
+                        final ConfigProperties common = getDispatcher().getCommon( commonID );
+                        if ( common != null )
+                        {
+                            commons.add( common );
+                        }
+                    }
                 }
 
                 final A_Transform transform = addTransformOUT( cTransform.getString( "[@type]" ) ,
@@ -243,25 +183,25 @@ public abstract class A_Node
      * Add a transform to the node input.
      *
      * @param clazz Transform's type class
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties
      * @return the transform
      */
     public A_Transform addTransformIN( final Class<?> clazz ,
-                                       final String... commonsPropertiesID )
+                                       final List<ConfigProperties> commons )
     {
         return addTransformIN( clazz.getName() ,
-                               commonsPropertiesID );
+                               commons );
     }
 
     /**
      * Add a transform to the node input.
      *
      * @param type Transform's type
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties
      * @return the transform
      */
     public A_Transform addTransformIN( final String type ,
-                                       final String... commonsPropertiesID )
+                                       final List<ConfigProperties> commons )
     {
         if ( type == null )
         {
@@ -278,7 +218,7 @@ public abstract class A_Node
         {
             final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
             transform.setParameters( this ,
-                                     commonsPropertiesID );
+                                     commons );
 
             transformsIN.add( transform );
 
@@ -296,25 +236,25 @@ public abstract class A_Node
      * Add a transform to the node output.
      *
      * @param clazz Transform's type class
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties
      * @return the transform
      */
     public A_Transform addTransformOUT( final Class<?> clazz ,
-                                        final String... commonsPropertiesID )
+                                        final List<ConfigProperties> commons )
     {
         return addTransformOUT( clazz.getName() ,
-                                commonsPropertiesID );
+                                commons );
     }
 
     /**
      * Add a transform to the node output.
      *
      * @param type Transform's type
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties
      * @return the transform
      */
     public A_Transform addTransformOUT( final String type ,
-                                        final String... commonsPropertiesID )
+                                        final List<ConfigProperties> commons )
     {
         if ( type == null )
         {
@@ -331,7 +271,7 @@ public abstract class A_Node
         {
             final A_Transform transform = (A_Transform) Class.forName( type ).newInstance();
             transform.setParameters( this ,
-                                     commonsPropertiesID );
+                                     commons );
 
             transformsOUT.add( transform );
 
@@ -754,8 +694,7 @@ public abstract class A_Node
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( A_Node.class );
     private String nodeID;
-    private final Properties properties;
-    private final List<String> commonsPropertiesID;
+    private final ConfigProperties properties;
     private Dispatcher dispatcher;
     private final LinkedList<Message> internalStack;
     private volatile boolean activated;
@@ -765,4 +704,5 @@ public abstract class A_Node
     private Duration antiBurst;
     private Duration delay;
     private Message message;
+
 }

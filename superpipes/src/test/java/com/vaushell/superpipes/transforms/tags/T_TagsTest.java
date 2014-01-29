@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.transforms.tags;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.dispatch.Tags;
@@ -52,8 +53,10 @@ public class T_TagsTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy" ,
-                                             N_Dummy.class );
-        final A_Transform t = n.addTransformIN( T_Tags.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+        final A_Transform t = n.addTransformIN( T_Tags.class ,
+                                                ConfigProperties.EMPTY_COMMONS );
         t.getProperties().setProperty( "type" ,
                                        "INCLUDE_ONE" );
         t.getProperties().setProperty( "tags" ,
@@ -91,8 +94,10 @@ public class T_TagsTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy2" ,
-                                             N_Dummy.class );
-        final A_Transform t = n.addTransformIN( T_Tags.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+        final A_Transform t = n.addTransformIN( T_Tags.class ,
+                                                ConfigProperties.EMPTY_COMMONS );
         t.getProperties().setProperty( "type" ,
                                        "INCLUDE_ALL" );
         t.getProperties().setProperty( "tags" ,
@@ -130,8 +135,10 @@ public class T_TagsTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy3" ,
-                                             N_Dummy.class );
-        final A_Transform t = n.addTransformIN( T_Tags.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+        final A_Transform t = n.addTransformIN( T_Tags.class ,
+                                                ConfigProperties.EMPTY_COMMONS );
         t.getProperties().setProperty( "type" ,
                                        "EXCLUDE_ONE" );
         t.getProperties().setProperty( "tags" ,
@@ -170,8 +177,10 @@ public class T_TagsTest
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy4" ,
-                                             N_Dummy.class );
-        final A_Transform t = n.addTransformIN( T_Tags.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+        final A_Transform t = n.addTransformIN( T_Tags.class ,
+                                                ConfigProperties.EMPTY_COMMONS );
         t.getProperties().setProperty( "type" ,
                                        "EXCLUDE_ALL" );
         t.getProperties().setProperty( "tags" ,

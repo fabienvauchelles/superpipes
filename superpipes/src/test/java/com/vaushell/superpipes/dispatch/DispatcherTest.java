@@ -25,7 +25,7 @@ import com.vaushell.superpipes.nodes.stub.N_MessageLogger;
 import com.vaushell.superpipes.nodes.stub.N_NewsGenerator;
 import com.vaushell.superpipes.transforms.A_Transform;
 import com.vaushell.superpipes.transforms.done.T_Done;
-import java.util.Properties;
+import java.util.Arrays;
 import static org.testng.AssertJUnit.*;
 import org.testng.annotations.Test;
 
@@ -52,10 +52,12 @@ public class DispatcherTest
         final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
-                            N_NewsGenerator.class );
+                            N_NewsGenerator.class ,
+                            ConfigProperties.EMPTY_COMMONS );
 
         dispatcher.addNode( "receptor" ,
-                            N_MessageLogger.class );
+                            N_MessageLogger.class ,
+                            ConfigProperties.EMPTY_COMMONS );
 
         final A_Node node = dispatcher.nodes.get( "generator" );
         assertEquals( "Node should be a N_NewsGenerator class" ,
@@ -88,9 +90,11 @@ public class DispatcherTest
         final Dispatcher dispatcher = new Dispatcher();
 
         dispatcher.addNode( "generator" ,
-                            N_NewsGenerator.class );
+                            N_NewsGenerator.class ,
+                            ConfigProperties.EMPTY_COMMONS );
         dispatcher.addNode( "generator" ,
-                            N_NewsGenerator.class );
+                            N_NewsGenerator.class ,
+                            ConfigProperties.EMPTY_COMMONS );
     }
 
     /**
@@ -116,38 +120,36 @@ public class DispatcherTest
     {
         final Dispatcher dispatcher = new Dispatcher();
 
-        final Properties properties = new Properties();
-        properties.put( "test" ,
-                        "montest" );
+        final ConfigProperties properties = new ConfigProperties();
+        properties.setProperty( "test" ,
+                                "montest" );
         dispatcher.addCommon( "conf1" ,
                               properties );
 
-        final Properties properties2 = new Properties();
-        properties2.put( "check" ,
-                         "moncheck" );
+        final ConfigProperties properties2 = new ConfigProperties();
+        properties2.setProperty( "check" ,
+                                 "moncheck" );
         dispatcher.addCommon( "conf2" ,
                               properties2 );
 
         // Node
         final A_Node node = dispatcher.addNode( "dummy" ,
                                                 N_Dummy.class ,
-                                                "conf1" );
+                                                Arrays.asList( properties ) );
         node.getProperties().setProperty( "test2" ,
                                           "montest2" );
 
-        String val = node.getConfig( "test2" ,
-                                     false );
+        String val = node.getProperties().getConfigString( "test2" );
         assertEquals( "test2 property should be found" ,
                       "montest2" ,
                       val );
 
-        val = node.getConfig( "check" ,
-                              true );
+        val = node.getProperties().getConfigString( "check" ,
+                                                    null );
         assertNull( "check property is unknown" ,
                     val );
 
-        val = node.getConfig( "test" ,
-                              false );
+        val = node.getProperties().getConfigString( "test" );
         assertEquals( "test property should be found" ,
                       "montest" ,
                       val );
@@ -155,46 +157,24 @@ public class DispatcherTest
         node.getProperties().setProperty( "test" ,
                                           "monautretest" );
 
-        val = node.getConfig( "test" ,
-                              false );
+        val = node.getProperties().getConfigString( "test" );
         assertEquals( "test property should be found" ,
                       "monautretest" ,
                       val );
 
         // Transform
         final A_Transform transform = node.addTransformIN( T_Done.class ,
-                                                           "conf2" ,
-                                                           "conf1" );
+                                                           Arrays.asList( properties2 ,
+                                                                          properties ) );
 
-        val = transform.getConfig( "check" ,
-                                   false );
+        val = transform.getProperties().getConfigString( "check" );
         assertEquals( "check property should be found" ,
                       "moncheck" ,
                       val );
 
-        val = transform.getConfig( "test" ,
-                                   false );
+        val = transform.getProperties().getConfigString( "test" );
         assertEquals( "test property should be found" ,
                       "montest" ,
                       val );
-    }
-
-    /**
-     * Test unknown common conf.
-     */
-    @Test
-    public void testCommonsNull()
-    {
-        final Dispatcher dispatcher = new Dispatcher();
-
-        // Node
-        final A_Node node = dispatcher.addNode( "dummy" ,
-                                                N_Dummy.class ,
-                                                "confnull" );
-
-        assertNull( "confnull common is unknown" ,
-                    node.getConfig( "test2" ,
-                                    true ) );
-
     }
 }

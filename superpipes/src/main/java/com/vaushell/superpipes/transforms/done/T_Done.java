@@ -91,8 +91,8 @@ public class T_Done
         }
 
         // Load fields list
-        final String fieldsStr = getConfig( "fields" ,
-                                            true );
+        final String fieldsStr = getProperties().getConfigString( "fields" ,
+                                                                  null );
         if ( fieldsStr != null )
         {
             for ( final String field : fieldsStr.split( "," ) )

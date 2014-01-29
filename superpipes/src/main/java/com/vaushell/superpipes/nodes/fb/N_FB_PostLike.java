@@ -46,8 +46,6 @@ public class N_FB_PostLike
                DEFAULT_ANTIBURST );
 
         this.client = new FacebookClient();
-        this.retry = 3;
-        this.delayBetweenRetry = new Duration( 5L * 1000L );
     }
 
     @Override
@@ -57,36 +55,12 @@ public class N_FB_PostLike
         super.load( cNode );
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" ,
-                                           true );
-        if ( retryStr != null )
-        {
-            try
-            {
-                retry = Integer.parseInt( retryStr );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'retry' must be an integer" ,
-                                                    ex );
-            }
-        }
+        retry = getProperties().getConfigInteger( "retry" ,
+                                                  3 );
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
-                                                       true );
-        if ( delayBetweenRetryStr != null )
-        {
-            try
-            {
-                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
-                                                    ex );
-            }
-        }
+        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
+                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -97,24 +71,20 @@ public class N_FB_PostLike
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        final String pageName = getConfig( "pagename" ,
-                                           true );
+        final String pageName = getProperties().getConfigString( "pagename" ,
+                                                                 null );
         if ( pageName == null )
         {
-            client.login( getConfig( "key" ,
-                                     false ) ,
-                          getConfig( "secret" ,
-                                     false ) ,
+            client.login( getProperties().getConfigString( "key" ) ,
+                          getProperties().getConfigString( "secret" ) ,
                           tokenPath ,
                           getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
         }
         else
         {
             client.loginAsPage( pageName ,
-                                getConfig( "key" ,
-                                           false ) ,
-                                getConfig( "secret" ,
-                                           false ) ,
+                                getProperties().getConfigString( "key" ) ,
+                                getProperties().getConfigString( "secret" ) ,
                                 tokenPath ,
                                 getDispatcher().getVCodeFactory().
                 create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );

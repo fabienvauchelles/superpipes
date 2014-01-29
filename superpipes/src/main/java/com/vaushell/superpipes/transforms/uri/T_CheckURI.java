@@ -44,9 +44,6 @@ public class T_CheckURI
         super();
 
         this.client = null;
-        this.timeout = new Duration( 20L * 1000L );
-        this.retry = 3;
-        this.delayBetweenRetry = new Duration( 5L * 1000L );
     }
 
     @Override
@@ -63,52 +60,16 @@ public class T_CheckURI
         super.load( cNode );
 
         // Load timeout if exists.
-        final String timeoutStr = getConfig( "timeout" ,
-                                             true );
-        if ( timeoutStr != null )
-        {
-            try
-            {
-                timeout = new Duration( Long.parseLong( timeoutStr ) );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'timeout' must be a long" ,
-                                                    ex );
-            }
-        }
+        timeout = getProperties().getConfigDuration( "timeout" ,
+                                                     new Duration( 20L * 1000L ) );
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" ,
-                                           true );
-        if ( retryStr != null )
-        {
-            try
-            {
-                retry = Integer.parseInt( retryStr );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'retry' must be an integer" ,
-                                                    ex );
-            }
-        }
+        retry = getProperties().getConfigInteger( "retry" ,
+                                                  3 );
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
-                                                       true );
-        if ( delayBetweenRetryStr != null )
-        {
-            try
-            {
-                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
-                                                    ex );
-            }
-        }
+        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
+                                                               new Duration( 5L * 1000L ) );
     }
 
     @Override

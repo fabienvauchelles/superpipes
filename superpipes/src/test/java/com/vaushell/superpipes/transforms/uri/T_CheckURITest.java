@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.transforms.uri;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
@@ -46,8 +47,10 @@ public class T_CheckURITest
         // Dispatcher
         final Dispatcher dispatcher = new Dispatcher();
         this.node = dispatcher.addNode( "dummy" ,
-                                        N_Dummy.class );
-        this.transform = node.addTransformIN( T_CheckURI.class );
+                                        N_Dummy.class ,
+                                        ConfigProperties.EMPTY_COMMONS );
+        this.transform = node.addTransformIN( T_CheckURI.class ,
+                                              ConfigProperties.EMPTY_COMMONS );
 
         // Server
         this.server = new Server( PORT );

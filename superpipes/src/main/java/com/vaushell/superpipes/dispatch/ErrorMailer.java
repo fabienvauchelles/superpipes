@@ -51,7 +51,7 @@ public class ErrorMailer
 
         this.activated = true;
         this.internalStack = new ArrayList<>();
-        this.properties = new Properties();
+        this.properties = new ConfigProperties();
         this.antiBurst = new Duration( 1000L );
     }
 
@@ -67,18 +67,10 @@ public class ErrorMailer
             throw new IllegalArgumentException();
         }
 
-        Dispatcher.readProperties( properties ,
-                                   cNode );
+        properties.readProperties( cNode );
 
-        if ( properties.containsKey( "anti-burst" ) )
-        {
-            antiBurst = new Duration( Long.parseLong( properties.getProperty( "anti-burst" ) ) );
-
-            if ( antiBurst.getMillis() <= 0L )
-            {
-                throw new IllegalArgumentException( "anti-burst can't be <=0. Should be null or empty." );
-            }
-        }
+        antiBurst = properties.getConfigDuration( "anti-burst" ,
+                                                  null );
     }
 
     @Override
@@ -178,7 +170,7 @@ public class ErrorMailer
     }
 
     // DEFAULT
-    final Properties properties;
+    final ConfigProperties properties;
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( ErrorMailer.class );
@@ -260,36 +252,22 @@ public class ErrorMailer
             throw new IllegalArgumentException( "message" );
         }
 
-        final String host = properties.getProperty( "host" );
-        if ( host == null || host.isEmpty() )
-        {
-            throw new IllegalArgumentException( "host" );
-        }
-
-        final String from = properties.getProperty( "from" );
-        if ( from == null || from.isEmpty() )
-        {
-            throw new IllegalArgumentException( "from" );
-        }
-
-        final String tos = properties.getProperty( "to" );
-        if ( tos == null || tos.isEmpty() )
-        {
-            throw new IllegalArgumentException( "to" );
-        }
+        final String host = properties.getConfigString( "host" );
 
         final Properties props = System.getProperties();
         props.setProperty( "mail.smtp.host" ,
                            host );
 
-        final String port = properties.getProperty( "port" );
-        if ( port != null && !port.isEmpty() )
+        final String port = properties.getConfigString( "port" ,
+                                                        null );
+        if ( port != null )
         {
             props.setProperty( "mail.smtp.port" ,
                                port );
         }
 
-        if ( "true".equalsIgnoreCase( properties.getProperty( "ssl" ) ) )
+        if ( "true".equalsIgnoreCase( properties.getConfigString( "ssl" ,
+                                                                  null ) ) )
         {
             props.setProperty( "mail.smtp.ssl.enable" ,
                                "true" );
@@ -301,10 +279,10 @@ public class ErrorMailer
 
         final javax.mail.Message msg = new MimeMessage( session );
 
-        msg.setFrom( new InternetAddress( from ) );
+        msg.setFrom( new InternetAddress( properties.getConfigString( "from" ) ) );
 
         msg.setRecipients( javax.mail.Message.RecipientType.TO ,
-                           InternetAddress.parse( tos ,
+                           InternetAddress.parse( properties.getConfigString( "to" ) ,
                                                   false ) );
 
         msg.setSubject( "superpipes error message" );
@@ -321,9 +299,11 @@ public class ErrorMailer
         {
             t = session.getTransport( "smtp" );
 
-            final String username = properties.getProperty( "username" );
-            final String password = properties.getProperty( "password" );
-            if ( username == null || username.isEmpty() || password == null || password.isEmpty() )
+            final String username = properties.getConfigString( "username" ,
+                                                                null );
+            final String password = properties.getConfigString( "password" ,
+                                                                null );
+            if ( username == null || password == null )
             {
                 t.connect();
             }

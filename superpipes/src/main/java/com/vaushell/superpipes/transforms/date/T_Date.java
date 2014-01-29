@@ -47,19 +47,12 @@ public class T_Date
     public void prepare()
         throws Exception
     {
-        final String minDateStr = getConfig( "date-min" ,
-                                             true );
-        if ( minDateStr != null )
-        {
-            minCal = df.parseDateTime( minDateStr );
-        }
-
-        final String maxDateStr = getConfig( "date-max" ,
-                                             true );
-        if ( maxDateStr != null )
-        {
-            maxCal = df.parseDateTime( maxDateStr );
-        }
+        minCal = getProperties().getConfigDateTime( "date-min" ,
+                                                    df ,
+                                                    null );
+        maxCal = getProperties().getConfigDateTime( "date-max" ,
+                                                    df ,
+                                                    null );
     }
 
     @Override

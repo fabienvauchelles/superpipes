@@ -49,8 +49,6 @@ public class N_TB_Post
                DEFAULT_ANTIBURST );
 
         this.client = new TumblrClient();
-        this.retry = 3;
-        this.delayBetweenRetry = new Duration( 5L * 1000L );
         this.blogname = null;
     }
 
@@ -61,39 +59,14 @@ public class N_TB_Post
         super.load( cNode );
 
         // Load retry count if exists.
-        final String retryStr = getConfig( "retry" ,
-                                           true );
-        if ( retryStr != null )
-        {
-            try
-            {
-                retry = Integer.parseInt( retryStr );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'retry' must be an integer" ,
-                                                    ex );
-            }
-        }
+        retry = getProperties().getConfigInteger( "retry" ,
+                                                  3 );
 
         // Load delay between retry if exists.
-        final String delayBetweenRetryStr = getConfig( "delay-between-retry" ,
-                                                       true );
-        if ( delayBetweenRetryStr != null )
-        {
-            try
-            {
-                delayBetweenRetry = new Duration( Long.parseLong( delayBetweenRetryStr ) );
-            }
-            catch( final NumberFormatException ex )
-            {
-                throw new IllegalArgumentException( "'delay-between-retry' must be a long" ,
-                                                    ex );
-            }
-        }
+        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
+                                                               new Duration( 5L * 1000L ) );
 
-        blogname = getConfig( "blogname" ,
-                              false );
+        blogname = getProperties().getConfigString( "blogname" );
     }
 
     // PROTECTED
@@ -104,10 +77,8 @@ public class N_TB_Post
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "key" ,
-                                 false ) ,
-                      getConfig( "secret" ,
-                                 false ) ,
+        client.login( getProperties().getConfigString( "key" ) ,
+                      getProperties().getConfigString( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
@@ -134,8 +105,8 @@ public class N_TB_Post
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
 
         final DateTime date;
-        if ( "true".equals( getConfig( "backdating" ,
-                                       true ) ) )
+        if ( getProperties().getConfigBoolean( "backdating" ,
+                                               Boolean.FALSE ) )
         {
             date = (DateTime) getMessage().getProperty( Message.KeyIndex.PUBLISHED_DATE );
         }

@@ -58,27 +58,23 @@ public class N_FB
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        final String pageName = getConfig( "pagename" ,
-                                           true );
+        final String pageName = getProperties().getConfigString( "pagename" ,
+                                                                 null );
         if ( pageName == null )
         {
-            client.login( getConfig( "key" ,
-                                     false ) ,
-                          getConfig( "secret" ,
-                                     false ) ,
+            client.login( getProperties().getConfigString( "key" ) ,
+                          getProperties().getConfigString( "secret" ) ,
                           tokenPath ,
                           getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
 
-            forcedTarget = getConfig( "userid" ,
-                                      true );
+            forcedTarget = getProperties().getConfigString( "userid" ,
+                                                            null );
         }
         else
         {
             client.loginAsPage( pageName ,
-                                getConfig( "key" ,
-                                           false ) ,
-                                getConfig( "secret" ,
-                                           false ) ,
+                                getProperties().getConfigString( "key" ) ,
+                                getProperties().getConfigString( "secret" ) ,
                                 tokenPath ,
                                 getDispatcher().getVCodeFactory().
                 create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
@@ -94,8 +90,7 @@ public class N_FB
             LOGGER.trace( "[" + getNodeID() + "] read feed " );
         }
 
-        final int max = Integer.parseInt( getConfig( "max" ,
-                                                     false ) );
+        final int max = getProperties().getConfigInteger( "max" );
 
         int count = 0;
         final Iterator<FB_Post> it = client.iteratorFeed( forcedTarget ,

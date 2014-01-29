@@ -19,12 +19,10 @@
 
 package com.vaushell.superpipes.transforms;
 
-import com.vaushell.superpipes.dispatch.Dispatcher;
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
 /**
@@ -38,25 +36,20 @@ public abstract class A_Transform
     public A_Transform()
     {
         this.node = null;
-        this.properties = new Properties();
-        this.commonsPropertiesID = new ArrayList<>();
+        this.properties = new ConfigProperties();
     }
 
     /**
      * Set transform's parameters.
      *
      * @param node Parent node
-     * @param commonsPropertiesID commons properties set reference
+     * @param commons commons properties
      */
     public void setParameters( final A_Node node ,
-                               final String[] commonsPropertiesID )
+                               final List<ConfigProperties> commons )
     {
         this.node = node;
-
-        for ( final String cpID : commonsPropertiesID )
-        {
-            this.commonsPropertiesID.add( cpID );
-        }
+        this.properties.addCommons( commons );
     }
 
     public A_Node getNode()
@@ -64,51 +57,9 @@ public abstract class A_Transform
         return node;
     }
 
-    public Properties getProperties()
+    public ConfigProperties getProperties()
     {
         return properties;
-    }
-
-    /**
-     * Retrieve node's parameter.
-     *
-     * @param key Key of parameter
-     * @param acceptNull if false, the null value throw an IllegalArgumentException.
-     * @return the value
-     */
-    public String getConfig( final String key ,
-                             final boolean acceptNull )
-    {
-        if ( key == null || key.isEmpty() )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        String value = properties.getProperty( key );
-        if ( value != null )
-        {
-            return value;
-        }
-
-        for ( final String commonPropertiesID : commonsPropertiesID )
-        {
-            final Properties commonsProperties = node.getDispatcher().getCommon( commonPropertiesID );
-            if ( commonsProperties != null )
-            {
-                value = commonsProperties.getProperty( key );
-                if ( value != null )
-                {
-                    return value;
-                }
-            }
-        }
-
-        if ( acceptNull )
-        {
-            return null;
-        }
-
-        throw new IllegalArgumentException( "Can't find property '" + key + "'" );
     }
 
     /**
@@ -120,8 +71,7 @@ public abstract class A_Transform
     public void load( final HierarchicalConfiguration cNode )
         throws Exception
     {
-        Dispatcher.readProperties( properties ,
-                                   cNode );
+        getProperties().readProperties( cNode );
     }
 
     /**
@@ -152,6 +102,5 @@ public abstract class A_Transform
 
     // PRIVATE
     private A_Node node;
-    private final Properties properties;
-    private final List<String> commonsPropertiesID;
+    private final ConfigProperties properties;
 }

@@ -65,11 +65,9 @@ public class N_RSS
     protected void loop()
         throws Exception
     {
-        final URL url = new URL( getConfig( "url" ,
-                                            false ) );
+        final URL url = new URL( getProperties().getConfigString( "url" ) );
 
-        final int max = Integer.parseInt( getConfig( "max" ,
-                                                     false ) );
+        final int max = getProperties().getConfigInteger( "max" );
 
         if ( LOGGER.isTraceEnabled() )
         {

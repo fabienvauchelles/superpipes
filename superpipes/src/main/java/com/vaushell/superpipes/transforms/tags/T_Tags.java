@@ -54,11 +54,9 @@ public class T_Tags
     public void prepare()
         throws Exception
     {
-        op = OpType.valueOf( getConfig( "type" ,
-                                        false ) );
+        op = OpType.valueOf( getProperties().getConfigString( "type" ) );
 
-        tags = getConfig( "tags" ,
-                          false ).split( "," );
+        tags = getProperties().getConfigString( "tags" ).split( "," );
     }
 
     @SuppressWarnings( "unchecked" )

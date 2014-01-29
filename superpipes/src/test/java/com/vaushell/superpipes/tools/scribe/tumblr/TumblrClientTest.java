@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.tools.scribe.tumblr;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Tags;
 import com.vaushell.superpipes.tools.scribe.code.VC_FileFactory;
@@ -26,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.joda.time.DateTime;
 import static org.testng.AssertJUnit.*;
@@ -79,23 +79,13 @@ public class TumblrClientTest
                          new VC_FileFactory( pDatas ) );
 
         // Test if parameters are set
-        final Properties properties = dispatcher.getCommon( "tumblr" );
+        final ConfigProperties properties = dispatcher.getCommon( "tumblr" );
 
-        blogname = properties.getProperty( "blogname" );
-        assertNotNull( "Parameter 'blogname' should exist" ,
-                       blogname );
-
-        final String key = properties.getProperty( "key" );
-        assertNotNull( "Parameter 'key' should exist" ,
-                       key );
-
-        final String secret = properties.getProperty( "secret" );
-        assertNotNull( "Parameter 'secret' should exist" ,
-                       secret );
+        blogname = properties.getConfigString( "blogname" );
 
         // Create tokens & login
-        client.login( key ,
-                      secret ,
+        client.login( properties.getConfigString( "key" ) ,
+                      properties.getConfigString( "secret" ) ,
                       dispatcher.getDatas().resolve( "test-tokens/tumblr.token" ) ,
                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }

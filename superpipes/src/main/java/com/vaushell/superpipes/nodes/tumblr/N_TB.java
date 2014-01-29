@@ -55,8 +55,7 @@ public class N_TB
     {
         super.load( cNode );
 
-        blogname = getConfig( "blogname" ,
-                              false );
+        blogname = getProperties().getConfigString( "blogname" );
     }
 
     // PROTECTED
@@ -67,10 +66,8 @@ public class N_TB
         final Path tokenPath = getDispatcher().getDatas().resolve( Paths.get( getNodeID() ,
                                                                               "token" ) );
 
-        client.login( getConfig( "key" ,
-                                 false ) ,
-                      getConfig( "secret" ,
-                                 false ) ,
+        client.login( getProperties().getConfigString( "key" ) ,
+                      getProperties().getConfigString( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
     }
@@ -85,8 +82,7 @@ public class N_TB
             LOGGER.trace( "[" + getNodeID() + "] read feed " );
         }
 
-        final int max = Integer.parseInt( getConfig( "max" ,
-                                                     false ) );
+        final int max = getProperties().getConfigInteger( "max" );
 
         int count = 0;
         final Iterator<TB_Post> it = client.iteratorFeed( blogname ,

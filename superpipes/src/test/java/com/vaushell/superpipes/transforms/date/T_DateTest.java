@@ -19,6 +19,7 @@
 
 package com.vaushell.superpipes.transforms.date;
 
+import com.vaushell.superpipes.dispatch.ConfigProperties;
 import com.vaushell.superpipes.dispatch.Dispatcher;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
@@ -48,13 +49,16 @@ public class T_DateTest
      *
      * @throws java.lang.Exception
      */
+    @SuppressWarnings( "unchecked" )
     @Test
     public void testInside()
         throws Exception
     {
         final A_Node n = dispatcher.addNode( "dummy" ,
-                                             N_Dummy.class );
-        final A_Transform t = n.addTransformIN( T_Date.class );
+                                             N_Dummy.class ,
+                                             ConfigProperties.EMPTY_COMMONS );
+        final A_Transform t = n.addTransformIN( T_Date.class ,
+                                                ConfigProperties.EMPTY_COMMONS );
         t.getProperties().setProperty( "date-min" ,
                                        "01/03/2014 10:30:00" );
         t.getProperties().setProperty( "date-max" ,
