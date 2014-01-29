@@ -26,11 +26,11 @@ JSVC is used to daemonize SuperPipes (more info [here](http://commons.apache.org
 
 #### Step 3: Download and install the Debian package
 
-The latest package is available [here](http://fabien.vauchelles.com/superpipes/1.0.1/superpipes_1.0.1_all.deb).
+The latest package is available [here](http://fabien.vauchelles.com/superpipes/1.0.2/superpipes_1.0.2_all.deb).
 
 ```sh
-$ wget http://fabien.vauchelles.com/superpipes/1.0.1/superpipes_1.0.1_all.deb
-$ sudo dpkg -i superpipes_1.0.0_all.deb
+$ wget http://fabien.vauchelles.com/superpipes/1.0.2/superpipes_1.0.2_all.deb
+$ sudo dpkg -i superpipes_1.0.2_all.deb
 ```
 
 ### How to use SuperPipes ?
@@ -107,7 +107,7 @@ It's coming!
 
 SuperPipes is a JAR file. I can manually install it on each platform:)
 
-Just [download the dist file](http://fabien.vauchelles.com/superpipes/1.0.1/superpipes-1.0.1-dist.tar.gz), unzip it, and run it.
+Just [download the dist file](http://fabien.vauchelles.com/superpipes/1.0.2/superpipes-1.0.2-dist.tar.gz), unzip it, and run it.
 
 
 ## How to go further ?
