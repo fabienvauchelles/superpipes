@@ -24,8 +24,11 @@ It uses [Shaari JAVA API](https://github.com/fabienvauchelles/shaarli-java-api).
 Key | Description | Type | Required | Default value | Example value
  --- | --- | --- | --- | --- | ---
 timeout | Socket timeout in milliseconds. How long should I wait before the link is delivered? | long | no | 20000 | 20000
-retry | How many times do I retry if the check fails ? | integer | no | 3 | 3
-delayBetweenRetry | How long should I wait between 2 checks ? (in milliseconds) | long | no | 5000 | 5000
+retry | How many times do I retry if the check fails ? | integer | no | 10 | 10
+wait-time | How long should I wait between 2 checks ? (in milliseconds) | long | no | 5000 | 5000
+wait-time-multiplier | How multiple I `wait-time` each time ? | double | no | 2.0 | 2.0
+jitter-range | Add or substract randomly time to `wait-time` (between 0 and `jitter-range`) | int | no | 500 | 500
+max-duration | How long shoud I retry ? (in milliseconds, 0=disabled) | long | no | 0 | 10000
 url | URI of the RSS feed | string | yes | N/A | http://feeds.feedburner.com/lesliensducode
 login | Login | string | yes | N/A | monlogin
 password | Password | string | yes | N/A | 1234

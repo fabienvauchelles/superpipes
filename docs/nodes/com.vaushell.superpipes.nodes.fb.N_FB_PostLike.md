@@ -26,8 +26,11 @@ See [How to create a Facebook application and get credentials](../tutorials/Crea
 Key | Description | Type | Required | Default value | Example value
  --- | --- | --- | --- | --- | --- 
 timeout | Socket timeout in milliseconds. How long should I wait before the message is liked ? | long | no | 20000 | 20000
-retry | How many times do I retry if the check fails ? | integer | no | 3 | 3
-delayBetweenRetry | How long should I wait between 2 checks ? (in milliseconds) | long | no | 5000 | 5000
+retry | How many times do I retry if the check fails ? | integer | no | 10 | 10
+wait-time | How long should I wait between 2 checks ? (in milliseconds) | long | no | 5000 | 5000
+wait-time-multiplier | How multiple I `wait-time` each time ? | double | no | 2.0 | 2.0
+jitter-range | Add or substract randomly time to `wait-time` (between 0 and `jitter-range`) | int | no | 500 | 500
+max-duration | How long shoud I retry ? (in milliseconds, 0=disabled) | long | no | 0 | 10000
 key | Application Key | string | yes | N/A | 435923492349
 secret | Application Secret | string | yes | N/A | 012345679abcdef0123456
 pagename | Pagename name to read. This isn't an ID: this is the page name. Can't be used with `userid` parameter. | string | no | N/A | Les liens du code
