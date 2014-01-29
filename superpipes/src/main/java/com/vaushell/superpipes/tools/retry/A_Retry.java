@@ -46,7 +46,7 @@ public abstract class A_Retry<T>
     }
 
     /**
-     * Set retry count.
+     * How many times do I retry if the check fails ?.
      *
      * @param retry Retry doesn't include normal execution. If retry is 2, code will be executed 3 times.
      * @return this element.
@@ -64,7 +64,7 @@ public abstract class A_Retry<T>
     }
 
     /**
-     * Set time to wait between 2 executions. First base time before multiplier.
+     * How long should I wait between 2 checks ? (in milliseconds).
      *
      * @param waitTime Time to wait
      * @return this element.
@@ -82,7 +82,7 @@ public abstract class A_Retry<T>
     }
 
     /**
-     * Set time multiplier between 2 executions. Next Time to Wait = Actual Time to wait * multiplier
+     * How multiple I wait-time each time ?. Next Time to Wait = Actual Time to wait * multiplier
      *
      * @param waitTimeMultiplier Multiplier.
      * @return this element.
@@ -100,7 +100,7 @@ public abstract class A_Retry<T>
     }
 
     /**
-     * Add jitter delay (minus or plus.).
+     * Add or substract randomly time to wait-time (between 0 and JitterRanger).
      *
      * @param jitterRange Jitter delay in ms.
      * @return this element.
@@ -118,7 +118,7 @@ public abstract class A_Retry<T>
     }
 
     /**
-     * Set the max duration execution. Doesn't interrupt code execution.
+     * How long shoud I retry ? (in milliseconds, 0=disabled). Doesn't interrupt code execution.
      *
      * @param maxDuration Maximum duration.
      * @return this element.
