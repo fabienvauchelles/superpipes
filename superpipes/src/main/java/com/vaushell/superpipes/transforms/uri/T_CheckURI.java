@@ -21,10 +21,11 @@ package com.vaushell.superpipes.transforms.uri;
 
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.tools.HTTPhelper;
+import com.vaushell.superpipes.tools.retry.A_Retry;
+import com.vaushell.superpipes.tools.retry.RetryException;
 import com.vaushell.superpipes.transforms.A_Transform;
 import java.io.IOException;
 import java.net.URI;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -54,25 +55,6 @@ public class T_CheckURI
     }
 
     @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load timeout if exists.
-        timeout = getProperties().getConfigDuration( "timeout" ,
-                                                     new Duration( 20L * 1000L ) );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
-    }
-
-    @Override
     public Message transform( final Message message )
         throws Exception
     {
@@ -92,26 +74,47 @@ public class T_CheckURI
 
         try
         {
-            if ( isURIvalid( uri ,
-                             retry ) )
+            new A_Retry<Void>()
             {
-                return message;
-            }
-            else
-            {
-                if ( LOGGER.isTraceEnabled() )
+                @Override
+                protected Void executeContent()
+                    throws IOException
                 {
-                    LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] Invalid URI : " + uri.
-                        toString() );
+                    if ( HTTPhelper.isURIvalid( client ,
+                                                uri ,
+                                                getProperties().getConfigDuration( "timeout" ,
+                                                                                   new Duration( 20L * 1000L ) ) ) )
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        throw new IOException( "Cannot validate URI=" + uri );
+                    }
                 }
-
-                return null;
             }
+                .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                             3 ) )
+                .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                                 new Duration( 2000L ) ) )
+                .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                         2.0 ) )
+                .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                                   500 ) )
+                .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                    new Duration( 10_000L ) ) )
+                .execute();
+
+            return message;
         }
-        catch( final IOException ex )
+        catch( final RetryException ex )
         {
-            LOGGER.warn( "Error while checking URI : '" + uri.toString() + "'" ,
-                         ex );
+            if ( LOGGER.isTraceEnabled() )
+            {
+                LOGGER.trace( "[" + getNode().getNodeID() + "/" + getClass().getSimpleName() + "] Invalid URI : " + uri.
+                    toString() ,
+                              ex );
+            }
 
             return null;
         }
@@ -130,56 +133,4 @@ public class T_CheckURI
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( T_CheckURI.class );
     private CloseableHttpClient client;
-    private Duration timeout;
-    private int retry;
-    private Duration delayBetweenRetry;
-
-    private boolean isURIvalid( final URI uri ,
-                                final int remainingRetry )
-        throws IOException
-    {
-        if ( uri == null )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        try
-        {
-            if ( HTTPhelper.isURIvalid( client ,
-                                        uri ,
-                                        timeout ) )
-            {
-                return true;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return false;
-                }
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return isURIvalid( uri ,
-                           remainingRetry - 1 );
-    }
 }

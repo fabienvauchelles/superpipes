@@ -22,13 +22,13 @@ package com.vaushell.superpipes.nodes.tumblr;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.dispatch.Tags;
 import com.vaushell.superpipes.nodes.A_Node;
+import com.vaushell.superpipes.tools.retry.A_Retry;
 import com.vaushell.superpipes.tools.scribe.tumblr.TumblrClient;
 import com.vaushell.superpipes.tools.scribe.tumblr.TumblrException;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -49,24 +49,6 @@ public class N_TB_Post
                DEFAULT_ANTIBURST );
 
         this.client = new TumblrClient();
-        this.blogname = null;
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
-
-        blogname = getProperties().getConfigString( "blogname" );
     }
 
     // PROTECTED
@@ -125,25 +107,52 @@ public class N_TB_Post
             desc = (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION );
         }
 
-        final long ID = postLink( uri == null ? null : uri.toString() ,
-                                  (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
-                                  desc ,
-                                  (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
-                                  date ,
-                                  retry );
+        final long ID = new A_Retry<Long>()
+        {
+            @Override
+            protected Long executeContent()
+                throws IOException , TumblrException
+            {
+                final String title = (String) getMessage().getProperty( Message.KeyIndex.TITLE );
+
+                final long ID = client.postLink( getProperties().getConfigString( "blogname" ) ,
+                                                 uri == null ? null : uri.toString() ,
+                                                 title ,
+                                                 desc ,
+                                                 (Tags) getMessage().getProperty( Message.KeyIndex.TAGS ) ,
+                                                 date );
+
+                if ( ID < 0 )
+                {
+                    throw new IOException( "Cannot post link with title=" + title );
+                }
+                else
+                {
+                    return ID;
+                }
+            }
+        }
+            .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                         10 ) )
+            .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                             new Duration( 5000L ) ) )
+            .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                     2.0 ) )
+            .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                               500 ) )
+            .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                new Duration( 0L ) ) )
+            .execute();
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        if ( ID >= 0 )
-        {
-            getMessage().setProperty( "id-tumblr" ,
-                                      ID );
+        getMessage().setProperty( "id-tumblr" ,
+                                  ID );
 
-            sendMessage();
-        }
+        sendMessage();
     }
 
     @Override
@@ -155,64 +164,4 @@ public class N_TB_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TB_Post.class );
     private final TumblrClient client;
-    private int retry;
-    private Duration delayBetweenRetry;
-    private String blogname;
-
-    private long postLink( final String uri ,
-                           final String title ,
-                           final String description ,
-                           final Tags tags ,
-                           final DateTime date ,
-                           final int remainingRetry )
-        throws IOException , TumblrException
-    {
-        try
-        {
-            final long ID = client.postLink( blogname ,
-                                             uri ,
-                                             title ,
-                                             description ,
-                                             tags ,
-                                             date );
-
-            if ( ID >= 0 )
-            {
-                return ID;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return ID;
-                }
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return postLink( uri ,
-                         title ,
-                         description ,
-                         tags ,
-                         date ,
-                         remainingRetry - 1 );
-    }
 }

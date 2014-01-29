@@ -21,12 +21,12 @@ package com.vaushell.superpipes.nodes.fb;
 
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
+import com.vaushell.superpipes.tools.retry.A_Retry;
 import com.vaushell.superpipes.tools.scribe.fb.FacebookClient;
 import com.vaushell.superpipes.tools.scribe.fb.FacebookException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +46,6 @@ public class N_FB_PostLike
                DEFAULT_ANTIBURST );
 
         this.client = new FacebookClient();
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -108,9 +93,37 @@ public class N_FB_PostLike
             throw new IllegalArgumentException( "message doesn't have an post id" );
         }
 
+        final String ID = (String) getMessage().getProperty( "id-facebook" );
+
         // Like
-        likePost( (String) getMessage().getProperty( "id-facebook" ) ,
-                  retry );
+        new A_Retry<Void>()
+        {
+
+            @Override
+            protected Void executeContent()
+                throws IOException , FacebookException
+            {
+                if ( client.likePost( ID ) )
+                {
+                    return null;
+                }
+                else
+                {
+                    throw new IOException( "Can't delete post with ID=" + ID );
+                }
+            }
+        }
+            .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                         10 ) )
+            .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                             new Duration( 5000L ) ) )
+            .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                     2.0 ) )
+            .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                               500 ) )
+            .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                new Duration( 0L ) ) )
+            .execute();
 
         sendMessage();
     }
@@ -124,53 +137,4 @@ public class N_FB_PostLike
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_FB_PostLike.class );
     private final FacebookClient client;
-    private int retry;
-    private Duration delayBetweenRetry;
-
-    private boolean likePost( final String ID ,
-                              final int remainingRetry )
-        throws FacebookException , IOException
-    {
-        if ( ID == null || ID.isEmpty() )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        try
-        {
-            if ( client.likePost( ID ) )
-            {
-                return true;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return false;
-                }
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return likePost( ID ,
-                         remainingRetry - 1 );
-    }
 }

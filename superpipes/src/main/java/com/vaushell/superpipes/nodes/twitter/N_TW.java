@@ -46,7 +46,6 @@ public class N_TW
                null );
 
         this.client = new TwitterClient();
-        this.forcedTarget = null;
     }
 
     // PROTECTED
@@ -61,9 +60,6 @@ public class N_TW
                       getProperties().getConfigString( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-
-        forcedTarget = getProperties().getConfigLong( "userid" ,
-                                                      null );
     }
 
     @Override
@@ -78,7 +74,8 @@ public class N_TW
         final int max = getProperties().getConfigInteger( "max" );
 
         int count = 0;
-        final Iterator<TW_Tweet> it = client.iteratorTimeline( forcedTarget ,
+        final Iterator<TW_Tweet> it = client.iteratorTimeline( getProperties().getConfigLong( "userid" ,
+                                                                                              null ) ,
                                                                Math.min( POST_MAX_COUNT ,
                                                                          max ) );
 
@@ -125,5 +122,4 @@ public class N_TW
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW.class );
     private final TwitterClient client;
     private static final int POST_MAX_COUNT = 200;
-    private Long forcedTarget;
 }

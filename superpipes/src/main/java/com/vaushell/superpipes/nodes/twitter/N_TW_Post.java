@@ -22,13 +22,14 @@ package com.vaushell.superpipes.nodes.twitter;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.dispatch.Tags;
 import com.vaushell.superpipes.nodes.A_Node;
+import com.vaushell.superpipes.tools.retry.A_Retry;
+import com.vaushell.superpipes.tools.retry.RetryException;
 import com.vaushell.superpipes.tools.scribe.OAuthException;
 import com.vaushell.superpipes.tools.scribe.twitter.TwitterClient;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,23 +49,6 @@ public class N_TW_Post
                SECURE_ANTIBURST );
 
         this.client = new TwitterClient();
-        this.retry = 3;
-        this.delayBetweenRetry = new Duration( 5L * 1000L );
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -95,20 +79,19 @@ public class N_TW_Post
 
         // Send to Twitter
         final long ID;
+
         if ( getMessage().contains( Message.KeyIndex.PICTURE ) )
         {
             final byte[] picture = (byte[]) getMessage().getProperty( Message.KeyIndex.PICTURE );
 
             ID = tweetPictureFailsafe( createContent( getMessage() ,
                                                       TwitterClient.TWEET_IMAGE_SIZE ) ,
-                                       picture ,
-                                       retry );
+                                       picture );
         }
         else
         {
             ID = tweet( createContent( getMessage() ,
-                                       TwitterClient.TWEET_SIZE ) ,
-                        retry );
+                                       TwitterClient.TWEET_SIZE ) );
         }
 
         if ( LOGGER.isTraceEnabled() )
@@ -116,13 +99,10 @@ public class N_TW_Post
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        if ( ID >= 0 )
-        {
-            getMessage().setProperty( "id-twitter" ,
-                                      ID );
+        getMessage().setProperty( "id-twitter" ,
+                                  ID );
 
-            sendMessage();
-        }
+        sendMessage();
     }
 
     @Override
@@ -212,137 +192,100 @@ public class N_TW_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
     private final TwitterClient client;
-    private int retry;
-    private Duration delayBetweenRetry;
-
-    private long tweet( final String message ,
-                        final int remainingRetry )
-        throws IOException , OAuthException
-    {
-        try
-        {
-            final long ID = client.tweet( message );
-
-            if ( ID >= 0 )
-            {
-                return ID;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return ID;
-                }
-            }
-        }
-        catch( final IOException |
-                     OAuthException ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return tweet( message ,
-                      remainingRetry - 1 );
-    }
-
-    private long tweetPicture( final String message ,
-                               final byte[] picture ,
-                               final int remainingRetry )
-        throws IOException , OAuthException
-    {
-        try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
-        {
-            final long ID = client.tweetPicture( message ,
-                                                 bis );
-
-            if ( ID >= 0 )
-            {
-                return ID;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return ID;
-                }
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return tweetPicture( message ,
-                             picture ,
-                             remainingRetry - 1 );
-    }
 
     private long tweetPictureFailsafe( final String message ,
-                                       final byte[] picture ,
-                                       final int remainingRetry )
-        throws IOException , OAuthException
+                                       final byte[] picture )
+        throws RetryException
     {
         try
         {
-            final long ID = tweetPicture( message ,
-                                          picture ,
-                                          remainingRetry );
-            if ( ID >= 0 )
+            return new A_Retry<Long>()
             {
-                return ID;
-            }
-        }
-        catch( final Throwable ex )
-        {
-            // Ignore but log error
-            LOGGER.error( "Cannot send picture+tweet. Send only tweet" ,
-                          ex );
-        }
+                @Override
+                protected Long executeContent()
+                    throws IOException , OAuthException
+                {
+                    try( ByteArrayInputStream bis = new ByteArrayInputStream( picture ) )
+                    {
+                        final long ID = client.tweetPicture( message ,
+                                                             bis );
 
-        // Cannot send tweet+picture. Send only tweet.
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
+                        if ( ID < 0 )
+                        {
+                            throw new IOException( "Cannot tweet with message=" + message );
+                        }
+                        else
+                        {
+                            return ID;
+                        }
+                    }
+                }
             }
-            catch( final InterruptedException ex )
+                .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                             10 ) )
+                .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                                 new Duration( 5000L ) ) )
+                .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                         2.0 ) )
+                .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                                   500 ) )
+                .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                    new Duration( 0L ) ) )
+                .execute();
+        }
+        catch( final RetryException ex )
+        {
+            // Cannot send tweet+picture. Send only tweet.
+            final Duration d = getProperties().getConfigDuration( "wait-time" ,
+                                                                  new Duration( 5000L ) );
+            if ( d.getMillis() > 0L )
             {
-                // Ignore
+                try
+                {
+                    Thread.sleep( d.getMillis() );
+                }
+                catch( final InterruptedException ex2 )
+                {
+                    // Ignore
+                }
+            }
+
+            return tweet( message );
+        }
+    }
+
+    private long tweet( final String message )
+        throws RetryException
+    {
+        return new A_Retry<Long>()
+        {
+            @Override
+            protected Long executeContent()
+                throws IOException , OAuthException
+            {
+                final long ID = client.tweet( message );
+
+                if ( ID < 0 )
+                {
+                    throw new IOException( "Cannot tweet with message=" + message );
+                }
+                else
+                {
+                    return ID;
+                }
             }
         }
-
-        return tweet( message ,
-                      remainingRetry );
+            .
+            setRetry( getProperties().getConfigInteger( "retry" ,
+                                                        10 ) )
+            .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                             new Duration( 5000L ) ) )
+            .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                     2.0 ) )
+            .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                               500 ) )
+            .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                new Duration( 0L ) ) )
+            .execute();
     }
 }

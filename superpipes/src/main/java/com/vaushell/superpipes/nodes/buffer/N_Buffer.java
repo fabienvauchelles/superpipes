@@ -76,13 +76,6 @@ public class N_Buffer
                 slots.add( slot );
             }
         }
-
-        flowLimit = getProperties().getConfigDuration( "flow-limit" ,
-                                                       null );
-        waitMin = getProperties().getConfigInteger( "wait-min" ,
-                                                    null );
-        waitMax = getProperties().getConfigInteger( "wait-max" ,
-                                                    null );
     }
 
     // PROTECTED
@@ -174,11 +167,8 @@ public class N_Buffer
 
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Buffer.class );
-    private Duration flowLimit;
     private final List<Slot> slots;
     private final TreeSet<Long> messageIDs;
-    private Integer waitMin;
-    private Integer waitMax;
     private DateTime lastWrite;
     private Path messagesPath;
     private final Random rnd;
@@ -208,13 +198,12 @@ public class N_Buffer
         final DateTime now = new DateTime();
 
         final Duration delta;
-        if ( waitMin == null || waitMax == null )
+        if ( getProperties().containsKey( "wait-min" ) && getProperties().containsKey( "wait-max" ) )
         {
-            delta = new Duration( 0L );
-        }
-        else
-        {
-            if ( waitMin.equals( waitMax ) )
+            final int waitMin = getProperties().getConfigInteger( "wait-min" );
+            final int waitMax = getProperties().getConfigInteger( "wait-max" );
+
+            if ( waitMin == waitMax )
             {
                 delta = new Duration( (long) waitMin );
             }
@@ -222,6 +211,10 @@ public class N_Buffer
             {
                 delta = new Duration( (long) ( rnd.nextInt( waitMax - waitMin ) + waitMin ) );
             }
+        }
+        else
+        {
+            delta = new Duration( 0L );
         }
 
         final DateTime ID;
@@ -288,12 +281,12 @@ public class N_Buffer
         }
 
         // Anti burst
-        if ( flowLimit != null && lastWrite != null )
+        if ( getProperties().containsKey( "flow-limit" ) && lastWrite != null )
         {
             final Duration diff = new Duration( lastWrite ,
                                                 from );
 
-            final Duration toAdd = flowLimit.minus( diff );
+            final Duration toAdd = getProperties().getConfigDuration( "flow-limit" ).minus( diff );
             if ( toAdd.isLongerThan( minDuration ) )
             {
                 minDuration = toAdd;

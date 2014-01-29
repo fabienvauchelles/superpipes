@@ -49,7 +49,6 @@ public class N_LNK
                null );
 
         this.client = new LinkedInClient();
-        this.forcedTarget = null;
     }
 
     // PROTECTED
@@ -64,9 +63,6 @@ public class N_LNK
                       getProperties().getConfigString( "secret" ) ,
                       tokenPath ,
                       getDispatcher().getVCodeFactory().create( "[" + getClass().getName() + " / " + getNodeID() + "] " ) );
-
-        forcedTarget = getProperties().getConfigString( "userid" ,
-                                                        null );
     }
 
     @Override
@@ -81,7 +77,8 @@ public class N_LNK
         final int max = getProperties().getConfigInteger( "max" );
 
         int count = 0;
-        final Iterator<LNK_Status> it = client.iteratorFeed( forcedTarget ,
+        final Iterator<LNK_Status> it = client.iteratorFeed( getProperties().getConfigString( "userid" ,
+                                                                                              null ) ,
                                                              Math.min( POST_MAX_COUNT ,
                                                                        max ) );
         while ( it.hasNext() && count < max )
@@ -159,5 +156,4 @@ public class N_LNK
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
     private static final int POST_MAX_COUNT = 250;
     private final LinkedInClient client;
-    private String forcedTarget;
 }

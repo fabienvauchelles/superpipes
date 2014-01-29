@@ -24,10 +24,11 @@ import com.vaushell.shaarlijavaapi.ShaarliTemplates;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.dispatch.Tags;
 import com.vaushell.superpipes.nodes.A_Node;
+import com.vaushell.superpipes.tools.retry.A_Retry;
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -67,14 +68,6 @@ public class N_Shaarli_Post
                                cTemplate.getString( "[@regex]" ) );
             }
         }
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -117,24 +110,53 @@ public class N_Shaarli_Post
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
         final Tags tags = (Tags) getMessage().getProperty( Message.KeyIndex.TAGS );
 
-        final String ID = createLink( uri == null ? null : uri.toString() ,
-                                      (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
-                                      (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
-                                      tags == null ? Collections.EMPTY_SET : tags.getAll() ,
-                                      retry );
+        final String ID = new A_Retry<String>()
+        {
+
+            @Override
+            protected String executeContent()
+                throws IOException
+            {
+                final String title = (String) getMessage().getProperty( Message.KeyIndex.TITLE );
+
+                final String ID = client.createLink( uri == null ? null : uri.toString() ,
+                                                     title ,
+                                                     (String) getMessage().getProperty( Message.KeyIndex.DESCRIPTION ) ,
+                                                     tags == null ? Collections.EMPTY_SET : tags.getAll() ,
+                                                     false );
+
+                if ( ID == null || ID.isEmpty() )
+                {
+                    throw new IOException( "Cannot post link with title=" + title );
+                }
+                else
+                {
+                    return ID;
+                }
+            }
+
+        }
+            .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                         10 ) )
+            .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                             new Duration( 5000L ) ) )
+            .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                     2.0 ) )
+            .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                               500 ) )
+            .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                new Duration( 0L ) ) )
+            .execute();
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        if ( ID != null && !ID.isEmpty() )
-        {
-            getMessage().setProperty( "id-shaarli" ,
-                                      ID );
+        getMessage().setProperty( "id-shaarli" ,
+                                  ID );
 
-            sendMessage();
-        }
+        sendMessage();
     }
 
     @Override
@@ -147,59 +169,4 @@ public class N_Shaarli_Post
     private static final Logger LOGGER = LoggerFactory.getLogger( N_Shaarli_Post.class );
     private ShaarliClient client;
     private final ShaarliTemplates templates;
-    private int retry;
-    private Duration delayBetweenRetry;
-
-    private String createLink( final String uri ,
-                               final String title ,
-                               final String description ,
-                               final Set<String> tags ,
-                               final int remainingRetry )
-    {
-        try
-        {
-            final String ID = client.createLink( uri ,
-                                                 title ,
-                                                 description ,
-                                                 tags ,
-                                                 false );
-
-            if ( ID == null || ID.isEmpty() )
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return ID;
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return createLink( uri ,
-                           title ,
-                           description ,
-                           tags ,
-                           remainingRetry - 1 );
-    }
 }

@@ -21,12 +21,12 @@ package com.vaushell.superpipes.nodes.twitter;
 
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
+import com.vaushell.superpipes.tools.retry.A_Retry;
 import com.vaushell.superpipes.tools.scribe.OAuthException;
 import com.vaushell.superpipes.tools.scribe.twitter.TwitterClient;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +46,6 @@ public class N_TW_Delete
                SECURE_ANTIBURST );
 
         this.client = new TwitterClient();
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -94,23 +79,40 @@ public class N_TW_Delete
         {
             final long ID = (long) getMessage().getProperty( "id-twitter" );
 
-            if ( deleteTweet( ID ,
-                              retry ) )
+            new A_Retry<Void>()
             {
-                if ( LOGGER.isTraceEnabled() )
+                @Override
+                protected Void executeContent()
+                    throws IOException , OAuthException
                 {
-                    LOGGER.trace( "[" + getNodeID() + "] can delete tweet ID=" + ID );
+                    if ( client.deleteTweet( ID ) )
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        throw new IOException( "Can't delete post with ID=" + ID );
+                    }
                 }
+            }
+                .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                             10 ) )
+                .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                                 new Duration( 5000L ) ) )
+                .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                         2.0 ) )
+                .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                                   500 ) )
+                .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                    new Duration( 0L ) ) )
+                .execute();
 
-                sendMessage();
-            }
-            else
+            if ( LOGGER.isTraceEnabled() )
             {
-                if ( LOGGER.isTraceEnabled() )
-                {
-                    LOGGER.trace( "[" + getNodeID() + "] cannot delete tweet ID=" + ID );
-                }
+                LOGGER.trace( "[" + getNodeID() + "] can delete tweet ID=" + ID );
             }
+
+            sendMessage();
         }
     }
 
@@ -123,49 +125,4 @@ public class N_TW_Delete
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Delete.class );
     private final TwitterClient client;
-    private int retry;
-    private Duration delayBetweenRetry;
-
-    private boolean deleteTweet( final long ID ,
-                                 final int remainingRetry )
-        throws IOException , OAuthException
-    {
-        try
-        {
-            if ( client.deleteTweet( ID ) )
-            {
-                return true;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return false;
-                }
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return deleteTweet( ID ,
-                            remainingRetry - 1 );
-    }
-
 }

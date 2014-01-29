@@ -27,7 +27,6 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +45,6 @@ public class N_TB
                DEFAULT_ANTIBURST );
 
         this.client = new TumblrClient();
-        this.blogname = null;
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        blogname = getProperties().getConfigString( "blogname" );
     }
 
     // PROTECTED
@@ -85,7 +74,7 @@ public class N_TB
         final int max = getProperties().getConfigInteger( "max" );
 
         int count = 0;
-        final Iterator<TB_Post> it = client.iteratorFeed( blogname ,
+        final Iterator<TB_Post> it = client.iteratorFeed( getProperties().getConfigString( "blogname" ) ,
                                                           Math.min( POST_MAX_COUNT ,
                                                                     max ) );
         while ( it.hasNext() && count < max )
@@ -154,5 +143,4 @@ public class N_TB
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TB.class );
     private final TumblrClient client;
     private static final int POST_MAX_COUNT = 20;
-    private String blogname;
 }

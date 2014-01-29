@@ -21,12 +21,12 @@ package com.vaushell.superpipes.nodes.tumblr;
 
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
+import com.vaushell.superpipes.tools.retry.A_Retry;
 import com.vaushell.superpipes.tools.scribe.tumblr.TumblrClient;
 import com.vaushell.superpipes.tools.scribe.tumblr.TumblrException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,24 +46,6 @@ public class N_TB_Delete
                LIGHT_ANTIBURST );
 
         this.client = new TumblrClient();
-        this.blogname = null;
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
-
-        blogname = getProperties().getConfigString( "blogname" );
     }
 
     // PROTECTED
@@ -98,23 +80,42 @@ public class N_TB_Delete
         {
             final long ID = (long) getMessage().getProperty( "id-tumblr" );
 
-            if ( deletePost( ID ,
-                             retry ) )
+            new A_Retry<Void>()
             {
-                if ( LOGGER.isTraceEnabled() )
+                @Override
+                protected Void executeContent()
+                    throws IOException , TumblrException
                 {
-                    LOGGER.trace( "[" + getNodeID() + "] can delete post ID=" + ID );
+                    if ( client.deletePost( getProperties().getConfigString( "blogname" ) ,
+                                            ID ) )
+                    {
+                        return null;
+                    }
+                    else
+                    {
+                        throw new IOException( "Can't delete post with ID=" + ID );
+                    }
                 }
 
-                sendMessage();
             }
-            else
+                .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                             10 ) )
+                .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                                 new Duration( 5000L ) ) )
+                .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                         2.0 ) )
+                .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                                   500 ) )
+                .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                    new Duration( 0L ) ) )
+                .execute();
+
+            if ( LOGGER.isTraceEnabled() )
             {
-                if ( LOGGER.isTraceEnabled() )
-                {
-                    LOGGER.trace( "[" + getNodeID() + "] cannot delete post ID=" + ID );
-                }
+                LOGGER.trace( "[" + getNodeID() + "] can delete post ID=" + ID );
             }
+
+            sendMessage();
         }
     }
 
@@ -127,50 +128,4 @@ public class N_TB_Delete
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TB_Delete.class );
     private final TumblrClient client;
-    private int retry;
-    private Duration delayBetweenRetry;
-    private String blogname;
-
-    private boolean deletePost( final long ID ,
-                                final int remainingRetry )
-        throws IOException , TumblrException
-    {
-        try
-        {
-            if ( client.deletePost( blogname ,
-                                    ID ) )
-            {
-                return true;
-            }
-            else
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return false;
-                }
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return deletePost( ID ,
-                           remainingRetry - 1 );
-    }
 }

@@ -22,13 +22,13 @@ package com.vaushell.superpipes.nodes.linkedin;
 import com.vaushell.superpipes.dispatch.Message;
 import com.vaushell.superpipes.nodes.A_Node;
 import com.vaushell.superpipes.nodes.twitter.N_TW_Post;
+import com.vaushell.superpipes.tools.retry.A_Retry;
 import com.vaushell.superpipes.tools.scribe.OAuthException;
 import com.vaushell.superpipes.tools.scribe.linkedin.LinkedInClient;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,21 +48,6 @@ public class N_LNK_Post
                DEFAULT_ANTIBURST );
 
         this.client = new LinkedInClient();
-    }
-
-    @Override
-    public void load( final HierarchicalConfiguration cNode )
-        throws Exception
-    {
-        super.load( cNode );
-
-        // Load retry count if exists.
-        retry = getProperties().getConfigInteger( "retry" ,
-                                                  3 );
-
-        // Load delay between retry if exists.
-        delayBetweenRetry = getProperties().getConfigDuration( "delay-between-retry" ,
-                                                               new Duration( 5L * 1000L ) );
     }
 
     // PROTECTED
@@ -100,7 +85,7 @@ public class N_LNK_Post
 
         // Send to Twitter
         final URI uri = (URI) getMessage().getProperty( Message.KeyIndex.URI );
-        String uriStr;
+        final String uriStr;
         if ( uri == null )
         {
             uriStr = null;
@@ -110,23 +95,50 @@ public class N_LNK_Post
             uriStr = uri.toString();
         }
 
-        final String ID = postLink( (String) getMessage().getProperty( Message.KeyIndex.CONTENT ) ,
-                                    uriStr ,
-                                    (String) getMessage().getProperty( Message.KeyIndex.TITLE ) ,
-                                    retry );
+        final String ID = new A_Retry<String>()
+        {
+            @Override
+            protected String executeContent()
+                throws IOException , OAuthException
+            {
+                final String title = (String) getMessage().getProperty( Message.KeyIndex.TITLE );
+
+                final String ID = client.postLink( (String) getMessage().getProperty( Message.KeyIndex.CONTENT ) ,
+                                                   uriStr ,
+                                                   title ,
+                                                   null );
+
+                if ( ID == null || ID.isEmpty() )
+                {
+                    throw new IOException( "Cannot post status with title=" + title );
+                }
+                else
+                {
+                    return ID;
+                }
+            }
+        }
+            .setRetry( getProperties().getConfigInteger( "retry" ,
+                                                         10 ) )
+            .setWaitTime( getProperties().getConfigDuration( "wait-time" ,
+                                                             new Duration( 5000L ) ) )
+            .setWaitTimeMultiplier( getProperties().getConfigDouble( "wait-time-multiplier" ,
+                                                                     2.0 ) )
+            .setJitterRange( getProperties().getConfigInteger( "jitter-range" ,
+                                                               500 ) )
+            .setMaxDuration( getProperties().getConfigDuration( "max-duration" ,
+                                                                new Duration( 0L ) ) )
+            .execute();
 
         if ( LOGGER.isTraceEnabled() )
         {
             LOGGER.trace( "[" + getNodeID() + "] receive ID : " + ID );
         }
 
-        if ( ID != null && !ID.isEmpty() )
-        {
-            getMessage().setProperty( "id-linkedin" ,
-                                      ID );
+        getMessage().setProperty( "id-linkedin" ,
+                                  ID );
 
-            sendMessage();
-        }
+        sendMessage();
     }
 
     @Override
@@ -138,57 +150,4 @@ public class N_LNK_Post
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( N_TW_Post.class );
     private final LinkedInClient client;
-    private int retry;
-    private Duration delayBetweenRetry;
-
-    private String postLink( final String message ,
-                             final String uriStr ,
-                             final String title ,
-                             final int remainingRetry )
-        throws IOException , OAuthException
-    {
-        try
-        {
-            final String ID = client.postLink( message ,
-                                               uriStr ,
-                                               title ,
-                                               null );
-
-            if ( ID == null || ID.isEmpty() )
-            {
-                if ( remainingRetry <= 0 )
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                return ID;
-            }
-        }
-        catch( final Throwable ex )
-        {
-            if ( remainingRetry <= 0 )
-            {
-                throw ex;
-            }
-        }
-
-        if ( delayBetweenRetry.getMillis() > 0L )
-        {
-            try
-            {
-                Thread.sleep( delayBetweenRetry.getMillis() );
-            }
-            catch( final InterruptedException ex )
-            {
-                // Ignore
-            }
-        }
-
-        return postLink( message ,
-                         uriStr ,
-                         title ,
-                         remainingRetry - 1 );
-    }
 }
