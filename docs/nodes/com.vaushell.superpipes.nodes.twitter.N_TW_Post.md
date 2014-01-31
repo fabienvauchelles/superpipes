@@ -30,7 +30,6 @@ See [How to create a Twitter application and get credentials](../tutorials/Creat
 
 Key | Description | Type | Required | Default value | Example value
  --- | --- | --- | --- | --- | ---
-timeout | Socket timeout in milliseconds. How long should I wait before the tweet is delivered ? | long | no | 20000 | 20000
 retry | How many times do I retry if the check fails ? | integer | no | 10 | 10
 wait-time | How long should I wait between 2 checks ? (in milliseconds) | long | no | 5000 | 5000
 wait-time-multiplier | How multiple I `wait-time` each time ? | double | no | 2.0 | 2.0
