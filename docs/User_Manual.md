@@ -378,6 +378,11 @@ I can add these transforms:
 </tr>
 
 <tr>
+<td><a href="transforms/com.vaushell.superpipes.transforms.rnd.T_RandomLinear.md">com.vaushell.superpipes.transforms.rnd.T_RandomLinear</a></td>
+<td>Keep only X percent of messages</td>
+</tr>
+
+<tr>
 <td><a href="transforms/com.vaushell.superpipes.transforms.tags.T_Tags.md">com.vaushell.superpipes.transforms.tags.T_Tags</a></td>
 <td>Keep message only if tags contain a set of tags</td>
 </tr>
