@@ -4,6 +4,8 @@
 
 ## Table of Contents
 
+<a href="#which-nodes-can-i-use-"><img alt="NodeList" src="https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/btnodeslist.png" /></a> <a href="#which-transforms-can-i-use-"><img alt="NodeList" src="https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/bttransformslist.png" /></a>
+
 * [How SuperPipes works ?](#how-superpipes-works-)
 * [How are the files organized ?](#how-are-the-files-organized-)
 * [How is the configuration file built ?](#how-is-the-configuration-file-built-)
