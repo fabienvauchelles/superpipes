@@ -47,7 +47,8 @@ public class TwitterClientTest
     public TwitterClientTest()
     {
         this.dispatcher = new Dispatcher();
-        this.client = new TwitterClient();
+        this.client1 = new TwitterClient();
+        this.client2 = new TwitterClient();
     }
 
     /**
@@ -79,14 +80,19 @@ public class TwitterClientTest
                          pDatas ,
                          new VC_FileFactory( pDatas ) );
 
-        // Test if parameters are set
         final ConfigProperties properties = dispatcher.getCommon( "twitter" );
 
-        // Create tokens & login
-        client.login( properties.getConfigString( "key" ) ,
-                      properties.getConfigString( "secret" ) ,
-                      dispatcher.getDatas().resolve( "test-tokens/twitter.token" ) ,
-                      dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
+        // Create tokens & login for client 1
+        client1.login( properties.getConfigString( "key" ) ,
+                       properties.getConfigString( "secret" ) ,
+                       dispatcher.getDatas().resolve( "test-tokens/twitter.token" ) ,
+                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
+
+        // Create tokens & login for client 2
+        client2.login( properties.getConfigString( "key" ) ,
+                       properties.getConfigString( "secret" ) ,
+                       dispatcher.getDatas().resolve( "test-tokens/twitter2.token" ) ,
+                       dispatcher.getVCodeFactory().create( "[" + getClass().getName() + "] " ) );
     }
 
     /**
@@ -101,13 +107,13 @@ public class TwitterClientTest
         // Post
         final String message = "Bloggé de codé de Fabien Vauchelles (http://bit.ly/Ijk3of) #java at " + new DateTime().getMillis();
 
-        final long ID = client.tweet( message );
+        final long ID = client1.tweet( message );
 
         assertTrue( "ID should be return" ,
                     ID >= 0 );
 
         // Read
-        final TW_Tweet tweet = client.readTweet( ID );
+        final TW_Tweet tweet = client1.readTweet( ID );
 
         assertEquals( "ID should be the same" ,
                       ID ,
@@ -121,7 +127,7 @@ public class TwitterClientTest
 
         // Delete
         assertTrue( "Delete should work" ,
-                    client.deleteTweet( ID ) );
+                    client1.deleteTweet( ID ) );
     }
 
     /**
@@ -137,17 +143,17 @@ public class TwitterClientTest
         throws Exception
     {
         // Post
-        final long ID = client.tweet( "Allez voir mon blog #" + new DateTime().getMillis() );
+        final long ID = client1.tweet( "Allez voir mon blog #" + new DateTime().getMillis() );
 
         assertTrue( "ID should be return" ,
                     ID >= 0 );
 
         // Delete
         assertTrue( "Delete should work" ,
-                    client.deleteTweet( ID ) );
+                    client1.deleteTweet( ID ) );
 
         // Read
-        client.readTweet( ID );
+        client1.readTweet( ID );
     }
 
     /**
@@ -165,15 +171,15 @@ public class TwitterClientTest
         final long ID;
         try( InputStream is = getClass().getResourceAsStream( "/media.png" ) )
         {
-            ID = client.tweetPicture( message ,
-                                      is );
+            ID = client1.tweetPicture( message ,
+                                       is );
 
             assertTrue( "ID should be return" ,
                         ID >= 0 );
         }
 
         // Read
-        final TW_Tweet tweet = client.readTweet( ID );
+        final TW_Tweet tweet = client1.readTweet( ID );
 
         assertEquals( "ID should be the same" ,
                       ID ,
@@ -186,7 +192,7 @@ public class TwitterClientTest
 
         // Delete
         assertTrue( "Delete should work" ,
-                    client.deleteTweet( ID ) );
+                    client1.deleteTweet( ID ) );
     }
 
     /**
@@ -200,28 +206,28 @@ public class TwitterClientTest
     {
         // Tweet 1
         final String message1 = "Allez voir mon blog n°1" + new DateTime().getMillis();
-        final long ID1 = client.tweet( message1 );
+        final long ID1 = client1.tweet( message1 );
 
         assertTrue( "ID1 should be return" ,
                     ID1 >= 0 );
 
         // Tweet 2
         final String message2 = "Allez voir mon blog n°2" + new DateTime().getMillis();
-        final long ID2 = client.tweet( message2 );
+        final long ID2 = client1.tweet( message2 );
 
         assertTrue( "ID2 should be return" ,
                     ID2 >= 0 );
 
         // Tweet 3
         final String message3 = "Allez voir mon blog n°3" + new DateTime().getMillis();
-        final long ID3 = client.tweet( message3 );
+        final long ID3 = client1.tweet( message3 );
 
         assertTrue( "ID3 should be return" ,
                     ID3 >= 0 );
 
         // Retrieve Tweet
-        final List<TW_Tweet> tweets = client.readTimeline( null ,
-                                                           3 );
+        final List<TW_Tweet> tweets = client1.readTimeline( null ,
+                                                            3 );
         assertEquals( "We should have 3 tweets" ,
                       3 ,
                       tweets.size() );
@@ -254,8 +260,8 @@ public class TwitterClientTest
                       tweet1.getMessage() );
 
         // Check iterator
-        final Iterator<TW_Tweet> it = client.iteratorTimeline( null ,
-                                                               1 );
+        final Iterator<TW_Tweet> it = client1.iteratorTimeline( null ,
+                                                                1 );
         assertTrue( "We should have result" ,
                     it.hasNext() );
         assertEquals( "IDs should be the same" ,
@@ -276,18 +282,51 @@ public class TwitterClientTest
 
         // Delete Tweet 3
         assertTrue( "Delete should work" ,
-                    client.deleteTweet( ID3 ) );
+                    client1.deleteTweet( ID3 ) );
 
         // Delete Tweet 2
         assertTrue( "Delete should work" ,
-                    client.deleteTweet( ID2 ) );
+                    client1.deleteTweet( ID2 ) );
 
         // Delete Tweet 1
         assertTrue( "Delete should work" ,
-                    client.deleteTweet( ID1 ) );
+                    client1.deleteTweet( ID1 ) );
+    }
+
+    /**
+     * Test retweet.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testRetweet()
+        throws Exception
+    {
+        // Post
+        final String message = "Blogge codé de Fabien Vauchelles (http://bit.ly/Ijk3of) #java at " + new DateTime().getMillis();
+
+        final long ID = client1.tweet( message );
+
+        assertTrue( "ID should be return" ,
+                    ID >= 0 );
+
+        // Retweet
+        final long ID2 = client2.retweet( ID );
+
+        assertTrue( "ID should be return" ,
+                    ID2 >= 0 );
+
+        // Delete Retweet
+        assertTrue( "Delete should work" ,
+                    client2.deleteTweet( ID2 ) );
+
+        // Delete Tweet
+        assertTrue( "Delete should work" ,
+                    client1.deleteTweet( ID ) );
     }
 
     // PRIVATE
     private final Dispatcher dispatcher;
-    private final TwitterClient client;
+    private final TwitterClient client1;
+    private final TwitterClient client2;
 }

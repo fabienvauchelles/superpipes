@@ -442,6 +442,43 @@ public class TwitterClient
             private Long maxID;
         };
     }
+
+    /**
+     * Retweet a tweet.
+     *
+     * @param ID Tweet's ID
+     * @return Retweet's ID
+     * @throws IOException
+     * @throws OAuthException
+     */
+    public long retweet( final long ID )
+        throws IOException , OAuthException
+    {
+        if ( ID < 0 )
+        {
+            throw new IllegalArgumentException();
+        }
+
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace(
+                "[" + getClass().getSimpleName() + "] retweet() : ID=" + ID );
+        }
+
+        final OAuthRequest request = new OAuthRequest( Verb.POST ,
+                                                       "https://api.twitter.com/1.1/statuses/retweet/" + Long.toString( ID ) + ".json" );
+
+        final Response response = sendSignedRequest( request );
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final JsonNode node = (JsonNode) mapper.readTree( response.getStream() );
+
+        checkErrors( response ,
+                     node );
+
+        return node.get( "id" ).asLong();
+    }
+
     // PRIVATE
     private static final Logger LOGGER = LoggerFactory.getLogger( TwitterClient.class );
     private final DateTimeFormatter fmt;
