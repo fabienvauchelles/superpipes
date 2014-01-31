@@ -95,9 +95,11 @@ public class N_TW_PostTest
         throws Exception
     {
         // Construct path
+        final ConfigProperties properties = dispatcher.getCommon( "twitter" );
+
         final A_Node nTwitter = dispatcher.addNode( "twitter" ,
                                                     N_TW_Post.class ,
-                                                    Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
+                                                    Arrays.asList( properties ) );
         nTwitter.addTransformIN( T_FindBiggest.class ,
                                  ConfigProperties.EMPTY_COMMONS );
         nTwitter.addTransformIN( T_Shorten.class ,
@@ -107,13 +109,13 @@ public class N_TW_PostTest
                                                                                    N_ReceiveBlocking.class ,
                                                                                    ConfigProperties.EMPTY_COMMONS );
 
-        dispatcher.addNode( "delete" ,
+        dispatcher.addNode( "twitter-delete" ,
                             N_TW_Delete.class ,
-                            Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
+                            Arrays.asList( properties ) );
 
         dispatcher.addRoute( "twitter" ,
-                             "delete" );
-        dispatcher.addRoute( "delete" ,
+                             "twitter-delete" );
+        dispatcher.addRoute( "twitter-delete" ,
                              "receive" );
 
         // Start
@@ -171,9 +173,11 @@ public class N_TW_PostTest
         throws Exception
     {
         // Construct path
+        final ConfigProperties properties = dispatcher.getCommon( "twitter" );
+
         final A_Node nTwitter = dispatcher.addNode( "twitter" ,
                                                     N_TW_Post.class ,
-                                                    Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
+                                                    Arrays.asList( properties ) );
         nTwitter.addTransformIN( T_FindBiggest.class ,
                                  ConfigProperties.EMPTY_COMMONS );
         nTwitter.addTransformIN( T_Shorten.class ,
@@ -183,13 +187,13 @@ public class N_TW_PostTest
                                                                                    N_ReceiveBlocking.class ,
                                                                                    ConfigProperties.EMPTY_COMMONS );
 
-        dispatcher.addNode( "delete" ,
+        dispatcher.addNode( "twitter-delete" ,
                             N_TW_Delete.class ,
-                            Arrays.asList( dispatcher.getCommon( "twitter" ) ) );
+                            Arrays.asList( properties ) );
 
         dispatcher.addRoute( "twitter" ,
-                             "delete" );
-        dispatcher.addRoute( "delete" ,
+                             "twitter-delete" );
+        dispatcher.addRoute( "twitter-delete" ,
                              "receive" );
 
         // Start
@@ -224,6 +228,63 @@ public class N_TW_PostTest
                       "organize" ,
                       "task" ,
                       "todo" )
+        );
+
+        // Send it
+        nTwitter.receiveMessage( message );
+
+        // Wait to be receive
+        final Message messageRcv = nReceive.getProcessingMessageOrWait( new Duration( 10L * 1000L ) );
+        assertNotNull( "Message shouldn't be null" ,
+                       messageRcv );
+
+        // Stop
+        dispatcher.stopAndWait();
+    }
+
+    /**
+     * Send a tweet and retweet.
+     *
+     * @throws java.lang.Exception
+     */
+    @Test
+    public void testRetweet()
+        throws Exception
+    {
+        // Construct path
+        final ConfigProperties properties = dispatcher.getCommon( "twitter" );
+
+        final A_Node nTwitter = dispatcher.addNode( "twitter" ,
+                                                    N_TW_Post.class ,
+                                                    Arrays.asList( properties ) );
+
+        nTwitter.addTransformIN( T_Shorten.class ,
+                                 Arrays.asList( dispatcher.getCommon( "bitly" ) ) );
+
+        dispatcher.addNode( "twitter-retweet" ,
+                            N_TW_Post.class ,
+                            Arrays.asList( properties ) );
+
+        final N_ReceiveBlocking nReceive = (N_ReceiveBlocking) dispatcher.addNode( "receive" ,
+                                                                                   N_ReceiveBlocking.class ,
+                                                                                   ConfigProperties.EMPTY_COMMONS );
+
+        dispatcher.addRoute( "twitter" ,
+                             "twitter-retweet" );
+        dispatcher.addRoute( "twitter-retweet" ,
+                             "receive" );
+
+        // Start
+        dispatcher.start();
+
+        // Create the message
+        final Message message = Message.create(
+            Message.KeyIndex.TITLE ,
+            "My very cool blog" ,
+            Message.KeyIndex.PUBLISHED_DATE ,
+            new DateTime() ,
+            Message.KeyIndex.URI ,
+            URI.create( "http://www.thesecretweapon.org/" )
         );
 
         // Send it
