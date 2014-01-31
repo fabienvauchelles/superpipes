@@ -331,6 +331,11 @@ Delay the message:
 <td>Post a tweet</td>
 </tr>
 
+<tr>
+<td><a href="nodes/com.vaushell.superpipes.nodes.twitter.N_TW_Retweet.md">com.vaushell.superpipes.nodes.twitter.N_TW_Retweet</a></td>
+<td>Retweet a tweet</td>
+</tr>
+
 </table>
 
 ![Star](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/star24.png) very useful :)
