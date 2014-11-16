@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # What is SuperPipes ?
@@ -11,7 +11,7 @@ Imagine that your Twitter followers will be informed about cooking during their 
 
 This is the power of SuperPipes !
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/header_example.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/header_example.png)
 
 
 # Why should I use SuperPipes ?
@@ -26,7 +26,7 @@ This is the power of SuperPipes !
 
 Furthermore, most used services are available:
 
-![Facebook](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook64.png) | ![Twitter](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter64.png) | ![LinkedIn](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_small64.png) | ![Tumblr](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr64.png) | ![RSS](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/rss64.png) | ![Shaarli](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/shaarli64.png)
+![Facebook](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook64.png) | ![Twitter](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter64.png) | ![LinkedIn](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_small64.png) | ![Tumblr](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr64.png) | ![RSS](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/rss64.png) | ![Shaarli](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/shaarli64.png)
 :---:|:---:|:---:|:---:|:---:|:---:
 [Facebook](https://developers.facebook.com/) | [Twitter](https://dev.twitter.com/) | [LinkedIn](http://developer.linkedin.com/) | [Tumblr](http://www.tumblr.com/developers) | RSS | [Shaarli](http://sebsauvage.net/wiki/doku.php?id=php:shaarli)
 
