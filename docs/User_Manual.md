@@ -1,10 +1,10 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 # User manual
 
 ## Table of Contents
 
-<a href="#which-nodes-can-i-use-"><img alt="NodeList" src="https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/btnodeslist.png" /></a> <a href="#which-transforms-can-i-use-"><img alt="NodeList" src="https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/bttransformslist.png" /></a>
+<a href="#which-nodes-can-i-use-"><img alt="NodeList" src="https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/btnodeslist.png" /></a> <a href="#which-transforms-can-i-use-"><img alt="NodeList" src="https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/bttransformslist.png" /></a>
 
 * [How SuperPipes works ?](#how-superpipes-works-)
 * [How are the files organized ?](#how-are-the-files-organized-)
@@ -40,7 +40,7 @@ In addition, a node has a process that is repeated indefinitely.
 
 Here is a diagram example:
 
-![Diagram example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/flow_example.png)
+![Diagram example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/flow_example.png)
 
 
 ## How are the files organized ?
@@ -73,7 +73,7 @@ Superpipes uses an XML configuration file: `/usr/local/superpipes/conf/configura
 
 The file contains 4 sections:
 
-![Sections](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/xml-sections.png)
+![Sections](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/xml-sections.png)
 
 __Warning !__ The order of sections should be: mailer, commons, nodes and routes.
 
@@ -238,7 +238,7 @@ I can add these nodes:
 </tr>
 
 <tr>
-<td><img alt="star" src="https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/star24.png" /> <a href="nodes/com.vaushell.superpipes.nodes.buffer.N_Buffer.md">com.vaushell.superpipes.nodes.buffer.N_Buffer</a></td>
+<td><img alt="star" src="https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/star24.png" /> <a href="nodes/com.vaushell.superpipes.nodes.buffer.N_Buffer.md">com.vaushell.superpipes.nodes.buffer.N_Buffer</a></td>
 <td>
 Delay the message:
 <ul>
@@ -340,7 +340,7 @@ Delay the message:
 
 </table>
 
-![Star](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/star24.png) very useful :)
+![Star](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/star24.png) very useful :)
 
 
 ## Which transforms can I use ?
@@ -401,7 +401,7 @@ I can add these transforms:
 
 ### Post a message of my blog on Facebook and Twitter
 
-![Schema](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_blog_to_twitter_fb.png)
+![Schema](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_blog_to_twitter_fb.png)
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -477,7 +477,7 @@ I can add these transforms:
 
 ### Like all messages after the 20/01/2014, from a Facebook page, with my own account
 
-![Schema](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_facebook_like.png)
+![Schema](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_facebook_like.png)
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -553,7 +553,7 @@ I can add these transforms:
 
 ### Remove all tweets from a Twitter account
 
-![Schema](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/delete_twitter.png)
+![Schema](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/delete_twitter.png)
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -598,7 +598,7 @@ I can add these transforms:
 
 ### Remove all messages from a Facebook page
 
-![Schema](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/delete_facebook.png)
+![Schema](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/delete_facebook.png)
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -644,7 +644,7 @@ I can add these transforms:
 
 ### Migrate a Shaarli to another Shaarli
 
-![Schema](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_shaarli.png)
+![Schema](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_shaarli.png)
 
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
