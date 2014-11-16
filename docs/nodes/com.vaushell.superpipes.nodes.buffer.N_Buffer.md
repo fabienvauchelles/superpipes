@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_Buffer
@@ -44,7 +44,7 @@ endat | End time of the slot. Format is `HH:mm:ss`. This is exclusive. | date | 
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/buffer_example.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/buffer_example.png)
 
 I like all the messages of my product page:
 
