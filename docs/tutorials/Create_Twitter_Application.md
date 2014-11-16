@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Create a Twitter application
@@ -11,9 +11,9 @@ And get credentials.
 Sign in with your Twitter account at https://dev.twitter.com/
 
 
-![Step1](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_signin.png)
+![Step1](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_signin.png)
 
-![Step1b](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_signin2.png)
+![Step1b](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_signin2.png)
 
 ---
 
@@ -21,7 +21,7 @@ Sign in with your Twitter account at https://dev.twitter.com/
 
 Go to your applications
 
-![Step2](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_apps.png)
+![Step2](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_apps.png)
 
 ---
 
@@ -29,7 +29,7 @@ Go to your applications
 
 Create a new application
 
-![Step3](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_create_app.png)
+![Step3](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_create_app.png)
 
 ---
 
@@ -37,7 +37,7 @@ Create a new application
 
 Enter the basic information
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_info.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_info.png)
 
 ---
 
@@ -45,7 +45,7 @@ Enter the basic information
 
 Complete the creation
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_info2.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_info2.png)
 
 ---
 
@@ -53,7 +53,7 @@ Complete the creation
 
 Get application key and secret
 
-![Step6](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_credentials.png)
+![Step6](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_credentials.png)
 
 ---
 
@@ -61,7 +61,7 @@ Get application key and secret
 
 Go to Settings
 
-![Step7](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_settings.png)
+![Step7](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_settings.png)
 
 ---
 
@@ -69,9 +69,9 @@ Go to Settings
 
 Change access type to "Read and Write"
 
-![Step8](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_rights.png)
+![Step8](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_rights.png)
 
-![Step8b](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_ok.png)
+![Step8b](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_ok.png)
 
 
 __It's over !__

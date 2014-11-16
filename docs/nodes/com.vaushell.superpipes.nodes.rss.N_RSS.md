@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_RSS
@@ -26,7 +26,7 @@ max | Number of messages to read. | integer | yes | N/A | 50
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_blog_to_fb.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_blog_to_fb.png)
 
 I read all messages of my RSS feed 'http://feeds.feedburner.com/fabienvauchelles' every 15 minutes:
 

@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_Shaarli
@@ -42,7 +42,7 @@ regex | See the documentation Shaari JAVA API | regular expression | yes | (empt
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_shaarli.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_shaarli.png)
 
 I read 50 links of my Shaarli feed 'http://feeds.feedburner.com/lesliensducode' every 15 minutes:
 

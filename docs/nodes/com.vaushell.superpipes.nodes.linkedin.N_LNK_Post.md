@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_LNK_Post
@@ -37,7 +37,7 @@ secret | Application Secret | string | yes | N/A | 012345679abcdef0123456
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_blog_to_linked.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_blog_to_linked.png)
 
 I post a message from my blog to my LinkedIn profile:
 

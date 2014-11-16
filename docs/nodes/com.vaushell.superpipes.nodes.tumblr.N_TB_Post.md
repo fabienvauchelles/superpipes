@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_TB_Post
@@ -37,7 +37,7 @@ blogname | Name of the blog (such as lesliensducode.tumblr.com) | string | no | 
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_tumblr.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_tumblr.png)
 
 I post a message from a Tumblr blog to my new Tumblr blog 'lesliensducode.tumblr.com':
 

@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Link our Facebook application with SuperPipes
@@ -37,7 +37,7 @@ Remember the node on which we perform the authentication (here: `facebook-fabien
 
 Then copy the URL authentication:
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link1.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link1.png)
 
 ---
 
@@ -45,7 +45,7 @@ Then copy the URL authentication:
 
 Paste the URL in the browser:
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link2.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link2.png)
 
 ---
 
@@ -53,7 +53,7 @@ Paste the URL in the browser:
 
 Authenticate with the correct account:
 
-![Step6](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link3.png)
+![Step6](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link3.png)
 
 Then allow the application to access our account.
 
@@ -65,11 +65,11 @@ __Be quick !__
 
 Copy the returned URL:
 
-![Step7](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link4.png)
+![Step7](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link4.png)
 
 Because Facebook redirects to a blank page:
 
-![Step7b](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link5.png)
+![Step7b](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link5.png)
 
 ---
 
@@ -77,7 +77,7 @@ Because Facebook redirects to a blank page:
 
 Paste the URL to retrieve the verification code and copy it. It is indicated after "code=":
 
-![Step8](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link6.png)
+![Step8](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link6.png)
 
 ---
 
@@ -85,6 +85,6 @@ Paste the URL to retrieve the verification code and copy it. It is indicated aft
 
 Paste the verification code into SuperPipes:
 
-![Step9](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/facebook_link7.png)
+![Step9](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/facebook_link7.png)
 
 __It's done !__

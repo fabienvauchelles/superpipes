@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_TW_Post
@@ -41,7 +41,7 @@ secret | Application Secret | string | yes | N/A | lqsdlERTO345zerlsdf3459zsflze
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_twitter.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_twitter.png)
 
 I post a tweet from another wall to my wall:
 

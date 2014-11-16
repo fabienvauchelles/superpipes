@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_TW_Delete
@@ -36,7 +36,7 @@ secret | Application Secret | string | yes | N/A | lqsdlERTO345zerlsdf3459zsflze
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/delete_twitter.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/delete_twitter.png)
 
 I delete all tweets of my wall:
 

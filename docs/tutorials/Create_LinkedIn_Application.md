@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Create a LinkedIn application
@@ -10,7 +10,7 @@ And get credentials.
 
 Sign in with your LinkedIn account at : http://developer.linkedin.com/
 
-![Step1](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_signin.png)
+![Step1](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_signin.png)
 
 ---
 
@@ -18,7 +18,7 @@ Sign in with your LinkedIn account at : http://developer.linkedin.com/
 
 Give access to your account
 
-![Step2](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_access.png)
+![Step2](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_access.png)
 
 ---
 
@@ -26,7 +26,7 @@ Give access to your account
 
 Go to the application list "API Keys"
 
-![Step3](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_menu.png)
+![Step3](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_menu.png)
 
 ---
 
@@ -34,7 +34,7 @@ Go to the application list "API Keys"
 
 Create a new application
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_create_app.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_create_app.png)
 
 ---
 
@@ -42,7 +42,7 @@ Create a new application
 
 Enter the basic information
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_info.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_info.png)
 
 ---
 
@@ -50,7 +50,7 @@ Enter the basic information
 
 Give rights "r_basicprofile", "r_fullprofile" and "rw_nus"
 
-![Step6](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_info2.png)
+![Step6](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_info2.png)
 
 ---
 
@@ -58,7 +58,7 @@ Give rights "r_basicprofile", "r_fullprofile" and "rw_nus"
 
 Get application key and secret
 
-![Step7](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_credentials.png)
+![Step7](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_credentials.png)
 
 
 __It's over !__

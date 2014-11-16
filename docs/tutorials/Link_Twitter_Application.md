@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Link our Twitter application with SuperPipes
@@ -37,7 +37,7 @@ Remember the node on which we perform the authentication (here: `twitter-fabienv
 
 Then copy the URL authentication:
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_link1.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_link1.png)
 
 ---
 
@@ -45,7 +45,7 @@ Then copy the URL authentication:
 
 Paste the URL in the browser:
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_link2.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_link2.png)
 
 ---
 
@@ -53,7 +53,7 @@ Paste the URL in the browser:
 
 Authenticate with the correct account:
 
-![Step6](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_link3.png)
+![Step6](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_link3.png)
 
 ---
 
@@ -61,7 +61,7 @@ Authenticate with the correct account:
 
 Copy the verification code:
 
-![Step7](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_link4.png)
+![Step7](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_link4.png)
 
 ---
 
@@ -69,6 +69,6 @@ Copy the verification code:
 
 Paste the verification code into SuperPipes:
 
-![Step8](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/twitter_link5.png)
+![Step8](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/twitter_link5.png)
 
 __It's done !__

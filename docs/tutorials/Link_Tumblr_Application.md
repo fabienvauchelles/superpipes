@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Link our Tumblr application with SuperPipes
@@ -38,7 +38,7 @@ Remember the node on which we perform the authentication (here: tumblr-fabienvau
 
 Then copy the URL authentication:
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link1.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link1.png)
 
 ---
 
@@ -46,7 +46,7 @@ Then copy the URL authentication:
 
 Paste the URL in the browser:
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link2.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link2.png)
 
 ---
 
@@ -54,7 +54,7 @@ Paste the URL in the browser:
 
 Authenticate with the correct account:
 
-![Step6](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link3.png)
+![Step6](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link3.png)
 
 ---
 
@@ -62,7 +62,7 @@ Authenticate with the correct account:
 
 Allow the application to access our account:
 
-![Step7](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link4.png)
+![Step7](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link4.png)
 
 ---
 
@@ -70,7 +70,7 @@ Allow the application to access our account:
 
 In the URL returned by Tumblr, copy the verification code. It is indicated after "oauth_verifier=":
 
-![Step8](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link5.png)
+![Step8](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link5.png)
 
 ---
 
@@ -78,6 +78,6 @@ In the URL returned by Tumblr, copy the verification code. It is indicated after
 
 Paste the verification code into SuperPipes:
 
-![Step9](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link6.png)
+![Step9](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_link6.png)
 
 __It's done !__

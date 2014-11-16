@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_Shaarli_Post
@@ -46,7 +46,7 @@ regex | See the documentation Shaari JAVA API | regular expression | yes | (empt
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_shaarli.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/example_migrate_shaarli.png)
 
 I post links of [Sebsauvage's Shaarli](http://sebsauvage.net/links) to my Shaarli 'http://feeds.feedburner.com/lesliensducode':
 

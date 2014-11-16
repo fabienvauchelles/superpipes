@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Create a Tumblr application
@@ -18,7 +18,7 @@ Go to the developer website : http://www.tumblr.com/oauth/apps
 
 And create a new application
 
-![Step2](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_create_app.png)
+![Step2](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_create_app.png)
 
 ---
 
@@ -26,7 +26,7 @@ And create a new application
 
 Enter the basic information
 
-![Step3](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_info.png)
+![Step3](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_info.png)
 
 ---
 
@@ -34,7 +34,7 @@ Enter the basic information
 
 Show application secret
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_show_secret.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_show_secret.png)
 
 ---
 
@@ -42,7 +42,7 @@ Show application secret
 
 Get application key and secret
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/tumblr_get_credentials.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/tumblr_get_credentials.png)
 
 
 __It's over !__

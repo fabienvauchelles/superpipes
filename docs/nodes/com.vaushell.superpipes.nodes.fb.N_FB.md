@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Node: N_FB
@@ -34,7 +34,7 @@ max | Number of messages to read. | integer | yes | N/A | 50
 
 ## Use example
 
-![Example](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/buffer_example.png)
+![Example](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/buffer_example.png)
 
 I read 50 messages of my page 'Les liens du code' every 15 minutes:
 

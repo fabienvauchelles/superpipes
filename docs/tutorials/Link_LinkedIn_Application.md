@@ -1,4 +1,4 @@
-![SuperPipes](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
+![SuperPipes](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/logo_slogan238.png)
 
 
 # Link our LinkedIn application with SuperPipes
@@ -37,7 +37,7 @@ Remember the node on which we perform the authentication (here: `linkedin-fabien
 
 Then copy the URL authentication:
 
-![Step4](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link1.png)
+![Step4](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link1.png)
 
 ---
 
@@ -45,7 +45,7 @@ Then copy the URL authentication:
 
 Paste the URL in the browser:
 
-![Step5](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link2.png)
+![Step5](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link2.png)
 
 ---
 
@@ -55,7 +55,7 @@ Authenticate with the correct account.
 
 Then allow the application to access our account :
 
-![Step6](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link3.png)
+![Step6](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link3.png)
 
 ---
 
@@ -63,7 +63,7 @@ Then allow the application to access our account :
 
 In the URL returned by LinkedIn, copy the verification code. It is indicated after "oauth_verifier=":
 
-![Step7](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link4.png)
+![Step7](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link4.png)
 
 ---
 
@@ -71,6 +71,6 @@ In the URL returned by LinkedIn, copy the verification code. It is indicated aft
 
 Paste the verification code into SuperPipes:
 
-![Step8](https://raw2.github.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link5.png)
+![Step8](https://raw.githubusercontent.com/fabienvauchelles/superpipes/master/docs/images/linkedin_link5.png)
 
 __It's done !__
